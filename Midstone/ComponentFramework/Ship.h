@@ -1,7 +1,6 @@
 #pragma once
 #include "Actor.h"
 #include "Body.h"
-
 class Body;
 
 class Ship :
