@@ -98,6 +98,8 @@ StyleCopReport.xml
 *.svclog
 *.scc
 
+!Midstone/ComponentFramework/meshes/*.obj
+
 # Chutzpah Test files
 _Chutzpah*
 
