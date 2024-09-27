@@ -1,7 +1,7 @@
 #pragma once
 #include "Model.h"
 #include "Transform.h"
-//#include "Sphere.h"
+#include "sphere.h"
 class Actor
 {
 public:	
@@ -12,9 +12,13 @@ public:
 	Model model;
 
 	Actor();
+	
+	Sphere* collisionSphere = nullptr;
+
+	Actor() {}
 	bool OnCreate();
 	Actor(Transform transform_, Model model_);
-	void Render(Shader* shader) const; 
+	void Render(Shader* shader) const;
 	// Functions:
 	// render
 
