@@ -26,7 +26,13 @@ bool Scene1g::OnCreate() {
 	mesh = new Mesh("meshes/Sphere.obj");
 	mesh->OnCreate();
 
-	playerFleet.push_back(new FriendlyShip());
+	
+	
+	for (int i = 0; i <= startingFleetSize; i++) {
+		playerFleet.push_back(new FriendlyShip());
+		
+	}
+
 	playerFleet.push_back(new FriendlyShip());
 	for (FriendlyShip* ship : playerFleet) {
 		ship->model.mesh = new Mesh("meshes/Ship.obj");
@@ -35,7 +41,7 @@ bool Scene1g::OnCreate() {
 	}
 	//friendlyShip = FriendlyShip();
 	
-	playerFleet[1]->transform.setPos(Vec3(1.0f, 0.0f, 0.0f));
+	
 	
 
 	shader = new Shader("shaders/defaultVert.glsl", "shaders/defaultFrag.glsl");
@@ -95,10 +101,10 @@ void Scene1g::HandleEvents(const SDL_Event& sdlEvent) {
 			drawInWireMode = !drawInWireMode;
 			break;
 		case SDL_SCANCODE_Z:
-			
+			if (activeShip != 0) activeShip -= 1;
 			break;
 		case SDL_SCANCODE_X:
-			
+			if(activeShip != startingFleetSize + 1) activeShip += 1;
 			break;
 
 		case SDL_SCANCODE_P:
@@ -135,10 +141,10 @@ void Scene1g::Update(const float deltaTime) {
 
 		if (playerController.has3DClick) {
 
-			for (FriendlyShip* ship : playerFleet) {
-				shipWaypoint = playerController.getClickPos();
-				ship->moveToDestination(shipWaypoint);
-			}
+			
+			shipWaypoint = playerController.getClickPos();
+			playerFleet[activeShip]->moveToDestination(shipWaypoint);
+			
 			
 		}
 		for (FriendlyShip* ship : playerFleet) {

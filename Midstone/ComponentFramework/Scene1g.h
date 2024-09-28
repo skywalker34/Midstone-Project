@@ -28,6 +28,9 @@ private:
 	Vec3 shipWaypoint;
 	Quaternion newPosition;
 	std::vector<FriendlyShip*> playerFleet;
+
+	int activeShip = 0;
+	int startingFleetSize = 8;
 	
 	bool drawInWireMode;
 	bool isGameRunning = true;
