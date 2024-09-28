@@ -11,11 +11,11 @@ public:
 	Transform transform;
 	Model model;
 
-	Actor();
+
 	
 	Sphere* collisionSphere = nullptr;
 
-	Actor() {}
+	Actor();
 	bool OnCreate();
 	Actor(Transform transform_, Model model_);
 	void Render(Shader* shader) const;

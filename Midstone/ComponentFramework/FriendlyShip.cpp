@@ -19,6 +19,12 @@ bool FriendlyShip::OnCreate()
 	return true;
 }
 
+void FriendlyShip::OnDestroy()
+{
+	model.mesh->OnDestroy();
+	delete model.mesh;
+}
+
 void FriendlyShip::Update(const float deltaTime)
 {
 	

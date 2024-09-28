@@ -29,6 +29,7 @@ class FriendlyShip :
 
 		FriendlyShip();
 		bool OnCreate();
+		void OnDestroy();
 		void Update(const float deltaTime);
 		bool wouldIntersectPlanet = false;
 		void moveToDestination(Vec3 destination);

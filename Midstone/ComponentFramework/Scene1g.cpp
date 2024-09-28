@@ -11,7 +11,7 @@
 #include "Body.h"
 
 Scene1g::Scene1g() : shader{ nullptr }, mesh{ nullptr },
-drawInWireMode{ false } {
+drawInWireMode{ true } {
 	Debug::Info("Created Scene0: ", __FILE__, __LINE__);
 }
 
@@ -25,14 +25,18 @@ bool Scene1g::OnCreate() {
 
 	mesh = new Mesh("meshes/Sphere.obj");
 	mesh->OnCreate();
-	if (friendlyShip.OnCreate() == false) {
-		std::cout << "ship failed we have a problem";
+
+	playerFleet.push_back(new FriendlyShip());
+	playerFleet.push_back(new FriendlyShip());
+	for (FriendlyShip* ship : playerFleet) {
+		ship->model.mesh = new Mesh("meshes/Ship.obj");
+		ship->model.mesh->OnCreate();
+		ship->transform.setPos(Vec3(0.0f, 0, 0));
 	}
-	friendlyShip = FriendlyShip();
-	friendlyShip.model.mesh = new Mesh("meshes/Ship.obj");
-	friendlyShip.model.mesh->OnCreate();
+	//friendlyShip = FriendlyShip();
 	
-	friendlyShip.transform.setPos(Vec3(0.0f, 0, 0));
+	playerFleet[1]->transform.setPos(Vec3(1.0f, 0.0f, 0.0f));
+	
 
 	shader = new Shader("shaders/defaultVert.glsl", "shaders/defaultFrag.glsl");
 	if (shader->OnCreate() == false) {
@@ -62,8 +66,12 @@ void Scene1g::OnDestroy() {
 	mesh->OnDestroy();
 	delete mesh;
 
-	friendlyShip.model.mesh->OnDestroy();
-	delete friendlyShip.model.mesh;
+	
+
+	for (FriendlyShip* ship : playerFleet) {
+		ship->OnDestroy();
+		delete ship;
+	}
 
 	shader->OnDestroy();
 	delete shader;
@@ -126,13 +134,17 @@ void Scene1g::Update(const float deltaTime) {
 		
 
 		if (playerController.has3DClick) {
-			shipWaypoint = playerController.getClickPos();
-			friendlyShip.moveToDestination(shipWaypoint);
+
+			for (FriendlyShip* ship : playerFleet) {
+				shipWaypoint = playerController.getClickPos();
+				ship->moveToDestination(shipWaypoint);
+			}
+			
 		}
-		friendlyShip.Update(deltaTime);
-		 
-		
-		friendlyShip.shipModelMatrix = friendlyShip.transform.toModelMatrix();
+		for (FriendlyShip* ship : playerFleet) {
+			ship->Update(deltaTime);
+			ship->shipModelMatrix = ship->transform.toModelMatrix();
+		}
 
 	}
 
@@ -157,8 +169,10 @@ void Scene1g::Render() const {
 	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, modelMatrix);
 	mesh->Render(GL_TRIANGLES);
 	
-	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, friendlyShip.shipModelMatrix);
-	friendlyShip.model.mesh->Render(GL_TRIANGLES);
+	for (FriendlyShip* ship : playerFleet) {
+		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
+		ship->model.mesh->Render(GL_TRIANGLES);
+	}
 
 	playerController.Render(shader);
 

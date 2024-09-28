@@ -6,6 +6,7 @@
 #include "Actor.h"
 #include "FriendlyShip.h"
 #include <Matrix.h>
+#include "Vector.h"
 using namespace MATH;
 
 /// Forward declarations 
@@ -26,7 +27,8 @@ private:
 	Vec3 axis;
 	Vec3 shipWaypoint;
 	Quaternion newPosition;
-	FriendlyShip friendlyShip;
+	std::vector<FriendlyShip*> playerFleet;
+	
 	bool drawInWireMode;
 	bool isGameRunning = true;
 
