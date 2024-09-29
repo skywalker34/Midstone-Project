@@ -12,6 +12,7 @@ private:
 	
 	Matrix4 projection;
 	DualQuat viewDq;
+	bool orbitMode = false;
 
 public:
 	Transform transform;//temp here (move back to private later)
@@ -22,6 +23,9 @@ public:
 	Matrix4 GetViewMatrix() const;
 	Matrix4 GetProjectionMatrix() const;
 	DualQuat GetViewDQuaternion() const;
+	void toggleOrbitMode() {
+		orbitMode = !orbitMode;
+	}
 
 };
 

@@ -152,11 +152,14 @@ void Scene1g::Update(const float deltaTime) {
 			playerFleet[activeShip]->moveToDestination(shipWaypoint);
 			
 			
+			
 		}
 		for (FriendlyShip* ship : playerFleet) {
 			ship->Update(deltaTime);
 			ship->shipModelMatrix = ship->transform.toModelMatrix();
+			ship->color = BLUE;//all friendly ships are blue except the active ship
 		}
+		playerFleet[activeShip]->color = GREEN;	//temporary to turn the selected ship green
 
 	}
 

@@ -2,6 +2,7 @@
 #include "Ship.h"
 #include "Bullet.h"
 #include "ShipController.h"
+#include "Constants.h"
 #include <vector>
 #include <QMath.h>
 #include <VMath.h>
@@ -22,6 +23,7 @@ class FriendlyShip :
 		ShipController controller;
 		Vec3 destination = Vec3(0, 0, 0);
 		Vec3 moveDirection;
+		Vec4 color = BLUE;
 		bool isMoving = false;
 		float newAngle = 0;
 

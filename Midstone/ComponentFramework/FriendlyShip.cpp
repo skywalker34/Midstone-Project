@@ -52,7 +52,7 @@ void FriendlyShip::Update(const float deltaTime)
 void FriendlyShip::Render(Shader* shader) const
 {
 	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, transform.toModelMatrix());
-	glUniform4fv(shader->GetUniformID("meshColor"), 1, Vec4(0.0f, 0.0f, 1.0f, 0.2f));
+	glUniform4fv(shader->GetUniformID("meshColor"), 1, color);
 	model.mesh->Render(GL_TRIANGLES);
 }
 

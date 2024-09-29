@@ -13,7 +13,13 @@ void Camera::SetView(const Transform t_)
 	transform = t_;
 	DualQuat T = DQMath::translate(-transform.getPos());
 	DualQuat R = DQMath::rotate(QMath::conjugate(transform.getOrientation()));
-	viewDq = R * T;
+	if (orbitMode) {
+		viewDq = T * R;
+	}
+	else {
+		viewDq = R * T;
+	}
+	
 
 }
 	

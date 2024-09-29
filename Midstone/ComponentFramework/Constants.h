@@ -19,4 +19,9 @@ const Vec3 DOWN = Vec3(0, -1, 0);
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 640;
 
+//Colours
+const Vec4 RED = Vec4(1.0f, 0.0f, 0.0f, 1.0f);
+const Vec4 GREEN = Vec4(0.0f, 1.0f, 0.0f, 1.0f);
+const Vec4 BLUE = Vec4(0.0f, 0.0f, 1.0f, 1.0f);
+
 #endif

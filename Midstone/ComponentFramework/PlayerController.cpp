@@ -61,6 +61,10 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 			//if player hits o reset them to the origin
 			transform = Transform();
 			break;
+		case SDL_SCANCODE_E:
+			//switches between orbit and free mode
+			camera.toggleOrbitMode();
+			break;
 
 
 		}
