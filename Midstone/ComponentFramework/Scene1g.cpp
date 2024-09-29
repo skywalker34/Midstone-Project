@@ -26,17 +26,18 @@ bool Scene1g::OnCreate() {
 	mesh = new Mesh("meshes/Sphere.obj");
 	mesh->OnCreate();
 
+	enemyFleet.push_back(new EnemyShip());
+	enemyFleet[0]->OnCreate();
+	enemyFleet[0]->transform.setPos(enemySpawnPoint);
 	
 	
 	for (int i = 0; i <= startingFleetSize; i++) {
 		playerFleet.push_back(new FriendlyShip());
-		
 	}
 
 	playerFleet.push_back(new FriendlyShip());
 	for (FriendlyShip* ship : playerFleet) {
-		ship->model.mesh = new Mesh("meshes/Ship.obj");
-		ship->model.mesh->OnCreate();
+		ship->OnCreate();
 		ship->transform.setPos(Vec3(0.0f, 0, 0));
 	}
 	//friendlyShip = FriendlyShip();
@@ -75,6 +76,11 @@ void Scene1g::OnDestroy() {
 	
 
 	for (FriendlyShip* ship : playerFleet) {
+		ship->OnDestroy();
+		delete ship;
+	}
+
+	for (EnemyShip* ship : enemyFleet) {
 		ship->OnDestroy();
 		delete ship;
 	}
@@ -173,11 +179,17 @@ void Scene1g::Render() const {
 	glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 	glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
 	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, modelMatrix);
+	glUniform4fv(shader->GetUniformID("meshColor"), 1, Vec4(0.2f, 0.2f, 0.2f, 0.2f));
 	mesh->Render(GL_TRIANGLES);
 	
 	for (FriendlyShip* ship : playerFleet) {
-		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
-		ship->model.mesh->Render(GL_TRIANGLES);
+		//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
+		ship->Render(shader);
+	}
+
+	for (EnemyShip* ship : enemyFleet) {
+		//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
+		ship->Render(shader);
 	}
 
 	playerController.Render(shader);

@@ -14,6 +14,8 @@ FriendlyShip::FriendlyShip()
 
 bool FriendlyShip::OnCreate()
 {
+	model = Model("Ship.obj");
+	if (model.OnCreate() == false) return false;
 	printf("Ship Created! \n");
 	
 	return true;
@@ -21,8 +23,8 @@ bool FriendlyShip::OnCreate()
 
 void FriendlyShip::OnDestroy()
 {
-	model.mesh->OnDestroy();
-	delete model.mesh;
+	
+	model.OnDestroy();
 }
 
 void FriendlyShip::Update(const float deltaTime)
@@ -45,6 +47,13 @@ void FriendlyShip::Update(const float deltaTime)
 		body->vel = Vec3();
 	}
 	
+}
+
+void FriendlyShip::Render(Shader* shader) const
+{
+	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, transform.toModelMatrix());
+	glUniform4fv(shader->GetUniformID("meshColor"), 1, Vec4(0.0f, 0.0f, 1.0f, 0.2f));
+	model.mesh->Render(GL_TRIANGLES);
 }
 
 

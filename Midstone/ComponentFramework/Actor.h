@@ -16,7 +16,8 @@ public:
 	Sphere* collisionSphere = nullptr;
 
 	Actor();
-	bool OnCreate();
+	virtual bool OnCreate();
+
 	Actor(Transform transform_, Model model_);
 	void Render(Shader* shader) const;
 	// Functions:

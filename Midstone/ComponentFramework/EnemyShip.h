@@ -1,6 +1,7 @@
 #pragma once
 #include "Ship.h"
-class EnemyShip : Ship
+class EnemyShip : 
+	public Ship
 {
 	//enemy ship is an actor that simply finds its target and "suicide bombs" it
 
@@ -21,5 +22,10 @@ class EnemyShip : Ship
 		//float speed;
 		//Body* body;
 		//Matrix4 shipModelMatrix;
+
+	public:
+		bool OnCreate() override;
+		void OnDestroy();
+		void Render(Shader* shader) const;
 };
 
