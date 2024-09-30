@@ -11,7 +11,7 @@
 #include "Body.h"
 
 Scene1g::Scene1g() : shader{ nullptr }, mesh{ nullptr },
-drawInWireMode{ false } {
+drawInWireMode{ true } {
 	Debug::Info("Created Scene0: ", __FILE__, __LINE__);
 }
 
@@ -25,14 +25,25 @@ bool Scene1g::OnCreate() {
 
 	mesh = new Mesh("meshes/Sphere.obj");
 	mesh->OnCreate();
-	if (friendlyShip.OnCreate() == false) {
-		std::cout << "ship failed we have a problem";
-	}
-	friendlyShip = FriendlyShip();
-	friendlyShip.model.mesh = new Mesh("meshes/Ship.obj");
-	friendlyShip.model.mesh->OnCreate();
+
+	enemyFleet.push_back(new EnemyShip());
+	enemyFleet[0]->OnCreate();
+	enemyFleet[0]->transform.setPos(enemySpawnPoint);
 	
-	friendlyShip.transform.setPos(Vec3(0.0f, 0, 0));
+	
+	for (int i = 0; i <= startingFleetSize; i++) {
+		playerFleet.push_back(new FriendlyShip());
+	}
+
+	playerFleet.push_back(new FriendlyShip());
+	for (FriendlyShip* ship : playerFleet) {
+		ship->OnCreate();
+		ship->transform.setPos(Vec3(0.0f, 0, 0));
+	}
+	//friendlyShip = FriendlyShip();
+	
+	
+	
 
 	shader = new Shader("shaders/defaultVert.glsl", "shaders/defaultFrag.glsl");
 	if (shader->OnCreate() == false) {
@@ -62,8 +73,17 @@ void Scene1g::OnDestroy() {
 	mesh->OnDestroy();
 	delete mesh;
 
-	friendlyShip.model.mesh->OnDestroy();
-	delete friendlyShip.model.mesh;
+	
+
+	for (FriendlyShip* ship : playerFleet) {
+		ship->OnDestroy();
+		delete ship;
+	}
+
+	for (EnemyShip* ship : enemyFleet) {
+		ship->OnDestroy();
+		delete ship;
+	}
 
 	shader->OnDestroy();
 	delete shader;
@@ -87,10 +107,10 @@ void Scene1g::HandleEvents(const SDL_Event& sdlEvent) {
 			drawInWireMode = !drawInWireMode;
 			break;
 		case SDL_SCANCODE_Z:
-			
+			if (activeShip != 0) activeShip -= 1;
 			break;
 		case SDL_SCANCODE_X:
-			
+			if(activeShip != startingFleetSize + 1) activeShip += 1;
 			break;
 
 		case SDL_SCANCODE_P:
@@ -126,13 +146,20 @@ void Scene1g::Update(const float deltaTime) {
 		
 
 		if (playerController.has3DClick) {
+
+			
 			shipWaypoint = playerController.getClickPos();
-			friendlyShip.moveToDestination(shipWaypoint);
+			playerFleet[activeShip]->moveToDestination(shipWaypoint);
+			
+			
+			
 		}
-		friendlyShip.Update(deltaTime);
-		 
-		
-		friendlyShip.shipModelMatrix = friendlyShip.transform.toModelMatrix();
+		for (FriendlyShip* ship : playerFleet) {
+			ship->Update(deltaTime);
+			ship->shipModelMatrix = ship->transform.toModelMatrix();
+			ship->color = BLUE;//all friendly ships are blue except the active ship
+		}
+		playerFleet[activeShip]->color = GREEN;	//temporary to turn the selected ship green
 
 	}
 
@@ -155,10 +182,18 @@ void Scene1g::Render() const {
 	glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 	glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
 	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, modelMatrix);
+	glUniform4fv(shader->GetUniformID("meshColor"), 1, Vec4(0.2f, 0.2f, 0.2f, 0.2f));
 	mesh->Render(GL_TRIANGLES);
 	
-	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, friendlyShip.shipModelMatrix);
-	friendlyShip.model.mesh->Render(GL_TRIANGLES);
+	for (FriendlyShip* ship : playerFleet) {
+		//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
+		ship->Render(shader);
+	}
+
+	for (EnemyShip* ship : enemyFleet) {
+		//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
+		ship->Render(shader);
+	}
 
 	playerController.Render(shader);
 

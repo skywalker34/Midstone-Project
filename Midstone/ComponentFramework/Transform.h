@@ -18,8 +18,14 @@ class Transform
 
 		//Setters
 		void setPos(Vec3 p);
+		void setPos(float x, float y, float z) {
+			position = Vec3(x, y, z);
+		}
 		void setOrientation(Quaternion q);
 		void setScale(Vec3 s);
+		void setScale(float x, float y, float z) {
+			scale = Vec3(x, y, z);
+		}
 		//Getters
 		Vec3 getPos() const;
 		Vec3 getScale() const;

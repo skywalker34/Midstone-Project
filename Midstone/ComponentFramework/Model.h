@@ -21,5 +21,6 @@ public:
 	Model();
 	Model(std::string meshName_);
 	bool OnCreate();
+	void OnDestroy();
 };
 
