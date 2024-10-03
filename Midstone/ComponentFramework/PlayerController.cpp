@@ -71,10 +71,17 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 		break;
 
 	case SDL_MOUSEBUTTONDOWN:
-
 	{
-		has3DClick = true;
-		clickPos = get3DClickCoords(sdlEvent.button.x, sdlEvent.button.y);
+		switch (sdlEvent.button.clicks){
+		case SDL_BUTTON_LEFT:
+			has3DClick = true;
+			clickPos = get3DClickCoords(sdlEvent.button.x, sdlEvent.button.y);
+			std::cout << "LEFT";
+			break;
+		case SDL_BUTTON_RIGHT:
+			std::cout << "Right";
+			break;
+		}
 	}
 	break;
 
@@ -131,7 +138,7 @@ Vec3 PlayerController::get3DClickCoords(float sdl_X, float sdl_Y)
 
 	// Make a line from the camera position to the mouse
 	// Using the join of two points
-	DualQuat line = transform.getPos() & sdlPosWorldSpace;
+	line = transform.getPos() & sdlPosWorldSpace;
 
 	// Make a plane based off scrollwheel
 	Plane plane = Plane(0, 0, 1, -(-planeDepth));
@@ -141,6 +148,11 @@ Vec3 PlayerController::get3DClickCoords(float sdl_X, float sdl_Y)
 
 	// Divide out the w component
 	intersection = intersection / intersection.w;
+
+		
+
+		
+		
 
 
 	return Vec3(intersection);

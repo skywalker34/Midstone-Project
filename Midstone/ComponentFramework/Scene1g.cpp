@@ -122,6 +122,49 @@ void Scene1g::HandleEvents(const SDL_Event& sdlEvent) {
 		break;
 
 
+		//below is SUUUUUUPER temporary
+		//will be in collision namespace once its up and running
+		if (playerController.hasDQLine) {
+			DualQuat line = playerController.getLine();
+			
+			line = DQMath::normalize(line);
+
+
+			//loop through the spheres
+			for (FriendlyShip* ship : playerFleet) {
+				Vec4 centrePoint = ship->transform.getPos();
+				Flector M = centrePoint * line;
+				Plane pM = M.plane;//grab the plane part of the flector
+				Vec4 vM = M.point;
+
+				float dSquared = (2 * 2) - (VMath::mag(vM) * VMath::mag(vM)); // d^2 = r^2 - (*<M>3)^2
+				//pretty sure I'm doing this part wrong (*<M>3)^2
+
+				if (dSquared > 0) { //if d^2 > 0 then the line and sphere intersect
+					Vec4 i1 = line ^ (M.plane + Plane(0, 0, 0, sqrt(dSquared))) * -1;
+					i1 = i1 / i1.w;
+					i1.print("Intersection Point 1");
+
+
+
+					Vec4 i2 = line ^ (M.plane + Plane(0, 0, 0, -sqrt(dSquared))) * -1;
+					i2 = i2 / i2.w;
+					i2.print("Intersection Point 2");
+				}
+			
+	
+			}
+
+
+			//centrePoint = VMath::normalize(centrePoint4); //if I normalize the centre point I get the wrong answer 
+
+			
+
+
+
+			
+
+		}
 		/////////////////////**DO NOT PUT ANY CONTROLS THAT AREN'T RELEVANT TO THE SCENE IN THE SCENE**\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 		//use player controller instead for player controls
 		/*case SDL_MOUSEMOTION:

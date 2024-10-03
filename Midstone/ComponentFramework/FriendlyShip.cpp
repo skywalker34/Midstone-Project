@@ -14,6 +14,7 @@ FriendlyShip::FriendlyShip()
 
 bool FriendlyShip::OnCreate()
 {
+	
 	model = Model("Ship.obj");
 	if (model.OnCreate() == false) return false;
 	printf("Ship Created! \n");
