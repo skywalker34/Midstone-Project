@@ -7,6 +7,8 @@ using namespace MATH;
 
 const Vec3 ORIGIN = Vec3(0, 0, 0);
 
+const float CAMERA_TO_ORIGIN = 20;
+
 // Direction
 const Vec3 FORWARD = Vec3(0, 0, -1);
 const Vec3 BACKWARD = Vec3(0, 0, 1);

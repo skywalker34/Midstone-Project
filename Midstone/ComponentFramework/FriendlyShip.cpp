@@ -8,7 +8,7 @@ FriendlyShip::FriendlyShip()
 
 	
 	
-	printf("FriendlyShip Constructor: Transform initialized with position (%f, %f, %f)\n", transform.getPos().x, transform.getPos().y, transform.getPos().z);
+	//printf("FriendlyShip Constructor: Transform initialized with position (%f, %f, %f)\n", transform.getPos().x, transform.getPos().y, transform.getPos().z);
 	
 }
 
@@ -33,11 +33,11 @@ void FriendlyShip::Update(const float deltaTime)
 	if (isMoving) {
 		transform = body->Update(deltaTime, transform);
 		//keeps the ship pointing toward where its going
-		Vec3 axis = VMath::cross(Vec3(0, 0, -1), moveDirection); //use the foward vector (negative z and diretion to get the axis of rotation)
-		float targetAngle = acos(VMath::dot(Vec3(0, 0, -1), moveDirection)) * RADIANS_TO_DEGREES;
-
+		//Vec3 axis = VMath::cross(Vec3(0, 0, -1), moveDirection); //use the foward vector (negative z and diretion to get the axis of rotation)
+		Vec3 axis = Vec3(0, 0, -1);
+		float targetAngle = acos(VMath::dot(Vec3(transform.getPos().x, transform.getPos().y, 0), moveDirection)) * RADIANS_TO_DEGREES;
 		newAngle = targetAngle > newAngle ? newAngle + 1 : targetAngle;	// Not done yet
-		
+		std::cout << targetAngle << std::endl;
 		Quaternion newTransform = QMath::angleAxisRotation(newAngle, axis);	// Not done yet
 	
 		transform.setOrientation(newTransform);
