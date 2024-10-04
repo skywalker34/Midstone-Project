@@ -144,7 +144,12 @@ void Scene1g::HandleEvents(const SDL_Event& sdlEvent) {
 			//allows us to pause and unpause time, whoah.
 			isGameRunning = !isGameRunning;
 			break;
+		case SDL_SCANCODE_F:
+			//TEMPORARY DELETE THIS LATER
+			playerFleet[activeShip]->Fire();
+			break;
 		}
+
 
 		break;
 
@@ -181,6 +186,9 @@ void Scene1g::HandleEvents(const SDL_Event& sdlEvent) {
 
 void Scene1g::Update(const float deltaTime) {
 
+	Vec3 forward = Vec3 (1, 0.5, 2);
+	forward = VMath::normalize(forward);
+	enemyFleet[0]->transform.setPos(enemyFleet[0]->transform.getPos() + (forward * 0.05));
 	
 	if (isGameRunning) {
 		playerController.Update(deltaTime);

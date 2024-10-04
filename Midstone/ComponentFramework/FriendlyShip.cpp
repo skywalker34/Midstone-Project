@@ -8,17 +8,17 @@ FriendlyShip::FriendlyShip()
 
 	
 	
-	printf("FriendlyShip Constructor: Transform initialized with position (%f, %f, %f)\n", transform.getPos().x, transform.getPos().y, transform.getPos().z);
+	//printf("FriendlyShip Constructor: Transform initialized with position (%f, %f, %f)\n", transform.getPos().x, transform.getPos().y, transform.getPos().z);
 	
 }
 
 bool FriendlyShip::OnCreate()
 {
-	
 	model = Model("Ship.obj");
 	if (model.OnCreate() == false) return false;
 	printf("Ship Created! \n");
 	
+	Fire();
 	return true;
 }
 
@@ -26,19 +26,38 @@ void FriendlyShip::OnDestroy()
 {
 	
 	model.OnDestroy();
+	for (Bullet* bullet : bullets) {
+		bullet->OnDestroy();
+		delete bullet;
+	}
 }
 
 void FriendlyShip::Update(const float deltaTime)
 {
-	
+
+	for (int i = 0; i < bullets.size(); i++) {
+		bullets[i]->Update(deltaTime);
+		if (bullets[i]->deleteMe) {
+			bullets[i]->OnDestroy();
+			delete bullets[i];
+			bullets[i] = nullptr;
+			bullets.erase(std::remove(bullets.begin(), bullets.end(), nullptr), bullets.end());
+
+		}
+	}
+
 	if (isMoving) {
 		transform = body->Update(deltaTime, transform);
 		//keeps the ship pointing toward where its going
-		Vec3 axis = VMath::cross(Vec3(0, 0, -1), moveDirection); //use the foward vector (negative z and diretion to get the axis of rotation)
-		float targetAngle = acos(VMath::dot(Vec3(0, 0, -1), moveDirection)) * RADIANS_TO_DEGREES;
-
+		//Vec3 axis = VMath::cross(Vec3(0, 0, -1), moveDirection); //use the foward vector (negative z and diretion to get the axis of rotation)
+		Vec3 axis = Vec3(0, 0, -1);
+		float targetAngle = acos(VMath::dot(Vec3(transform.getPos().x, transform.getPos().y, 0), moveDirection)) * RADIANS_TO_DEGREES;
 		newAngle = targetAngle > newAngle ? newAngle + 1 : targetAngle;	// Not done yet
-		
+
+		if (targetAngle > newAngle) {
+
+		}
+		std::cout << targetAngle << std::endl;
 		Quaternion newTransform = QMath::angleAxisRotation(newAngle, axis);	// Not done yet
 	
 		transform.setOrientation(newTransform);
@@ -52,6 +71,10 @@ void FriendlyShip::Update(const float deltaTime)
 
 void FriendlyShip::Render(Shader* shader) const
 {
+	for (Bullet* bullet : bullets) {
+		bullet->Render(shader);
+	}
+
 	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, transform.toModelMatrix());
 	glUniform4fv(shader->GetUniformID("meshColor"), 1, color);
 	model.mesh->Render(GL_TRIANGLES);
@@ -59,6 +82,16 @@ void FriendlyShip::Render(Shader* shader) const
 
 
 
+
+void FriendlyShip::Fire()
+{
+
+	//the third parameter here "BACKWARD" should instead be the direction the ship is facing
+	bullets.push_back(new Bullet(transform, 0.1f, BACKWARD));
+	if (bullets.back()->OnCreate() == false) {
+		printf("Bullet failed! /n");
+	}
+}
 
 void FriendlyShip::moveToDestination(Vec3 destination_)
 {

@@ -19,13 +19,14 @@ class FriendlyShip :
 		//speed
 		//body
 		//modelmatrix
-		std::vector<Bullet> bullets;
+		std::vector<Bullet*> bullets;
 		ShipController controller;
 		Vec3 destination = Vec3(0, 0, 0);
 		Vec3 moveDirection;
 		Vec4 color = BLUE;
 		bool isMoving = false;
 		float newAngle = 0;
+		const float projectileSpeed = 0.1;//the distance (units/frame) this ship's projectile moves
 
 		Sphere* detectionSphere = nullptr;
 
@@ -37,6 +38,7 @@ class FriendlyShip :
 		void Update(const float deltaTime);
 		void Render(Shader* shader) const;
 		bool wouldIntersectPlanet = false;
+		void Fire();
 		void moveToDestination(Vec3 destination);
 		bool hasReachDestination();
 
