@@ -72,16 +72,19 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 
 	case SDL_MOUSEBUTTONDOWN:
 	{
-		switch (sdlEvent.button.clicks){
+		switch (sdlEvent.button.button){
 		case SDL_BUTTON_LEFT:
 			has3DClick = true;
 			clickPos = get3DClickCoords(sdlEvent.button.x, sdlEvent.button.y);
 			std::cout << "LEFT";
 			break;
 		case SDL_BUTTON_RIGHT:
+			hasDQLine = true;
+			clickPos = get3DClickCoords(sdlEvent.button.x, sdlEvent.button.y);
 			std::cout << "Right";
 			break;
 		}
+		break;
 	}
 	break;
 
