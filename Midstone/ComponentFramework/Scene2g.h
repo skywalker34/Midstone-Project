@@ -8,6 +8,7 @@
 #include "EnemyShip.h"
 #include <Matrix.h>
 #include "Vector.h"
+//#include "Camera2.h"
 using namespace MATH;
 
 /// Forward declarations 
@@ -37,6 +38,8 @@ private:
 	
 	bool drawInWireMode;
 	bool isGameRunning = true;
+
+	//Camera2 skyboxCamera;
 
 public:
 	explicit Scene2g();

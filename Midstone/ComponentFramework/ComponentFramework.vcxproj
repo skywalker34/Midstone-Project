@@ -127,6 +127,7 @@
     <ClCompile Include="Body.cpp" />
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Camera2.cpp" />
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="EnemyShip.cpp" />
     <ClCompile Include="FriendlyShip.cpp" />
@@ -155,6 +156,7 @@
     <ClInclude Include="Body.h" />
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Camera2.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="EnemyShip.h" />
@@ -186,6 +188,8 @@
   <ItemGroup>
     <None Include="shaders\defaultFrag.glsl" />
     <None Include="shaders\defaultVert.glsl" />
+    <None Include="shaders\skyboxFrag.glsl" />
+    <None Include="shaders\skyboxVert.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

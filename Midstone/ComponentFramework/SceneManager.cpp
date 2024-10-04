@@ -5,6 +5,7 @@
 #include "Scene0g.h"
 #include "Scene0p.h"
 #include "Scene1g.h"
+#include "Scene2g.h"
 
 
 
@@ -52,7 +53,7 @@ bool SceneManager::Initialize(std::string name_, int width_, int height_) {
 
 	/********************************   Default first scene   ***********************/
 
-	BuildNewScene(SCENE_NUMBER::SCENE1g); 
+	BuildNewScene(SCENE_NUMBER::SCENE2g); 
 
 	/********************************************************************************/
 	return true;
@@ -149,7 +150,7 @@ bool SceneManager::BuildNewScene(SCENE_NUMBER scene) {
 		break;*/
 
 	case SCENE_NUMBER::SCENE2g:
-		currentScene = new Scene1g();
+		currentScene = new Scene2g();
 		status = currentScene->OnCreate();
 		//if (currentSceneNumber == 2) break;
 		break;
