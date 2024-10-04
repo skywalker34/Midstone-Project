@@ -22,10 +22,18 @@ class EnemyShip :
 		//float speed;
 		//Body* body;
 		//Matrix4 shipModelMatrix;
+	Vec3 target; 
 
 	public:
+		EnemyShip();
+		EnemyShip(Vec3 pos);
+
+		void setTarget(Vec3 target_);
+		Vec3 getTargetDirection();
+
 		bool OnCreate() override;
 		void OnDestroy();
+		void Update(const float deltaTime);
 		void Render(Shader* shader) const;
 };
 

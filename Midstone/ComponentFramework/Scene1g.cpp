@@ -53,9 +53,17 @@ bool Scene1g::OnCreate() {
 	mesh = new Mesh("meshes/Sphere.obj");
 	mesh->OnCreate();
 
-	enemyFleet.push_back(new EnemyShip());
-	enemyFleet[0]->OnCreate();
-	enemyFleet[0]->transform.setPos(enemySpawnPoint);
+	
+
+	
+
+	for (int i = 0; i <= startingFleetSize; i++) {
+		enemyFleet.push_back(new EnemyShip(Vec3(fmod(rand(), 5), fmod(rand(), 5), fmod(rand(), 5))));
+	}
+	for (EnemyShip* ship : enemyFleet) {
+		ship->OnCreate();
+
+	}
 	
 	
 	for (int i = 0; i <= startingFleetSize; i++) {
@@ -186,9 +194,7 @@ void Scene1g::HandleEvents(const SDL_Event& sdlEvent) {
 
 void Scene1g::Update(const float deltaTime) {
 
-	Vec3 forward = Vec3 (1, 0.5, 2);
-	forward = VMath::normalize(forward);
-	enemyFleet[0]->transform.setPos(enemyFleet[0]->transform.getPos() + (forward * 0.05));
+
 	
 	if (isGameRunning) {
 		playerController.Update(deltaTime);
@@ -246,10 +252,12 @@ void Scene1g::Update(const float deltaTime) {
 
 		for (FriendlyShip* ship : playerFleet) {
 			ship->Update(deltaTime);
-			ship->shipModelMatrix = ship->transform.toModelMatrix();
 			ship->color = BLUE;//all friendly ships are blue except the active ship
 		}
 		playerFleet[activeShip]->color = GREEN;	//temporary to turn the selected ship green
+		for (EnemyShip* ship : enemyFleet) {
+			ship->Update(deltaTime);
+		}
 
 	}
 
