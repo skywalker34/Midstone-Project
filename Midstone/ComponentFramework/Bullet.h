@@ -15,7 +15,7 @@ class Bullet :
     float speed;
     Vec3 forward;
     Vec3 initialPos;
-    float maxRange = 100;//how far the bullet can travel before it deletes itself
+    const float maxRange = 100;//how far the bullet can travel before it deletes itself
     
     Vec4 color = ORANGE;
 
