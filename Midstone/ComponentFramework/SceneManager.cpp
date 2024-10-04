@@ -148,7 +148,11 @@ bool SceneManager::BuildNewScene(SCENE_NUMBER scene) {
 		status = currentScene->OnCreate();
 		break;*/
 
-	
+	case SCENE_NUMBER::SCENE2g:
+		currentScene = new Scene1g();
+		status = currentScene->OnCreate();
+		//if (currentSceneNumber == 2) break;
+		break;
 
 	default:
 		Debug::Error("Incorrect scene number assigned in the manager", __FILE__, __LINE__);

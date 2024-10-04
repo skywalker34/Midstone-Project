@@ -19,6 +19,7 @@ private:
 		SCENE0g = 0,
 		SCENE0p,
 		SCENE1g,
+		SCENE2g,
 		SCENE2,
 		SCENE3,
 		SCENE4,
