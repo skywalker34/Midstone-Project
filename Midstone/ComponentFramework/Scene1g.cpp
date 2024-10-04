@@ -217,6 +217,9 @@ void Scene1g::Update(const float deltaTime) {
 			DualQuat line = playerController.getLine();
 			line = DQMath::normalize(line);
 
+			Vec3 test = line ^ Plane(0, 0, 1, 0);
+			test.print("line test: ");
+
 
 			//loop through the spheres
 			for (int i = 0; i < playerFleet.size(); i++) {
