@@ -1,4 +1,5 @@
 #include "FriendlyShip.h"
+#include "Sphere.h"
 
 
 FriendlyShip::FriendlyShip()
@@ -15,6 +16,7 @@ FriendlyShip::FriendlyShip()
 bool FriendlyShip::OnCreate()
 {
 	model = Model("Ship.obj");
+	detectionSphere = Sphere(transform.getPos(), range);
 	if (model.OnCreate() == false) return false;
 	printf("Ship Created! \n");
 	
@@ -42,31 +44,28 @@ void FriendlyShip::Update(const float deltaTime)
 			delete bullets[i];
 			bullets[i] = nullptr;
 			bullets.erase(std::remove(bullets.begin(), bullets.end(), nullptr), bullets.end());
-
 		}
 	}
 
-	if (isMoving) {
-		transform = body->Update(deltaTime, transform);
-		//keeps the ship pointing toward where its going
-		//Vec3 axis = VMath::cross(Vec3(0, 0, -1), moveDirection); //use the foward vector (negative z and diretion to get the axis of rotation)
-		Vec3 axis = Vec3(0, 0, -1);
-		float targetAngle = acos(VMath::dot(Vec3(transform.getPos().x, transform.getPos().y, 0), moveDirection)) * RADIANS_TO_DEGREES;
-		newAngle = targetAngle > newAngle ? newAngle + 1 : targetAngle;	// Not done yet
+    if (isMoving) {
+        transform = body->Update(deltaTime, transform);
+        //keeps the ship pointing toward where its going
+        Vec3 axis = VMath::cross(Vec3(0, 0, -1), moveDirection); //use the foward vector (negative z and diretion to get the axis of rotation)
+        float targetAngle = acos(VMath::dot(Vec3(0, 0, -1), moveDirection)) * RADIANS_TO_DEGREES;
 
-		if (targetAngle > newAngle) {
+        newAngle = targetAngle > newAngle ? newAngle + 1 : targetAngle;    // Not done yet
 
-		}
-		std::cout << targetAngle << std::endl;
-		Quaternion newTransform = QMath::angleAxisRotation(newAngle, axis);	// Not done yet
+        Quaternion newTransform = QMath::angleAxisRotation(newAngle, axis);    // Not done yet
+
+        transform.setOrientation(newTransform);
+        isMoving = VMath::mag(destination - transform.getPos()) > 0.01;
+    }
+    else {
+        body->vel = Vec3();
+    }
+
 	
-		transform.setOrientation(newTransform);
-		isMoving = VMath::mag(destination - transform.getPos()) > 0.01;
-	}
-	else {
-		body->vel = Vec3();
-	}
-	
+	detectionSphere.center = transform.getPos();//update teh collision sphere to match the ships position
 }
 
 void FriendlyShip::Render(Shader* shader) const
@@ -87,7 +86,7 @@ void FriendlyShip::Fire()
 {
 
 	//the third parameter here "BACKWARD" should instead be the direction the ship is facing
-	bullets.push_back(new Bullet(transform, 0.1f, BACKWARD));
+	bullets.push_back(new Bullet(transform, 0.1f, targetDirection));
 	if (bullets.back()->OnCreate() == false) {
 		printf("Bullet failed! /n");
 	}

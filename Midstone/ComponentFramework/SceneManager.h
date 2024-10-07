@@ -21,7 +21,7 @@ private:
 		SCENE1g,
 		SCENE2g,
 		SCENE2,
-		SCENE3,
+		SCENE3g,
 		SCENE4,
 		SCENE5,
 		SCENE6,
