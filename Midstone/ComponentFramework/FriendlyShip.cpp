@@ -18,6 +18,7 @@ bool FriendlyShip::OnCreate()
 	if (model.OnCreate() == false) return false;
 	printf("Ship Created! \n");
 	
+	Fire();
 	return true;
 }
 
@@ -25,11 +26,26 @@ void FriendlyShip::OnDestroy()
 {
 	
 	model.OnDestroy();
+	for (Bullet* bullet : bullets) {
+		bullet->OnDestroy();
+		delete bullet;
+	}
 }
 
 void FriendlyShip::Update(const float deltaTime)
 {
-	
+
+	for (int i = 0; i < bullets.size(); i++) {
+		bullets[i]->Update(deltaTime);
+		if (bullets[i]->deleteMe) {
+			bullets[i]->OnDestroy();
+			delete bullets[i];
+			bullets[i] = nullptr;
+			bullets.erase(std::remove(bullets.begin(), bullets.end(), nullptr), bullets.end());
+
+		}
+	}
+
 	if (isMoving) {
 		slerpT = slerpT >= 1 ? 1 : slerpT + deltaTime;
 		transform = body->Update(deltaTime, transform);
@@ -44,9 +60,23 @@ void FriendlyShip::Update(const float deltaTime)
 
 void FriendlyShip::Render(Shader* shader) const
 {
+	for (Bullet* bullet : bullets) {
+		bullet->Render(shader);
+	}
+
 	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, transform.toModelMatrix());
 	glUniform4fv(shader->GetUniformID("meshColor"), 1, color);
 	model.mesh->Render(GL_TRIANGLES);
+}
+
+void FriendlyShip::Fire()
+{
+
+	//the third parameter here "BACKWARD" should instead be the direction the ship is facing
+	bullets.push_back(new Bullet(transform, 0.1f, BACKWARD));
+	if (bullets.back()->OnCreate() == false) {
+		printf("Bullet failed! /n");
+	}
 }
 
 void FriendlyShip::moveToDestination(Vec3 destination_)
