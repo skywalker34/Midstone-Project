@@ -39,7 +39,7 @@ class FriendlyShip :
 		void Render(Shader* shader) const;
 		bool wouldIntersectPlanet = false;
 		void moveToDestination(Vec3 destination);
-		void updateDirection();
+		void rotateTowardTarget(Vec3 target);
 		bool hasReachDestination();
 
 		~FriendlyShip();

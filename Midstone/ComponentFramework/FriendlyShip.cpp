@@ -33,7 +33,7 @@ void FriendlyShip::Update(const float deltaTime)
 	if (isMoving) {
 		slerpT = slerpT >= 1 ? 1 : slerpT + deltaTime;
 		transform = body->Update(deltaTime, transform);
-		updateDirection();
+		rotateTowardTarget(movingDirection);
 		isMoving = VMath::mag(destination - transform.getPos()) > 0.01;
 	}
 	else {
@@ -67,17 +67,17 @@ void FriendlyShip::moveToDestination(Vec3 destination_)
 	}
 }
 
-void FriendlyShip::updateDirection()
+void FriendlyShip::rotateTowardTarget(Vec3 target)
 {
 	//keeps the ship pointing toward where its going
 	if (slerpT < 1) {
 		Quaternion startQuad = QMath::lookAt(initialDirection, UP);
-		Quaternion targetQuad = QMath::lookAt(movingDirection, UP);
+		Quaternion targetQuad = QMath::lookAt(target, UP);
 		Quaternion currentQuat = QMath::slerp(startQuad, targetQuad, slerpT);
 		transform.setOrientation(currentQuat);
 	}
 	else {
-		initialDirection = movingDirection;
+		initialDirection = target;
 	}
 }
 
