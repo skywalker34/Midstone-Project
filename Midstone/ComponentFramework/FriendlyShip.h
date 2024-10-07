@@ -22,10 +22,11 @@ class FriendlyShip :
 		std::vector<Bullet> bullets;
 		ShipController controller;
 		Vec3 destination = Vec3(0, 0, 0);
-		Vec3 moveDirection;
+		Vec3 movingDirection;
+		Vec3 initialDirection = FORWARD;
 		Vec4 color = BLUE;
 		bool isMoving = false;
-		float newAngle = 0;
+		float slerpT = 0;
 
 		Sphere* detectionSphere = nullptr;
 
@@ -38,6 +39,7 @@ class FriendlyShip :
 		void Render(Shader* shader) const;
 		bool wouldIntersectPlanet = false;
 		void moveToDestination(Vec3 destination);
+		void updateDirection();
 		bool hasReachDestination();
 
 		~FriendlyShip();

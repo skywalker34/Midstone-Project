@@ -31,16 +31,9 @@ void FriendlyShip::Update(const float deltaTime)
 {
 	
 	if (isMoving) {
+		slerpT = slerpT >= 1 ? 1 : slerpT + deltaTime;
 		transform = body->Update(deltaTime, transform);
-		//keeps the ship pointing toward where its going
-		//Vec3 axis = VMath::cross(Vec3(0, 0, -1), moveDirection); //use the foward vector (negative z and diretion to get the axis of rotation)
-		Vec3 axis = Vec3(0, 0, -1);
-		float targetAngle = acos(VMath::dot(Vec3(transform.getPos().x, transform.getPos().y, 0), moveDirection)) * RADIANS_TO_DEGREES;
-		newAngle = targetAngle > newAngle ? newAngle + 1 : targetAngle;	// Not done yet
-		std::cout << targetAngle << std::endl;
-		Quaternion newTransform = QMath::angleAxisRotation(newAngle, axis);	// Not done yet
-	
-		transform.setOrientation(newTransform);
+		updateDirection();
 		isMoving = VMath::mag(destination - transform.getPos()) > 0.01;
 	}
 	else {
@@ -56,25 +49,35 @@ void FriendlyShip::Render(Shader* shader) const
 	model.mesh->Render(GL_TRIANGLES);
 }
 
-
-
-
 void FriendlyShip::moveToDestination(Vec3 destination_)
 {
 	destination = destination_;
 	isMoving = true;
-	newAngle = 0;
+	slerpT = 0;
 	if (wouldIntersectPlanet) {
-		
 		Vec3 axis = VMath::cross(destination, transform.getPos());
 		Quaternion newPosition = QMath::angleAxisRotation(1.0f, axis);
-		moveDirection = QMath::rotate(transform.getPos(), newPosition) - transform.getPos();
-		body->vel = speed * VMath::normalize(moveDirection);
+		movingDirection = QMath::rotate(transform.getPos(), newPosition) - transform.getPos();
+		body->vel = speed * VMath::normalize(movingDirection);
 	}
 	else {
 		Vec3 diff =  destination - transform.getPos(); //"draw" a vector between the 2 points
-		moveDirection = VMath::normalize(diff);//"convert" thevector into just a direction (normalize)
-		body->vel = moveDirection * speed; //tell the ship to move along that vector
+		movingDirection = VMath::normalize(diff);//"convert" thevector into just a direction (normalize)
+		body->vel = movingDirection * speed; //tell the ship to move along that vector
+	}
+}
+
+void FriendlyShip::updateDirection()
+{
+	//keeps the ship pointing toward where its going
+	if (slerpT < 1) {
+		Quaternion startQuad = QMath::lookAt(initialDirection, UP);
+		Quaternion targetQuad = QMath::lookAt(movingDirection, UP);
+		Quaternion currentQuat = QMath::slerp(startQuad, targetQuad, slerpT);
+		transform.setOrientation(currentQuat);
+	}
+	else {
+		initialDirection = movingDirection;
 	}
 }
 
@@ -82,5 +85,6 @@ bool FriendlyShip::hasReachDestination()
 {
 	return VMath::mag(body->pos - destination) < 0.1f;
 }
+
 
 FriendlyShip::~FriendlyShip() {}
