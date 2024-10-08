@@ -1,7 +1,7 @@
 #include <glew.h>
 #include <iostream>
 #include <SDL.h>
-#include "Scene1g.h"
+#include "Scene3g.h"
 #include <MMath.h>
 #include <QMath.h>
 #include <VMath.h>
@@ -11,72 +11,52 @@
 #include "Body.h"
 #include <chrono>
 
-Scene1g::Scene1g() : shader{ nullptr }, mesh{ nullptr },
+Scene3g::Scene3g() : shader{ nullptr }, mesh{ nullptr },
 drawInWireMode{ true } {
 	Debug::Info("Created Scene0: ", __FILE__, __LINE__);
 }
 
-Scene1g::~Scene1g() {
+Scene3g::~Scene3g() {
 	Debug::Info("Deleted Scene0: ", __FILE__, __LINE__);
 }
 
-bool Scene1g::OnCreate() {
+bool Scene3g::OnCreate() {
 	Debug::Info("Loading assets Scene0: ", __FILE__, __LINE__);
 	
 	
 	
-	DualQuat line = Vec4(0, 1, 0.5, 1) & Vec4(2, 2, 0.3, 1);
-	line = DQMath::normalize(line);
-	Vec4 centrePoint = Vec4(9,5,-0.1,1);
-	Flector M = centrePoint * line;
-	Plane pM = M.plane;//grab the plane part of the flector
-	Vec4 vM = M.point;//grab the trivector
-
-	float radius = 1.8f;
-	float dSquared = (radius * radius) - (VMath::mag(vM) * VMath::mag(vM)); // d^2 = r^2 - (*<M>3)^2
-
-	if (dSquared > 0) { //if d^2 > 0 then the line and sphere intersect
-	
-		Vec4 i1 = line ^ (pM + Plane(0, 0, 0, sqrt(dSquared))) * -1;
-		i1 = i1 / i1.w;
-		i1.print("Intersection Point 1");
-
-		Vec4 i2 = line ^ (pM + Plane(0, 0, 0, -sqrt(dSquared))) * -1;
-		i2 = i2 / i2.w;
-		i2.print("Intersection Point 2");
-	}
-	
-	
-
-	
-
-	mesh = new Mesh("meshes/Sphere.obj");
-	mesh->OnCreate();
+	//create an enemy spawn point (its random but with a set magnitude(distance) from the origin
 
 	
 
 	
 
-	for (int i = 0; i <= startingFleetSize; i++) {
-		enemyFleet.push_back(new EnemyShip(Vec3(fmod(rand(), 5), fmod(rand(), 5), fmod(rand(), 5))));
+	
+
+	
+
+	for (int i = 0; i < startingFleetSize; i++) {
+		enemyFleet.push_back(new EnemyShip(Vec3(5, 5, 0)));
+
+
 	}
 	for (EnemyShip* ship : enemyFleet) {
 		ship->OnCreate();
-		ship->setTarget(Vec3(0, 0, 0));	///temporary remove later
+		
 
 	}
 	
 	
-	for (int i = 0; i <= startingFleetSize; i++) {
+	for (int i = 0; i < startingFleetSize; i++) {
 		playerFleet.push_back(new FriendlyShip());
 	}
 
-	playerFleet.push_back(new FriendlyShip());
+
 	for (FriendlyShip* ship : playerFleet) {
 		ship->OnCreate();
 		ship->transform.setPos(Vec3(0.0f, 0, 0));
 	}
-	//friendlyShip = FriendlyShip();
+
 	
 	
 	
@@ -101,13 +81,10 @@ bool Scene1g::OnCreate() {
 
 }
 
-void Scene1g::OnDestroy() {
+void Scene3g::OnDestroy() {
 	Debug::Info("Deleting assets Scene0: ", __FILE__, __LINE__);
 
 	
-
-	mesh->OnDestroy();
-	delete mesh;
 
 	
 
@@ -127,7 +104,7 @@ void Scene1g::OnDestroy() {
 
 }
 
-void Scene1g::HandleEvents(const SDL_Event& sdlEvent) {
+void Scene3g::HandleEvents(const SDL_Event& sdlEvent) {
 
 
 	playerController.handleEvents(sdlEvent);
@@ -193,9 +170,14 @@ void Scene1g::HandleEvents(const SDL_Event& sdlEvent) {
 	}
 }
 
-void Scene1g::Update(const float deltaTime) {
+void Scene3g::Update(const float deltaTime) {
 
-
+	enemySpawnPoint.Update(deltaTime);
+	if (enemySpawnPoint.canSpawn == true) {
+		enemyFleet.push_back(new EnemyShip(enemySpawnPoint.position));
+		enemyFleet.back()->OnCreate();
+		enemySpawnPoint.canSpawn = false;
+	}
 	
 	if (isGameRunning) {
 		playerController.Update(deltaTime);
@@ -257,8 +239,18 @@ void Scene1g::Update(const float deltaTime) {
 		for (FriendlyShip* ship : playerFleet) {
 			ship->Update(deltaTime);
 			ship->color = BLUE;//all friendly ships are blue except the active ship
+
+			for (EnemyShip* targetShip : enemyFleet) {
+				if (COLLISION::SphereSphereCollisionDetected(&ship->detectionSphere, targetShip->collisionSphere)) {
+					std::cout << "COLLISION!" << std::endl;
+					ship->targetDirection = VMath::normalize(targetShip->transform.getPos() - ship->transform.getPos());
+					ship->Fire();
+
+				}
+			}
+			
 		}
-		playerFleet[activeShip]->color = GREEN;	//temporary to turn the selected ship green
+		
 		for (EnemyShip* ship : enemyFleet) {
 			ship->Update(deltaTime);
 		}
@@ -269,7 +261,7 @@ void Scene1g::Update(const float deltaTime) {
 
 }
 
-void Scene1g::Render() const {
+void Scene3g::Render() const {
 	/// Set the background color then clear the screen
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -283,9 +275,7 @@ void Scene1g::Render() const {
 	glUseProgram(shader->GetProgram());
 	glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 	glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, modelMatrix);
-	glUniform4fv(shader->GetUniformID("meshColor"), 1, Vec4(0.2f, 0.2f, 0.2f, 0.2f));
-	mesh->Render(GL_TRIANGLES);
+
 	
 	for (FriendlyShip* ship : playerFleet) {
 		//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);

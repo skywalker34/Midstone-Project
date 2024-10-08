@@ -127,9 +127,10 @@
     <ClCompile Include="Body.cpp" />
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Camera2.cpp" />
+    <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="EnemyShip.cpp" />
+    <ClCompile Include="EnemySpawner.cpp" />
     <ClCompile Include="FriendlyShip.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
@@ -138,6 +139,7 @@
     <ClCompile Include="Scene0p.cpp" />
     <ClCompile Include="Scene1g.cpp" />
     <ClCompile Include="Scene2g.cpp" />
+    <ClCompile Include="Scene3g.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Scene0g.cpp" />
@@ -156,10 +158,11 @@
     <ClInclude Include="Body.h" />
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="Camera2.h" />
+    <ClInclude Include="Collision.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="EnemyShip.h" />
+    <ClInclude Include="EnemySpawner.h" />
     <ClInclude Include="FriendlyShip.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
@@ -168,6 +171,7 @@
     <ClInclude Include="Scene0p.h" />
     <ClInclude Include="Scene1g.h" />
     <ClInclude Include="Scene2g.h" />
+    <ClInclude Include="Scene3g.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Scene0g.h" />

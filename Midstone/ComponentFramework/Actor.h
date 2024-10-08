@@ -2,6 +2,7 @@
 #include "Model.h"
 #include "Transform.h"
 #include "sphere.h"
+using namespace MATHEX;
 class Actor
 {
 public:	
