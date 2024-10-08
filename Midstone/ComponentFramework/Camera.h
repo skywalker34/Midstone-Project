@@ -4,6 +4,8 @@
 #include <Quaternion.h>
 #include <DQMath.h>
 #include "Transform.h"
+#include "SkyBox.h"
+#include "Trackball.h"
 using namespace MATH;
 using namespace MATHEX;
 
@@ -13,6 +15,12 @@ private:
 	Matrix4 projection;
 	DualQuat viewDq;
 	bool orbitMode = false;
+
+	Quaternion orientation;
+	Vec3 position;
+	Matrix4 view;
+	SkyBox* skybox;
+	Trackball trackball;
 
 public:
 	Transform transform;//temp here (move back to private later)
@@ -27,5 +35,13 @@ public:
 		orbitMode = !orbitMode;
 	}
 
+	bool OnCreate();
+	void OnDestroy();
+	void RenderSkyBox() const;
+	void HandelEvents(const SDL_Event& sdlEvent);
+	GLuint GetSkyBoxTextureID() const {
+		return skybox->GetTextureID();
+	}
+	Quaternion GetOrientation() const { return orientation; }
 };
 

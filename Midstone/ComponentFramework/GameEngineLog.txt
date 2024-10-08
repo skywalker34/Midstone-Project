@@ -13,6 +13,12 @@ Tue Oct  8 06:53:58 2024
 "viewMatrix" loc:1
 "meshColor" loc:3
 
+[INFO]: Uniforms:
+"modelMatrix" loc:2
+"projectionMatrix" loc:0
+"skyboxTexture" loc:3
+"viewMatrix" loc:1
+
 [INFO]: Deleting the SceneManager
 [INFO]: Deleting assets Scene0: 
-[INFO]: Deleted Scene0: 
+[INFO]: Deleted Scene2g: 

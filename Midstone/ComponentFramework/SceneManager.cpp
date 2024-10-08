@@ -5,6 +5,7 @@
 #include "Scene0g.h"
 #include "Scene0p.h"
 #include "Scene1g.h"
+#include "Scene2g.h"
 #include "Scene3g.h"
 
 
@@ -150,7 +151,7 @@ bool SceneManager::BuildNewScene(SCENE_NUMBER scene) {
 		break;*/
 
 	case SCENE_NUMBER::SCENE2g:
-		currentScene = new Scene1g();
+		currentScene = new Scene2g();
 		status = currentScene->OnCreate();
 		//if (currentSceneNumber == 2) break;
 		break;
