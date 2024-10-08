@@ -3,7 +3,8 @@
 #include "Sphere.h"
 
 //From Game Physics
-
+using namespace MATHEX;
+using namespace MATH;
 // Instead of a class, let’s put all the collision equations in a namespace.
 // I got this idea from the book "Beautiful C++: 30 Core Guidelines for Writing
 // Clean, Safe, and Fast Code" 

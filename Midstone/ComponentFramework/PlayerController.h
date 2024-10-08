@@ -20,6 +20,7 @@ class PlayerController
 		Trackball trackball;
 		Transform transform;
 		DualQuat line;
+		DualQuat line2;
 		Vec3 clickPos;
 		float planeDepth = 0;
 
@@ -34,7 +35,7 @@ class PlayerController
 		void Render(Shader* shader) const;
 		Vec3 getClickPos();//returns the position of a 3d click
 		Vec3 get3DClickCoords(float sdl_X, float sdl_Y);
-		DualQuat getLine() { hasDQLine = false;  return line; };
+		DualQuat getLine() { hasDQLine = false;  return line2; };
 		
 };
 

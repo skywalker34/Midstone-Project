@@ -1,4 +1,5 @@
 #include "FriendlyShip.h"
+#include "Sphere.h"
 
 
 FriendlyShip::FriendlyShip()
@@ -15,6 +16,7 @@ FriendlyShip::FriendlyShip()
 bool FriendlyShip::OnCreate()
 {
 	model = Model("Ship.obj");
+	detectionSphere = Sphere(transform.getPos(), range);
 	if (model.OnCreate() == false) return false;
 	printf("Ship Created! \n");
 	
@@ -42,9 +44,10 @@ void FriendlyShip::Update(const float deltaTime)
 			delete bullets[i];
 			bullets[i] = nullptr;
 			bullets.erase(std::remove(bullets.begin(), bullets.end(), nullptr), bullets.end());
-
 		}
 	}
+
+
 
 	if (isMoving) {
 		slerpT = slerpT >= 1 ? 1 : slerpT + deltaTime;
@@ -55,7 +58,9 @@ void FriendlyShip::Update(const float deltaTime)
 	else {
 		body->vel = Vec3();
 	}
+
 	
+	detectionSphere.center = transform.getPos();//update teh collision sphere to match the ships position
 }
 
 void FriendlyShip::Render(Shader* shader) const
@@ -73,7 +78,7 @@ void FriendlyShip::Fire()
 {
 
 	//the third parameter here "BACKWARD" should instead be the direction the ship is facing
-	bullets.push_back(new Bullet(transform, 0.1f, BACKWARD));
+	bullets.push_back(new Bullet(transform, 0.1f, targetDirection));
 	if (bullets.back()->OnCreate() == false) {
 		printf("Bullet failed! /n");
 	}

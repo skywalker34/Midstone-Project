@@ -77,12 +77,31 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 		case SDL_BUTTON_LEFT:
 			has3DClick = true;
 			
-			std::cout << "LEFT";
+
 			break;
 		case SDL_BUTTON_RIGHT:
+
+			Vec4 sdlPosPixelSpace = Vec4(sdlEvent.button.x, sdlEvent.button.y, 0, 1);
+
+
+			Vec4 sdlPosNDCSpace = MMath::inverse(MMath::viewportNDC(SCREEN_WIDTH, SCREEN_HEIGHT)) * sdlPosPixelSpace;
+			// Let's get the front of the NDC box
+			sdlPosNDCSpace.z = -1.0f;
+
+			Vec4 sdlPosCameraSpace = MMath::inverse(camera.GetProjectionMatrix()) * sdlPosNDCSpace;
+			// Divide out the w component
+			sdlPosCameraSpace = sdlPosCameraSpace / sdlPosCameraSpace.w;
+
+			Vec4 sdlPosWorldSpace = MMath::inverse(MATHEX::DQMath::toMatrix4(camera.GetViewDQuaternion())) * sdlPosCameraSpace;
+
+			// Make a line from the camera position to the mouse
+			// Using the join of two points
+			line2 = transform.getPos() & sdlPosWorldSpace;
+
+
 			hasDQLine = true;
 
-			std::cout << "Right";
+	
 			break;
 		}
 		break;
