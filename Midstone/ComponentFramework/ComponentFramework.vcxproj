@@ -130,6 +130,7 @@
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="EnemyShip.cpp" />
+    <ClCompile Include="EnemySpawner.cpp" />
     <ClCompile Include="FriendlyShip.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="Constants.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="EnemyShip.h" />
+    <ClInclude Include="EnemySpawner.h" />
     <ClInclude Include="FriendlyShip.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />

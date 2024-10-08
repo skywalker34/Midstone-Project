@@ -25,7 +25,9 @@ bool Scene3g::OnCreate() {
 	
 	
 	
+	//create an enemy spawn point (its random but with a set magnitude(distance) from the origin
 
+	
 
 	
 
@@ -170,7 +172,12 @@ void Scene3g::HandleEvents(const SDL_Event& sdlEvent) {
 
 void Scene3g::Update(const float deltaTime) {
 
-
+	enemySpawnPoint.Update(deltaTime);
+	if (enemySpawnPoint.canSpawn == true) {
+		enemyFleet.push_back(new EnemyShip(enemySpawnPoint.position));
+		enemyFleet.back()->OnCreate();
+		enemySpawnPoint.canSpawn = false;
+	}
 	
 	if (isGameRunning) {
 		playerController.Update(deltaTime);

@@ -9,6 +9,7 @@
 #include <Matrix.h>
 #include "Collision.h"
 #include "Vector.h"
+#include "EnemySpawner.h"
 using namespace MATH;
 
 /// Forward declarations 
@@ -21,6 +22,9 @@ private:
 
 	Shader* shader;
 	Mesh* mesh;
+
+	EnemySpawner enemySpawnPoint = EnemySpawner(7, 10);
+
 	Matrix4 projectionMatrix;
 	Matrix4 viewMatrix;
 	Matrix4 modelMatrix;
@@ -28,7 +32,7 @@ private:
 	Vec3 destination = Vec3(0, 3.0f, 0);
 	Vec3 axis;
 	Vec3 shipWaypoint;
-	Vec3 enemySpawnPoint = Vec3(5.0f, 5.0f, 0);
+	
 	Quaternion newPosition;
 	std::vector<FriendlyShip*> playerFleet;
 	std::vector<EnemyShip*> enemyFleet;
