@@ -28,6 +28,7 @@ class FriendlyShip :
 		ShipController controller;
 		Vec3 destination = Vec3(0, 0, 0);
 
+		Vec3 targetDirection = Vec3(0, 0, 0);
 		Vec3 movingDirection;
 		Vec3 initialDirection = FORWARD;
 
