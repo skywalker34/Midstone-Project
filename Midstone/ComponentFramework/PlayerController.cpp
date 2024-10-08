@@ -116,8 +116,6 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 		//plane depth increases if the mouse is wheeled up (by the amount the mouse is wheeled)
 		//plane depth decreases if the mouse is wheeled down (by the amount the mouse is wheeled)
 		break;
-
-		
 	}
 
 	
@@ -128,7 +126,9 @@ void PlayerController::Update(const float deltaTime)
 {
 	camera.SetView(transform);
 	clickGrid.transform.setOrientation(transform.getOrientation());
-	clickGrid.transform.setPos(get3DClickCoords(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2));
+	Vec3 cameraToGrid = VMath::normalize(camera.transform.getPos() - get3DClickCoords(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)) * (CAMERA_TO_ORIGIN + planeDepth);
+	Vec3 newCridPosition =camera.transform.getPos() - cameraToGrid;
+	clickGrid.transform.setPos(newCridPosition);
 }
 
 void PlayerController::Render(Shader* shader) const

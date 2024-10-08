@@ -27,12 +27,13 @@ class FriendlyShip :
 		std::vector<Bullet*> bullets;
 		ShipController controller;
 		Vec3 destination = Vec3(0, 0, 0);
-		Vec3 moveDirection;
 
-		Vec3 targetDirection = Vec3(0,0,0);
-		
+		Vec3 movingDirection;
+		Vec3 initialDirection = FORWARD;
+
 		Vec4 color = BLUE;
 		bool isMoving = false;
+		float slerpT = 0;
 		float newAngle = 0;
 		const float projectileSpeed = 0.1;//the distance (units/frame) this ship's projectile moves
 		float range = 5.0f;
@@ -49,6 +50,7 @@ class FriendlyShip :
 		bool wouldIntersectPlanet = false;
 		void Fire();
 		void moveToDestination(Vec3 destination);
+		void rotateTowardTarget(Vec3 target);
 		bool hasReachDestination();
 
 		~FriendlyShip();

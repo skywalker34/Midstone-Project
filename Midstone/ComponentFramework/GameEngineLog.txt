@@ -4,6 +4,7 @@ Tue Oct  8 06:53:58 2024
 [INFO]: Graphics card vendor Intel
 [INFO]: Graphics card name Intel(R) Iris(R) Xe Graphics
 [INFO]: GLSL Version 4.60 - Build 30.0.101.1029
+
 [INFO]: Created Scene0: 
 [INFO]: Loading assets Scene0: 
 [INFO]: Uniforms:
