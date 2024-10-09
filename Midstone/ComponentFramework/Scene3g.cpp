@@ -29,7 +29,7 @@ bool Scene3g::OnCreate() {
 	//create an enemy spawn point (its random but with a set magnitude(distance) from the origin
 
 	
-
+	
 	
 
 	
@@ -294,12 +294,18 @@ void Scene3g::Render() const {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	playerController.camera.RenderSkyBox();
+
 	if (drawInWireMode) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 	else {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
+
+
+	
+
 	glUseProgram(shader->GetProgram());
 	glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 	glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
@@ -318,6 +324,7 @@ void Scene3g::Render() const {
 	}
 
 	playerController.Render(shader);
+
 
 	glUseProgram(0);
 }

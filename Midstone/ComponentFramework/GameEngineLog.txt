@@ -1,4 +1,4 @@
-Wed Oct  9 11:04:26 2024
+Wed Oct  9 11:17:51 2024
 [INFO]: Starting the SceneManager
 [INFO]: OpenGL version: 4.6.0 - Build 30.0.101.1029
 [INFO]: Graphics card vendor Intel
@@ -11,6 +11,12 @@ Wed Oct  9 11:04:26 2024
 "projectionMatrix" loc:0
 "viewMatrix" loc:1
 "meshColor" loc:3
+
+[INFO]: Uniforms:
+"modelMatrix" loc:2
+"projectionMatrix" loc:0
+"viewMatrix" loc:1
+"skyboxTexture" loc:3
 
 [INFO]: Deleting the SceneManager
 [INFO]: Deleting assets Scene0: 
