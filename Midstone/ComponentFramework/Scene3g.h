@@ -24,7 +24,7 @@ private:
 	Shader* shader;
 	Mesh* mesh;
 
-	EnemySpawner enemySpawnPoint = EnemySpawner(7, 10);
+	EnemySpawner enemySpawnPoint = EnemySpawner(7, 5);
 
 	Matrix4 projectionMatrix;
 	Matrix4 viewMatrix;

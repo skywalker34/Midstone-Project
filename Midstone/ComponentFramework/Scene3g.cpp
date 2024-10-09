@@ -238,7 +238,7 @@ void Scene3g::Update(const float deltaTime) {
 
 		//below can probably be a recursive function?
 		for (FriendlyShip* ship : playerFleet) { //first we loop through every oen of the player's ships
-			ship->Update(deltaTime);//call their update functions
+			
 			ship->color = BLUE;//all friendly ships are blue except the active ship TEMPORARY REMOVE LATER
 
 			
@@ -251,12 +251,15 @@ void Scene3g::Update(const float deltaTime) {
 					std::vector<Bullet*> temp = ship->getBullets(); //if the ship fired just update the temp list of bullets
 				}
 				
-				for (Bullet* Bullet : temp) { //now we loop through each bullet to see if any would hit this enemy ship
-					if (COLLISION::SphereSphereCollisionDetected(Bullet->collisionSphere, targetShip->collisionSphere)) {
+				for (Bullet* bullet : temp) { //now we loop through each bullet to see if any would hit this enemy ship
+					if (COLLISION::SphereSphereCollisionDetected(bullet->collisionSphere, targetShip->collisionSphere)) {
+						bullet->deleteMe = true; //tell the ship to delete the bullet
 						targetShip->Hit();
 					}
 				}
 			}
+
+			ship->Update(deltaTime);//call their update functions
 			
 		}
 		
