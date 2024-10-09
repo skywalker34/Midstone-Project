@@ -36,6 +36,13 @@ void FriendlyShip::OnDestroy()
 
 void FriendlyShip::Update(const float deltaTime)
 {
+	if (canFire == false) {
+		timeSinceShot += deltaTime;
+		if (timeSinceShot >= rateOfFire) {
+			canFire = true;
+		}
+	}
+
 
 	for (int i = 0; i < bullets.size(); i++) {
 		bullets[i]->Update(deltaTime);
@@ -76,7 +83,8 @@ void FriendlyShip::Render(Shader* shader) const
 
 void FriendlyShip::Fire()
 {
-
+	canFire = false; 
+	timeSinceShot = 0;
 	//the third parameter here "BACKWARD" should instead be the direction the ship is facing
 	bullets.push_back(new Bullet(transform, 0.1f, targetDirection));
 	if (bullets.back()->OnCreate() == false) {

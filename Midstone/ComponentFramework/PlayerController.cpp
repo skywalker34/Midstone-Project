@@ -13,6 +13,8 @@ bool PlayerController::OnCreate()
 	
 	clickGrid = Actor(Transform(), Model("Plane.obj"));
 
+	if (camera.OnCreate() == false) return false;
+
 	if (clickGrid.OnCreate() == false) return false;
 	return true;
 	

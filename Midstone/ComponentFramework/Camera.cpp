@@ -83,6 +83,7 @@ void Camera::RenderSkyBox() const {
 	if (skybox == nullptr) return;
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glUseProgram(skybox->GetShader()->GetProgram());
 	glUniformMatrix4fv(skybox->GetShader()->GetUniformID("projectionMatrix"), 1, GL_FALSE, projection);
 	glUniformMatrix4fv(skybox->GetShader()->GetUniformID("viewMatrix"), 1, GL_FALSE, MMath::toMatrix4(transform.getOrientation()));

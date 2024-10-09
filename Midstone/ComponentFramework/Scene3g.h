@@ -16,6 +16,7 @@ using namespace MATH;
 union SDL_Event;
 class Mesh;
 class Shader;
+class Bullet;
 
 class Scene3g : public Scene {
 private:
@@ -23,7 +24,7 @@ private:
 	Shader* shader;
 	Mesh* mesh;
 
-	EnemySpawner enemySpawnPoint = EnemySpawner(7, 10);
+	EnemySpawner enemySpawnPoint = EnemySpawner(7, 5);
 
 	Matrix4 projectionMatrix;
 	Matrix4 viewMatrix;

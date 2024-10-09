@@ -24,7 +24,10 @@ class EnemyShip :
 		//Matrix4 shipModelMatrix;
 	Vec3 target; 
 
+
 	public:
+		bool deleteMe = false;//flag to tell the scene when to delete this ship
+
 		EnemyShip();
 		EnemyShip(Vec3 pos);
 
@@ -35,5 +38,7 @@ class EnemyShip :
 		void OnDestroy();
 		void Update(const float deltaTime);
 		void Render(Shader* shader) const;
+		//called when the enemy ship is hit by a projectile
+		void Hit();
 };
 

@@ -12,6 +12,8 @@ bool Bullet::OnCreate()
 	if (model.OnCreate() == false) return false;
 	transform.setScale(0.2f, 0.2f, 0.2f);
 
+	collisionSphere = new Sphere(transform.getPos(), 1.0f); //set the collision sphere
+
 	return true;
 }
 
@@ -23,7 +25,8 @@ void Bullet::OnDestroy()
 
 void Bullet::Update(const float deltaTime)
 {
-	
+	collisionSphere->center = transform.getPos(); //ensure the sphere's position remains the same as the bullet 
+
 	transform.setPos(transform.getPos() + (forward * speed));
 	if (abs(VMath::mag(transform.getPos() - initialPos) > maxRange)) {
 		deleteMe = true;
