@@ -9,7 +9,7 @@ EnemyShip::EnemyShip()
 EnemyShip::EnemyShip(Vec3 pos)
 {
 	transform = Transform(pos, Quaternion(1.0f, Vec3(0.0f, 0.0f, 0.0f)), Vec3(0.02f, 0.02f, 0.02f));
-	body = new Body(transform, Vec3(), Vec3(), 1);
+	body = new Body(&transform, Vec3(), Vec3(), 1);
 	
 }
 
@@ -54,7 +54,7 @@ void EnemyShip::OnDestroy()
 void EnemyShip::Update(const float deltaTime)
 {
 	body->ApplyForce(getTargetDirection() * speed);	//shouldn't have to do this every frame we nay want to move it
-	transform = body->Update(deltaTime, transform);
+	body->Update(deltaTime);
 
 	collisionSphere->center = transform.getPos();
 }

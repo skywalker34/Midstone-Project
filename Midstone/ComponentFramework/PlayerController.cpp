@@ -36,7 +36,7 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 
 			//	below works *marginally* better (still jank af)
 			v = transform.getPos();
-			v += (VMath::normalize(direction) * CAMERA_SPEED);
+			v += (VMath::normalize(-direction) * CAMERA_SPEED);
 			transform.setPos(v);
 			break;
 
@@ -45,7 +45,7 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 
 
 			v = transform.getPos();
-			v += (VMath::normalize(-direction) * CAMERA_SPEED);
+			v += (VMath::normalize(direction) * CAMERA_SPEED);
 			transform.setPos(v);
 			break;
 
@@ -62,6 +62,11 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 		case SDL_SCANCODE_O:
 			//if player hits o reset them to the origin
 			transform = Transform();
+			if(planeDepth == 0); 
+			{
+				//push the plane into the screen a bit more so theres no divide by zero
+				planeDepth += 1 ;
+			}
 			break;
 		case SDL_SCANCODE_E:
 			//switches between orbit and free mode

@@ -12,7 +12,7 @@
 
 #include <chrono>
 
-Scene3g::Scene3g() : shader{ nullptr }, mesh{ nullptr },
+Scene3g::Scene3g() : shader{ nullptr }, 
 drawInWireMode{ true } {
 	Debug::Info("Created Scene0: ", __FILE__, __LINE__);
 }
@@ -71,10 +71,7 @@ bool Scene3g::OnCreate() {
 		std::cout << "Controller failed ... we have a problem\n";
 	}
 
-	projectionMatrix = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);
-	viewMatrix = MMath::lookAt(Vec3(0.0f, 0.0f, 5.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
-	modelMatrix.loadIdentity();
-	
+		
 
 	printf("On Create finished!!!!!");
 	return true;

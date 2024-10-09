@@ -12,13 +12,15 @@ using namespace MATH;
 class Body {
 public:
     Body();
-	Body(Transform tran, Vec3 vel_, Vec3 acc_, float mass_);
+	Body(Transform* tran, Vec3 vel_, Vec3 acc_, float mass_);
+
     ~Body();
 // private: /// Physics stuff
 	Vec3 pos;
 	Vec3 vel;
 	Vec3 accel;
-	Transform transform;
+	Transform* transform;
+	
 
 	float mass;
 private: /// Graphics stuff 
@@ -27,7 +29,8 @@ private: /// Graphics stuff
 public:
 	bool OnCreate();
 	void OnDestroy();
-	Transform Update(const float deltaTime, Transform t);
+	void Update(const float deltaTime);
+	//Transform Update(const float deltaTime, Transform t);
 	void Render() const;
 	void ApplyForce(Vec3 force);
 	void setAccel(const Vec3 &accel_) { accel = accel_;}
