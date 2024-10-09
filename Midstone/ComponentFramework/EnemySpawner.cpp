@@ -9,7 +9,7 @@ EnemySpawner::EnemySpawner(float distance_, int spawnRate_)
 	distanceFromOrigin = distance_;
 	spawnRate = spawnRate_;
 
-	position = Vec3(fmod(rand(), spawnVariation), fmod(rand(), spawnVariation), fmod(rand(), spawnVariation)); //create a random vector
+	position = Vec3(fmod(rand(), 2 * spawnVariation) - spawnVariation, fmod(rand(), 2 * spawnVariation) - spawnVariation, fmod(rand(), 2 * spawnVariation) - spawnVariation); //create a random vector
 	position = VMath::normalize(position); //normalize the position (make length equal to 1)
 	position *= distanceFromOrigin; //lengthen the magnitude back to our desired distance
 }

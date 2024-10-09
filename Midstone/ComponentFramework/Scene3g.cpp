@@ -9,6 +9,7 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "Body.h"
+
 #include <chrono>
 
 Scene3g::Scene3g() : shader{ nullptr }, mesh{ nullptr },
@@ -235,24 +236,43 @@ void Scene3g::Update(const float deltaTime) {
 			}
 		}
 
+		//below can probably be a recursive function?
+		for (FriendlyShip* ship : playerFleet) { //first we loop through every oen of the player's ships
+			ship->Update(deltaTime);//call their update functions
+			ship->color = BLUE;//all friendly ships are blue except the active ship TEMPORARY REMOVE LATER
 
-		for (FriendlyShip* ship : playerFleet) {
-			ship->Update(deltaTime);
-			ship->color = BLUE;//all friendly ships are blue except the active ship
-
-			for (EnemyShip* targetShip : enemyFleet) {
-				if (COLLISION::SphereSphereCollisionDetected(&ship->detectionSphere, targetShip->collisionSphere)) {
+			
+			std::vector<Bullet*> temp = ship->getBullets(); //get a reference to all the bullets that ship has fired
+			for (EnemyShip* targetShip : enemyFleet) { //now loop through each enemy to detect if an enmy is in range
+				if (COLLISION::SphereSphereCollisionDetected(&ship->detectionSphere, targetShip->collisionSphere)) {	//check if enemy ship is in range
 					std::cout << "COLLISION!" << std::endl;
-					ship->targetDirection = VMath::normalize(targetShip->transform.getPos() - ship->transform.getPos());
-					ship->Fire();
-
+					ship->targetDirection = VMath::normalize(targetShip->transform.getPos() - ship->transform.getPos()); //if the enemy is in range get the direction from our ship to the enemy
+					ship->Fire();//fire a bullet at the enemy
+					std::vector<Bullet*> temp = ship->getBullets(); //if the ship fired just update the temp list of bullets
+				}
+				
+				for (Bullet* Bullet : temp) { //now we loop through each bullet to see if any would hit this enemy ship
+					if (COLLISION::SphereSphereCollisionDetected(Bullet->collisionSphere, targetShip->collisionSphere)) {
+						targetShip->Hit();
+					}
 				}
 			}
 			
 		}
 		
-		for (EnemyShip* ship : enemyFleet) {
-			ship->Update(deltaTime);
+		for (int i = 0; i < enemyFleet.size(); i++) {
+			enemyFleet[i]->Update(deltaTime);
+			if (enemyFleet[i]->deleteMe) {
+				enemyFleet[i]->OnDestroy();
+				delete enemyFleet[i];
+				enemyFleet[i] = nullptr;
+				enemyFleet.erase(std::remove(enemyFleet.begin(), enemyFleet.end(), nullptr), enemyFleet.end());
+			}
+			else {
+				enemyFleet[i]->Update(deltaTime);
+			}
+
+			
 		}
 
 	}
@@ -284,7 +304,9 @@ void Scene3g::Render() const {
 
 	for (EnemyShip* ship : enemyFleet) {
 		//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
-		ship->Render(shader);
+		if (ship->deleteMe == false) { //shouldn't have to have this if here...
+			ship->Render(shader);
+		}
 	}
 
 	playerController.Render(shader);

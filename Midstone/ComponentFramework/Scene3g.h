@@ -16,6 +16,7 @@ using namespace MATH;
 union SDL_Event;
 class Mesh;
 class Shader;
+class Bullet;
 
 class Scene3g : public Scene {
 private:

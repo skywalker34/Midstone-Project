@@ -54,6 +54,10 @@ class FriendlyShip :
 		void rotateTowardTarget(Vec3 target);
 		bool hasReachDestination();
 
+		std::vector<Bullet*>& getBullets() {
+			return bullets; 
+		}
+
 		~FriendlyShip();
 };
 
