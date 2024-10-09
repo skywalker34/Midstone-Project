@@ -243,12 +243,17 @@ void Scene3g::Update(const float deltaTime) {
 
 			
 			std::vector<Bullet*> temp = ship->getBullets(); //get a reference to all the bullets that ship has fired
+
+			
+
 			for (EnemyShip* targetShip : enemyFleet) { //now loop through each enemy to detect if an enmy is in range
-				if (COLLISION::SphereSphereCollisionDetected(&ship->detectionSphere, targetShip->collisionSphere)) {	//check if enemy ship is in range
-					std::cout << "COLLISION!" << std::endl;
-					ship->targetDirection = VMath::normalize(targetShip->transform.getPos() - ship->transform.getPos()); //if the enemy is in range get the direction from our ship to the enemy
-					ship->Fire();//fire a bullet at the enemy
-					std::vector<Bullet*> temp = ship->getBullets(); //if the ship fired just update the temp list of bullets
+				if (ship->canFire == true) { //before checking if enemy is in range check if the ship is even allowed to shoot yet
+					if (COLLISION::SphereSphereCollisionDetected(&ship->detectionSphere, targetShip->collisionSphere)) {	//check if enemy ship is in range
+						std::cout << "COLLISION!" << std::endl;
+						ship->targetDirection = VMath::normalize(targetShip->transform.getPos() - ship->transform.getPos()); //if the enemy is in range get the direction from our ship to the enemy
+						ship->Fire();//fire a bullet at the enemy
+						std::vector<Bullet*> temp = ship->getBullets(); //if the ship fired just update the temp list of bullets
+					}
 				}
 				
 				for (Bullet* bullet : temp) { //now we loop through each bullet to see if any would hit this enemy ship

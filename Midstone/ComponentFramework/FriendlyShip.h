@@ -34,6 +34,11 @@ class FriendlyShip :
 
 		Vec4 color = BLUE;
 		bool isMoving = false;
+		bool canFire = true;
+		
+		float timeSinceShot = 0;//the time since the ship has last fired a shot
+		float rateOfFire = 0.2; //how often this ship can shoot (seconds)
+
 		float slerpT = 0;
 		float newAngle = 0;
 		const float projectileSpeed = 0.1;//the distance (units/frame) this ship's projectile moves
