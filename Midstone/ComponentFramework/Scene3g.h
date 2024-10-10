@@ -22,7 +22,7 @@ class Scene3g : public Scene {
 private:
 
 	Shader* shader;
-	Mesh* mesh;
+	
 
 	EnemySpawner enemySpawnPoint = EnemySpawner(7, 5);
 

@@ -5,7 +5,7 @@
 FriendlyShip::FriendlyShip()
 {
 	transform = Transform(Vec3(0.0f, 0.0f, 0.0f), Quaternion(1.0f, Vec3(0.0f, 0.0f, 0.0f)), Vec3(0.02f, 0.02f, 0.02f));
-	body = new Body(transform, Vec3(), Vec3(), 1);
+	body = new Body(&transform, Vec3(), Vec3(), 1);
 
 	
 	
@@ -36,6 +36,10 @@ void FriendlyShip::OnDestroy()
 
 void FriendlyShip::Update(const float deltaTime)
 {
+
+
+	
+
 	if (canFire == false) {
 		timeSinceShot += deltaTime;
 		if (timeSinceShot >= rateOfFire) {
@@ -58,7 +62,7 @@ void FriendlyShip::Update(const float deltaTime)
 
 	if (isMoving) {
 		slerpT = slerpT >= 1 ? 1 : slerpT + deltaTime;
-		transform = body->Update(deltaTime, transform);
+		body->Update(deltaTime);
 		rotateTowardTarget(movingDirection);
 		isMoving = VMath::mag(destination - transform.getPos()) > 0.01;
 	}
