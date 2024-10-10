@@ -12,19 +12,17 @@ using namespace std;
 
 
 
-SceneUI::SceneUI(){
-	Debug::Info("Created SceneUI: ", __FILE__, __LINE__);
-}
 
 
-SceneUI::SceneUI(SDL_Window* sdlWindow)
+
+SceneUI::SceneUI(SDL_Window* sdlWindow_)
 {
-	window = sdlWindow;
+	window = sdlWindow_;
 	SDL_GetWindowSize(window, &screenWidth, &screenHeight);
 	screenRenderer = nullptr;
 
 	background = new Body();
-	background->SetTextureFile("textures/StartPhoto.jpg"); //Renders Background
+	background->SetTextureFile("textures/StartPhoto.jpg"); //Gets background photo
 
 	backgroundTexture = nullptr;
 
@@ -76,18 +74,28 @@ void SceneUI::OnDestroy() {
 
 
 }
-
-void SceneUI::HandleEvents(const SDL_Event& sdlEvent) 
-{
-	
-}
-
 SceneUI::~SceneUI()
 {
 	delete background;
 }
+// ^^ Delete Anything to do with background when being destroyed 
 
-void SceneUI::Update(const float deltaTime) {
+void SceneUI::HandleEvents(const SDL_Event& sdlEvent) 
+{
+	switch (sdlEvent.type) {
+	case SDL_KEYDOWN:
+		switch (sdlEvent.key.keysym.scancode) {
+		case SDL_SCANCODE_M:
+			switchButton = true;
+			cout << "pressed" << std::endl;
+			break;
+		}
+	}
+}
+
+
+void SceneUI::Update(const float deltaTime)
+{
 	
 		
 }

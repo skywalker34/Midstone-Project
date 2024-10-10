@@ -7,7 +7,7 @@
 #include "Scene1g.h"
 #include "SceneUI.h"
 
-
+//SceneUI ans;
 
 
 SceneManager::SceneManager(): 
@@ -63,15 +63,9 @@ bool SceneManager::Initialize(std::string name_, int width_, int height_) {
 void SceneManager::Run() {
 	timer->Start();
 	isRunning = true;
-
-	/* while (isRunning && SceneUI()) Does sum\
-	if(SwitchButton == true)
+	
+	while (isRunning) 
 	{
-		BuildNewScene(SCENE_NUMBER::SCENE1g);
-	}
-	else{}
-	 */
-	while (isRunning) {
 		HandleEvents();
 		timer->UpdateFrameTicks();
 		currentScene->Update(timer->GetDeltaTime());
@@ -80,6 +74,14 @@ void SceneManager::Run() {
 		SDL_GL_SwapWindow(window->getWindow());
 		SDL_Delay(timer->GetSleepTime(fps));
 	}
+	/*while (BuildNewScene(SCENE_NUMBER::SCENEUI))
+	{
+		if (ans.switchButton == true)
+		{
+			BuildNewScene(SCENE_NUMBER::SCENE0g);
+			
+		}
+	}*/
 }
 
 void SceneManager::HandleEvents() {
@@ -167,6 +169,7 @@ bool SceneManager::BuildNewScene(SCENE_NUMBER scene) {
 		currentScene = new SceneUI();
 		status = currentScene->OnCreate();
 		//if (currentSceneNumber == 2) break;
+		 
 		break;
 
 	default:

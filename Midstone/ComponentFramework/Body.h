@@ -33,6 +33,8 @@ public:
 	void ApplyForce(Vec3 force);
 	void setAccel(const Vec3 &accel_) { accel = accel_;}
 	
+
+
 	const char* GetTextureFile() {
 		return textureFile;
 	}

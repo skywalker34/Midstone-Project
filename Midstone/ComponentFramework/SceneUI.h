@@ -16,7 +16,7 @@ class Shader;
 class Texture;
 
 class SceneUI : public Scene {
-private:
+public:
 
 	SDL_Window* window;
 	int screenWidth, screenHeight, screenDepth = 1;
@@ -29,16 +29,13 @@ private:
 
 	SDL_Texture* backgroundTexture;
 
-	bool gameStart = false;
-
 	SDL_Texture* loadImage(const char* textureFile);
 
 	SDL_Rect scale(SDL_Texture* objectTexture,
 		int start_x = 0, int start_y = 0, float scale = 1.0f);
 	
-	 bool SwitchButton = false; // IF button press switch scenes 
 
-public:
+
 	explicit SceneUI();
 	SceneUI(SDL_Window* sdlWindow);
 	virtual bool OnCreate() override;
@@ -48,6 +45,7 @@ public:
 	virtual void HandleEvents(const SDL_Event& sdlEvent) override;
 	~SceneUI();
 
+	bool switchButton = false; // IF button press switch scenes 
 	
 };
 
