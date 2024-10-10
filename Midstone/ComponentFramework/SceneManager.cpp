@@ -64,7 +64,13 @@ void SceneManager::Run() {
 	timer->Start();
 	isRunning = true;
 
-	// while(isRunning && SceneUI()) Does sum
+	/* while (isRunning && SceneUI()) Does sum\
+	if(SwitchButton == true)
+	{
+		BuildNewScene(SCENE_NUMBER::SCENE1g);
+	}
+	else{}
+	 */
 	while (isRunning) {
 		HandleEvents();
 		timer->UpdateFrameTicks();
@@ -98,7 +104,7 @@ void SceneManager::HandleEvents() {
 				break;
 			case SDL_SCANCODE_F2:
 				currentSceneNumber -= 1;
-				BuildNewScene(SCENE_NUMBER::SCENE0g);
+				BuildNewScene(SCENE_NUMBER::SCENE1g);
 				break;
 			case SDL_SCANCODE_F3:
 			case SDL_SCANCODE_F4:

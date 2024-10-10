@@ -35,6 +35,8 @@ private:
 
 	SDL_Rect scale(SDL_Texture* objectTexture,
 		int start_x = 0, int start_y = 0, float scale = 1.0f);
+	
+	 bool SwitchButton = false; // IF button press switch scenes 
 
 public:
 	explicit SceneUI();

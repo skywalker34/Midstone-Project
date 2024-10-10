@@ -34,7 +34,7 @@ bool SceneUI::OnCreate() {
 	Debug::Info("Loading assets Scene0: ", __FILE__, __LINE__);
 	
 	//Create renderer for window
-	screenRenderer = SDL_CreateRenderer(window, -0.5, SDL_RENDERER_ACCELERATED);
+	screenRenderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if (!screenRenderer)
 	{
 		std::cout << "SDL_Error: " << SDL_GetError() << std::endl;
