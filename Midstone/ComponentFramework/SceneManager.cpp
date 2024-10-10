@@ -5,6 +5,7 @@
 #include "Scene0g.h"
 #include "Scene0p.h"
 #include "Scene1g.h"
+#include "SceneUI.h"
 
 
 
@@ -52,7 +53,7 @@ bool SceneManager::Initialize(std::string name_, int width_, int height_) {
 
 	/********************************   Default first scene   ***********************/
 
-	BuildNewScene(SCENE_NUMBER::SCENE1g); 
+	BuildNewScene(SCENE_NUMBER::SCENEUI); 
 
 	/********************************************************************************/
 	return true;
@@ -62,6 +63,8 @@ bool SceneManager::Initialize(std::string name_, int width_, int height_) {
 void SceneManager::Run() {
 	timer->Start();
 	isRunning = true;
+
+	// while(isRunning && SceneUI()) Does sum
 	while (isRunning) {
 		HandleEvents();
 		timer->UpdateFrameTicks();
@@ -150,6 +153,12 @@ bool SceneManager::BuildNewScene(SCENE_NUMBER scene) {
 
 	case SCENE_NUMBER::SCENE2g:
 		currentScene = new Scene1g();
+		status = currentScene->OnCreate();
+		//if (currentSceneNumber == 2) break;
+		break;
+
+	case SCENE_NUMBER::SCENEUI:
+		currentScene = new SceneUI();
 		status = currentScene->OnCreate();
 		//if (currentSceneNumber == 2) break;
 		break;

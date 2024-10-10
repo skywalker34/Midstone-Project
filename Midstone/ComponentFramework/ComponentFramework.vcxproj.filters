@@ -105,6 +105,9 @@
     <ClCompile Include="Scene2g.cpp">
       <Filter>Source Files\Scenes</Filter>
     </ClCompile>
+    <ClCompile Include="SceneUI.cpp">
+      <Filter>Source Files\Scenes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Debug.h">
@@ -189,6 +192,9 @@
       <Filter>Header Files\Actors</Filter>
     </ClInclude>
     <ClInclude Include="Scene2g.h">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneUI.h">
       <Filter>Header Files\Scenes</Filter>
     </ClInclude>
   </ItemGroup>

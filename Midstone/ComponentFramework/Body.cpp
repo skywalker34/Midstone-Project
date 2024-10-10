@@ -1,6 +1,10 @@
 #include "Body.h"
 
 
+Body::Body()
+{
+}
+
 Body::Body(Transform tran, Vec3 vel_, Vec3 acc_, float mass_)
 	: transform(tran), vel(vel_), accel(acc_), mass(mass_) {}
 
