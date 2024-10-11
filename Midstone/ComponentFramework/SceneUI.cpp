@@ -21,8 +21,8 @@ SceneUI::SceneUI(SDL_Window* sdlWindow_)
 	SDL_GetWindowSize(window, &screenWidth, &screenHeight);
 	screenRenderer = nullptr;
 
-	background = new Body();
-	background->SetTextureFile("textures/StartPhoto.jpg"); //Gets background photo
+	
+	backgroundTex = "textures/StartPhoto.jpg"; //Gets background photo
 
 	backgroundTexture = nullptr;
 
@@ -51,7 +51,7 @@ bool SceneUI::OnCreate() {
 	}
 
 	// Load the bodies's textures
-	backgroundTexture = loadImage(background->GetTextureFile());
+	backgroundTexture = loadImage(backgroundTex);
 
 	
 	

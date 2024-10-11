@@ -25,6 +25,8 @@ public:
 	//float xPixel;
 	SDL_Renderer* screenRenderer;
 
+
+	const char* backgroundTex;
 	Body* background;
 
 	SDL_Texture* backgroundTexture;

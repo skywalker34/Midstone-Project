@@ -71,7 +71,7 @@ void SceneManager::Run() {
 		currentScene->Update(timer->GetDeltaTime());
 		currentScene->Render();
 		
-		SDL_GL_SwapWindow(window->getWindow());
+		//SDL_GL_SwapWindow(window->getWindow());
 		SDL_Delay(timer->GetSleepTime(fps));
 	}
 	/*while (BuildNewScene(SCENE_NUMBER::SCENEUI))
@@ -166,7 +166,7 @@ bool SceneManager::BuildNewScene(SCENE_NUMBER scene) {
 		break;
 
 	case SCENE_NUMBER::SCENEUI:
-		currentScene = new SceneUI();
+		currentScene = new SceneUI(window->getWindow());
 		status = currentScene->OnCreate();
 		//if (currentSceneNumber == 2) break;
 		 
