@@ -1,11 +1,16 @@
 #pragma once
 #include "Ship.h"
 #include "Bullet.h"
+
+#include "Sphere.h"
 #include "ShipController.h"
 #include "Constants.h"
 #include <vector>
 #include <QMath.h>
 #include <VMath.h>
+using namespace MATH;
+using namespace MATHEX;
+
 class FriendlyShip : 
 	public Ship
 {
@@ -19,15 +24,27 @@ class FriendlyShip :
 		//speed
 		//body
 		//modelmatrix
-		std::vector<Bullet> bullets;
+		std::vector<Bullet*> bullets;
 		ShipController controller;
 		Vec3 destination = Vec3(0, 0, 0);
-		Vec3 moveDirection;
+
+		Vec3 targetDirection = Vec3(0, 0, 0);
+		Vec3 movingDirection;
+		Vec3 initialDirection = FORWARD;
+
 		Vec4 color = BLUE;
 		bool isMoving = false;
-		float newAngle = 0;
+		bool canFire = true;
+		
+		float timeSinceShot = 0;//the time since the ship has last fired a shot
+		float rateOfFire = 0.2; //how often this ship can shoot (seconds)
 
-		Sphere* detectionSphere = nullptr;
+		float slerpT = 0;
+		float newAngle = 0;
+		const float projectileSpeed = 0.1;//the distance (units/frame) this ship's projectile moves
+		float range = 5.0f;
+
+		Sphere detectionSphere;
 
 		FriendlyShip();
 		bool OnCreate() override; //probably a way to do this without ovveriding
@@ -37,8 +54,14 @@ class FriendlyShip :
 		void Update(const float deltaTime);
 		void Render(Shader* shader) const;
 		bool wouldIntersectPlanet = false;
+		void Fire();
 		void moveToDestination(Vec3 destination);
+		void rotateTowardTarget(Vec3 target);
 		bool hasReachDestination();
+
+		std::vector<Bullet*>& getBullets() {
+			return bullets; 
+		}
 
 		~FriendlyShip();
 };

@@ -28,7 +28,7 @@ void Trackball::HandleEvents(const SDL_Event& sdlEvent) {
 		onLeftMouseUp(sdlEvent.button.x, sdlEvent.button.y);
 	}
 	else if (sdlEvent.type == SDL_EventType::SDL_MOUSEMOTION &&
-		SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+		SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_MIDDLE)) {
 		onMouseMove(sdlEvent.button.x, sdlEvent.button.y);
 	}
 	else if (sdlEvent.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {

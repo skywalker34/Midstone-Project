@@ -59,6 +59,7 @@ bool Scene2g::OnCreate() {
 	modelMatrix.loadIdentity();
 	
 
+
 	printf("On Create finished!!!!!");
 	return true;
 
@@ -92,8 +93,6 @@ void Scene2g::OnDestroy() {
 }
 
 void Scene2g::HandleEvents(const SDL_Event& sdlEvent) {
-
-
 	playerController.handleEvents(sdlEvent);
 	//basically whats happening here is that the player controller has a boolean flag thats basically saying "I have something to tell you scenemanager"
 	//the scene knows to check for this flag and to recieve the message so the playercontroller does not need to have a reference to the scene
@@ -172,12 +171,17 @@ void Scene2g::Render() const {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	playerController.camera.RenderSkyBox();
+
 	if (drawInWireMode) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 	else {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
+
+	
+
 	glUseProgram(shader->GetProgram());
 	glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 	glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());

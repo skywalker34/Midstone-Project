@@ -22,10 +22,23 @@ class EnemyShip :
 		//float speed;
 		//Body* body;
 		//Matrix4 shipModelMatrix;
+	Vec3 target; 
+
 
 	public:
+		bool deleteMe = false;//flag to tell the scene when to delete this ship
+
+		EnemyShip();
+		EnemyShip(Vec3 pos);
+
+		void setTarget(Vec3 target_);
+		Vec3 getTargetDirection();
+
 		bool OnCreate() override;
 		void OnDestroy();
+		void Update(const float deltaTime);
 		void Render(Shader* shader) const;
+		//called when the enemy ship is hit by a projectile
+		void Hit();
 };
 

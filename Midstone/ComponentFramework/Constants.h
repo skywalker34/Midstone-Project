@@ -7,6 +7,8 @@ using namespace MATH;
 
 const Vec3 ORIGIN = Vec3(0, 0, 0);
 
+const float CAMERA_TO_ORIGIN = 20;	// Remove or rename
+
 // Direction
 const Vec3 FORWARD = Vec3(0, 0, -1);
 const Vec3 BACKWARD = Vec3(0, 0, 1);
@@ -23,5 +25,6 @@ const int SCREEN_HEIGHT = 640;
 const Vec4 RED = Vec4(1.0f, 0.0f, 0.0f, 1.0f);
 const Vec4 GREEN = Vec4(0.0f, 1.0f, 0.0f, 1.0f);
 const Vec4 BLUE = Vec4(0.0f, 0.0f, 1.0f, 1.0f);
+const Vec4 ORANGE = Vec4(1, 0.6, 0.0f, 1.0f);
 
 #endif

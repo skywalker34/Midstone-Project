@@ -6,6 +6,8 @@
 #include "Scene0p.h"
 #include "Scene1g.h"
 #include "SceneUI.h"
+#include "Scene2g.h"
+#include "Scene3g.h"
 
 //SceneUI ans;
 
@@ -53,7 +55,9 @@ bool SceneManager::Initialize(std::string name_, int width_, int height_) {
 
 	/********************************   Default first scene   ***********************/
 
+
 	BuildNewScene(SCENE_NUMBER::SCENEUI); 
+
 
 	/********************************************************************************/
 	return true;
@@ -174,7 +178,13 @@ bool SceneManager::BuildNewScene(SCENE_NUMBER scene) {
 		break;*/
 
 	case SCENE_NUMBER::SCENE2g:
-		currentScene = new Scene1g();
+		currentScene = new Scene2g();
+		status = currentScene->OnCreate();
+		//if (currentSceneNumber == 2) break;
+		break;
+
+	case SCENE_NUMBER::SCENE3g:
+		currentScene = new Scene3g();
 		status = currentScene->OnCreate();
 		//if (currentSceneNumber == 2) break;
 		break;

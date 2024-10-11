@@ -13,6 +13,8 @@ bool PlayerController::OnCreate()
 	
 	clickGrid = Actor(Transform(), Model("Plane.obj"));
 
+	if (camera.OnCreate() == false) return false;
+
 	if (clickGrid.OnCreate() == false) return false;
 	return true;
 	
@@ -34,7 +36,7 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 
 			//	below works *marginally* better (still jank af)
 			v = transform.getPos();
-			v += (VMath::normalize(direction) * CAMERA_SPEED);
+			v += (VMath::normalize(-direction) * CAMERA_SPEED);
 			transform.setPos(v);
 			break;
 
@@ -43,7 +45,7 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 
 
 			v = transform.getPos();
-			v += (VMath::normalize(-direction) * CAMERA_SPEED);
+			v += (VMath::normalize(direction) * CAMERA_SPEED);
 			transform.setPos(v);
 			break;
 
@@ -60,6 +62,11 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 		case SDL_SCANCODE_O:
 			//if player hits o reset them to the origin
 			transform = Transform();
+			if(planeDepth == 0); 
+			{
+				//push the plane into the screen a bit more so theres no divide by zero
+				planeDepth += 1 ;
+			}
 			break;
 		case SDL_SCANCODE_E:
 			//switches between orbit and free mode
@@ -71,10 +78,40 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 		break;
 
 	case SDL_MOUSEBUTTONDOWN:
-
 	{
-		has3DClick = true;
 		clickPos = get3DClickCoords(sdlEvent.button.x, sdlEvent.button.y);
+		switch (sdlEvent.button.button){
+		case SDL_BUTTON_LEFT:
+			has3DClick = true;
+			
+
+			break;
+		case SDL_BUTTON_RIGHT:
+
+			Vec4 sdlPosPixelSpace = Vec4(sdlEvent.button.x, sdlEvent.button.y, 0, 1);
+
+
+			Vec4 sdlPosNDCSpace = MMath::inverse(MMath::viewportNDC(SCREEN_WIDTH, SCREEN_HEIGHT)) * sdlPosPixelSpace;
+			// Let's get the front of the NDC box
+			sdlPosNDCSpace.z = -1.0f;
+
+			Vec4 sdlPosCameraSpace = MMath::inverse(camera.GetProjectionMatrix()) * sdlPosNDCSpace;
+			// Divide out the w component
+			sdlPosCameraSpace = sdlPosCameraSpace / sdlPosCameraSpace.w;
+
+			Vec4 sdlPosWorldSpace = MMath::inverse(MATHEX::DQMath::toMatrix4(camera.GetViewDQuaternion())) * sdlPosCameraSpace;
+
+			// Make a line from the camera position to the mouse
+			// Using the join of two points
+			line2 = transform.getPos() & sdlPosWorldSpace;
+
+
+			hasDQLine = true;
+
+	
+			break;
+		}
+		break;
 	}
 	break;
 
@@ -86,8 +123,6 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 		//plane depth increases if the mouse is wheeled up (by the amount the mouse is wheeled)
 		//plane depth decreases if the mouse is wheeled down (by the amount the mouse is wheeled)
 		break;
-
-		
 	}
 
 	
@@ -98,7 +133,9 @@ void PlayerController::Update(const float deltaTime)
 {
 	camera.SetView(transform);
 	clickGrid.transform.setOrientation(transform.getOrientation());
-	clickGrid.transform.setPos(get3DClickCoords(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2));
+	Vec3 cameraToGrid = VMath::normalize(camera.transform.getPos() - get3DClickCoords(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)) * (CAMERA_TO_ORIGIN + planeDepth);
+	Vec3 newCridPosition =camera.transform.getPos() - cameraToGrid;
+	clickGrid.transform.setPos(newCridPosition);
 }
 
 void PlayerController::Render(Shader* shader) const
@@ -131,7 +168,7 @@ Vec3 PlayerController::get3DClickCoords(float sdl_X, float sdl_Y)
 
 	// Make a line from the camera position to the mouse
 	// Using the join of two points
-	DualQuat line = transform.getPos() & sdlPosWorldSpace;
+	line = transform.getPos() & sdlPosWorldSpace;
 
 	// Make a plane based off scrollwheel
 	Plane plane = Plane(0, 0, 1, -(-planeDepth));
@@ -141,6 +178,11 @@ Vec3 PlayerController::get3DClickCoords(float sdl_X, float sdl_Y)
 
 	// Divide out the w component
 	intersection = intersection / intersection.w;
+
+		
+
+		
+		
 
 
 	return Vec3(intersection);
