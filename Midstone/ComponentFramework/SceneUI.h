@@ -47,7 +47,9 @@ public:
 	virtual void HandleEvents(const SDL_Event& sdlEvent) override;
 	~SceneUI();
 
-	bool switchButton = false; // IF button press switch scenes 
+
+	//MOVED TO Scene.h
+	//bool switchButton = false; // IF button press switch scenes 
 	
 };
 

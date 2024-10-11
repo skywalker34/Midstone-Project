@@ -64,6 +64,20 @@ void SceneManager::Run() {
 	timer->Start();
 	isRunning = true;
 	
+
+	while (isRunning && mainMenu) {
+		HandleEvents();
+		if (currentScene->switchButton) {
+			currentScene->switchButton = false;
+			BuildNewScene(SCENE_NUMBER::SCENE1g);
+			mainMenu = false;
+		}
+		timer->UpdateFrameTicks();
+		currentScene->Update(timer->GetDeltaTime());
+		currentScene->Render();
+
+		SDL_Delay(timer->GetSleepTime(fps));
+	}
 	while (isRunning) 
 	{
 		HandleEvents();
@@ -71,7 +85,7 @@ void SceneManager::Run() {
 		currentScene->Update(timer->GetDeltaTime());
 		currentScene->Render();
 		
-		//SDL_GL_SwapWindow(window->getWindow());
+		SDL_GL_SwapWindow(window->getWindow());
 		SDL_Delay(timer->GetSleepTime(fps));
 	}
 	/*while (BuildNewScene(SCENE_NUMBER::SCENEUI))
@@ -167,6 +181,7 @@ bool SceneManager::BuildNewScene(SCENE_NUMBER scene) {
 
 	case SCENE_NUMBER::SCENEUI:
 		currentScene = new SceneUI(window->getWindow());
+		mainMenu = true;
 		status = currentScene->OnCreate();
 		//if (currentSceneNumber == 2) break;
 		 

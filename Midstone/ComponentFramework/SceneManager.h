@@ -36,6 +36,7 @@ private:
 	unsigned int fps;
 	bool isRunning;
 	bool fullScreen;
+	bool mainMenu = false;
 	bool BuildNewScene(SCENE_NUMBER scene_);
 };
 
