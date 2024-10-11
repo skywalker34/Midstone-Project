@@ -4,6 +4,8 @@
 
 
 
+
+
 Body::Body(Transform* tran, Vec3 vel_, Vec3 acc_, float mass_) {
 	transform = tran;
 	vel = vel_;
