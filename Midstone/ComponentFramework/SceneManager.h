@@ -14,6 +14,7 @@ public:
 	int currentSceneNumber;
 	
 	
+	
 private:
 	enum class SCENE_NUMBER {
 		SCENE0g = 0,
@@ -35,6 +36,7 @@ private:
 	unsigned int fps;
 	bool isRunning;
 	bool fullScreen;
+	bool mainMenu = false;
 	bool BuildNewScene(SCENE_NUMBER scene_);
 };
 
