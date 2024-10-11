@@ -71,7 +71,7 @@ bool Scene3g::OnCreate() {
 		std::cout << "Controller failed ... we have a problem\n";
 	}
 
-		
+	playerFleet[activeShip]->displayRange = true;
 
 	printf("On Create finished!!!!!");
 	return true;

@@ -16,6 +16,10 @@ class FriendlyShip :
 {
 	public:
 
+
+		Model rangeSphere;
+		Transform rangeSphereT;
+		bool displayRange = false;
 		//Inherited:
 		// Transform transform
 		// Model model
