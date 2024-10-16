@@ -117,6 +117,12 @@
     <ClCompile Include="EnemySpawner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Scene5g.cpp">
+      <Filter>Source Files\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="ComputeShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Debug.h">
@@ -215,6 +221,12 @@
     <ClInclude Include="EnemySpawner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Scene5g.h">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="ComputeShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="GameEngineLog.txt">
@@ -232,6 +244,21 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="shaders\skyboxVert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\computer.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\loadVerticiesFrag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\loadVerticiesVert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\textureFrag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\textureVert.glsl">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

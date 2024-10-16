@@ -8,6 +8,7 @@
 #include "SceneUI.h"
 #include "Scene2g.h"
 #include "Scene3g.h"
+#include "Scene5g.h"
 
 //SceneUI ans;
 
@@ -56,7 +57,7 @@ bool SceneManager::Initialize(std::string name_, int width_, int height_) {
 	/********************************   Default first scene   ***********************/
 
 
-	BuildNewScene(SCENE_NUMBER::SCENEUI); 
+	BuildNewScene(SCENE_NUMBER::SCENE5g); 
 
 
 	/********************************************************************************/
@@ -89,7 +90,20 @@ void SceneManager::Run() {
 		currentScene->Update(timer->GetDeltaTime());
 		currentScene->Render();
 		
+<<<<<<< Updated upstream
 		SDL_GL_SwapWindow(window->getWindow());
+=======
+		if (!mainMenu) {
+			SDL_GL_SwapWindow(window->getWindow());
+		}
+		else if(currentScene->switchButton) {
+			currentScene->switchButton = false;
+			BuildNewScene(SCENE_NUMBER::SCENE5g);
+			mainMenu = false;
+		}
+		
+
+>>>>>>> Stashed changes
 		SDL_Delay(timer->GetSleepTime(fps));
 	}
 	/*while (BuildNewScene(SCENE_NUMBER::SCENEUI))
@@ -195,6 +209,13 @@ bool SceneManager::BuildNewScene(SCENE_NUMBER scene) {
 		status = currentScene->OnCreate();
 		//if (currentSceneNumber == 2) break;
 		 
+		break;
+
+	case SCENE_NUMBER::SCENE5g:
+		currentScene = new Scene5g();
+		status = currentScene->OnCreate();
+		//if (currentSceneNumber == 2) break;
+
 		break;
 
 	default:
