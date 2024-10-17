@@ -69,19 +69,15 @@ void SceneManager::Run() {
 	isRunning = true;
 	
 
-	while (isRunning && mainMenu) {
+	/*while (isRunning && mainMenu) {
 		HandleEvents();
-		if (currentScene->switchButton) {
-			currentScene->switchButton = false;
-			BuildNewScene(SCENE_NUMBER::SCENE1g);
-			mainMenu = false;
-		}
+		
 		timer->UpdateFrameTicks();
 		currentScene->Update(timer->GetDeltaTime());
 		currentScene->Render();
 
 		SDL_Delay(timer->GetSleepTime(fps));
-	}
+	}*/
 	while (isRunning) 
 	{
 		HandleEvents();
@@ -89,7 +85,16 @@ void SceneManager::Run() {
 		currentScene->Update(timer->GetDeltaTime());
 		currentScene->Render();
 		
-		SDL_GL_SwapWindow(window->getWindow());
+		if (!mainMenu) {
+			SDL_GL_SwapWindow(window->getWindow());
+		}
+		else if(currentScene->switchButton) {
+			currentScene->switchButton = false;
+			BuildNewScene(SCENE_NUMBER::SCENE3g);
+			mainMenu = false;
+		}
+		
+
 		SDL_Delay(timer->GetSleepTime(fps));
 	}
 	/*while (BuildNewScene(SCENE_NUMBER::SCENEUI))
