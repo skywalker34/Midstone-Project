@@ -5,6 +5,7 @@
 #include "Scene.h"
 #include "Vector.h"
 #include <Matrix.h>
+#include "SDL_ttf.h"
 
 using namespace MATH;
 
@@ -36,7 +37,7 @@ public:
 	SDL_Rect scale(SDL_Texture* objectTexture,
 		int start_x = 0, int start_y = 0, float scale = 1.0f);
 	
-
+	SDL_Color color = { 255, 255, 255 };
 
 	explicit SceneUI();
 	SceneUI(SDL_Window* sdlWindow);

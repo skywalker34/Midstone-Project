@@ -232,7 +232,7 @@ void Scene2g::Render() const {
 
 	SDL_Color foreground = { 0, 0, 0 };
 
-	font = TTF_OpenFont("D:/School Stuff/MidstoneNew/Midstone-Project/Midstone/ComponentFramework/Fonts/edosz.ttf", 20);
+	font = TTF_OpenFont("./Fonts/edosz.ttf", 20);
 	if (!font) {
 		std::cout << "Failed to load font: " << TTF_GetError() << std::endl;
 	}

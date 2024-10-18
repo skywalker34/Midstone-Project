@@ -26,6 +26,9 @@ SceneUI::SceneUI(SDL_Window* sdlWindow_)
 
 	backgroundTexture = nullptr;
 
+
+	TTF_Init();
+
 }
 
 bool SceneUI::OnCreate() {
@@ -107,6 +110,38 @@ void SceneUI::Render() const {
 
     //Render the background to the window.
 	SDL_RenderCopy(screenRenderer, backgroundTexture, nullptr, nullptr);
+
+	TTF_Font* font;
+
+	SDL_Color foreground = { 0, 0, 0 };
+
+	font = TTF_OpenFont("./Fonts/edosz.ttf", 20);
+	if (!font) {
+		std::cout << "Failed to load font: " << TTF_GetError() << std::endl;
+	}
+	else
+	{
+		SDL_Surface* text;
+		text = TTF_RenderText_Solid(font, "Hello World!", color);
+		if (!text) {
+			std::cout << "Failed to render text: " << TTF_GetError() << std::endl;
+		}
+		else
+		{
+			SDL_Texture* text_texture;
+
+			text_texture = SDL_CreateTextureFromSurface(screenRenderer, text);
+
+			SDL_Rect dest = { 0, 0, text->w, text->h };
+
+			SDL_RenderCopy(screenRenderer, text_texture, NULL, &dest);
+
+			SDL_DestroyTexture(text_texture);
+			SDL_FreeSurface(text);
+
+			//std::cout << "what the" << std::endl;
+		}
+	}
 
 	//Update the screen
 	SDL_RenderPresent(screenRenderer);
