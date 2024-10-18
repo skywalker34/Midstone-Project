@@ -13,6 +13,12 @@
 Scene2g::Scene2g() : shader{ nullptr }, mesh{ nullptr },
 drawInWireMode{ true } {
 	Debug::Info("Created Scene2g: ", __FILE__, __LINE__);
+
+	SDL_GetWindowSize(window, &screenWidth, &screenHeight);
+
+	gameTimer.Start();
+
+	TTF_Init();
 }
 
 Scene2g::~Scene2g() {
@@ -21,7 +27,7 @@ Scene2g::~Scene2g() {
 
 bool Scene2g::OnCreate() {
 	Debug::Info("Loading assets Scene2g: ", __FILE__, __LINE__);
-	
+
 
 	mesh = new Mesh("meshes/Sphere.obj");
 	mesh->OnCreate();
@@ -52,6 +58,21 @@ bool Scene2g::OnCreate() {
 
 	if (playerController.OnCreate() == false) {
 		std::cout << "Controller failed ... we have a problem\n";
+	}
+
+	//Create renderer for window
+	screenRenderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	if (!screenRenderer)
+	{
+		std::cout << "SDL_Error: " << SDL_GetError() << std::endl;
+		return false;
+	}
+
+	//Initialize renderer color (black)
+	SDL_SetRenderDrawColor(screenRenderer, 0, 0, 0, 255);
+
+	if (TTF_Init() < 0) {
+		std::cout << "Error initializing SDL_ttf: " << TTF_GetError() << std::endl;
 	}
 
 	projectionMatrix = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);
@@ -89,7 +110,14 @@ void Scene2g::OnDestroy() {
 	shader->OnDestroy();
 	delete shader;
 
+	//Destroy  the renderer
+	if (screenRenderer)
+	{
+		SDL_DestroyRenderer(screenRenderer);
+		screenRenderer = nullptr;
+	}
 
+	TTF_Quit();
 }
 
 void Scene2g::HandleEvents(const SDL_Event& sdlEvent) {
@@ -198,6 +226,44 @@ void Scene2g::Render() const {
 		//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
 		ship->Render(shader);
 	}
+	SDL_RenderClear(screenRenderer);
+
+	TTF_Font* font;
+
+	SDL_Color foreground = { 0, 0, 0 };
+
+	font = TTF_OpenFont("D:/School Stuff/MidstoneNew/Midstone-Project/Midstone/ComponentFramework/Fonts/edosz.ttf", 20);
+	if (!font) {
+		std::cout << "Failed to load font: " << TTF_GetError() << std::endl;
+	}
+	else
+	{
+		SDL_Surface* text;
+		text = TTF_RenderText_Solid(font, "Hello World!", color);
+		if (!text) {
+			std::cout << "Failed to render text: " << TTF_GetError() << std::endl;
+		}
+		else
+		{
+			SDL_Texture* text_texture;
+
+			text_texture = SDL_CreateTextureFromSurface(screenRenderer, text);
+
+			SDL_Rect dest = { 0, 0, text->w, text->h };
+
+			SDL_RenderCopy(screenRenderer, text_texture, NULL, &dest);
+
+			SDL_DestroyTexture(text_texture);
+			SDL_FreeSurface(text);
+
+			//std::cout << "what the" << std::endl;
+		}
+	}
+
+	// Update window
+	SDL_RenderPresent(screenRenderer);
+
+	TTF_CloseFont(font);
 
 	playerController.Render(shader);
 

@@ -8,6 +8,10 @@
 #include "EnemyShip.h"
 #include <Matrix.h>
 #include "Vector.h"
+#include "Timer.h"
+#include "SDL_ttf.h"
+//#include <ft2build.h>
+//#include FT_FREETYPE_H  
 using namespace MATH;
 
 /// Forward declarations 
@@ -31,6 +35,14 @@ private:
 	Quaternion newPosition;
 	std::vector<FriendlyShip*> playerFleet;
 	std::vector<EnemyShip*> enemyFleet;
+
+	Timer gameTimer;
+
+	SDL_Window* window;
+	int screenWidth = 1280, screenHeight = 640, screenDepth = 1;
+	SDL_Renderer* screenRenderer = nullptr;
+
+	SDL_Color color = { 255, 255, 255 };
 
 	int activeShip = 0;
 	int startingFleetSize = 8;
