@@ -26,20 +26,17 @@ private:
 
 	EnemySpawner enemySpawnPoint = EnemySpawner(7, 5);
 
-	Matrix4 projectionMatrix;
-	Matrix4 viewMatrix;
-	Matrix4 modelMatrix;
-	PlayerController playerController;
-	Vec3 destination = Vec3(0, 3.0f, 0);
-	Vec3 axis;
-	Vec3 shipWaypoint;
 	
-	Quaternion newPosition;
+	Matrix4 modelMatrix;
+	Mesh* mesh;
+	PlayerController playerController;
+	Vec3 shipWaypoint;
+
 	std::vector<FriendlyShip*> playerFleet;
 	std::vector<EnemyShip*> enemyFleet;
 
 	int activeShip = 0;
-	int startingFleetSize = 1;
+	int startingFleetSize = 8;
 	
 	bool drawInWireMode;
 	bool isGameRunning = true;

@@ -90,20 +90,16 @@ void SceneManager::Run() {
 		currentScene->Update(timer->GetDeltaTime());
 		currentScene->Render();
 		
-<<<<<<< Updated upstream
-		SDL_GL_SwapWindow(window->getWindow());
-=======
 		if (!mainMenu) {
 			SDL_GL_SwapWindow(window->getWindow());
 		}
 		else if(currentScene->switchButton) {
 			currentScene->switchButton = false;
-			BuildNewScene(SCENE_NUMBER::SCENE5g);
+			BuildNewScene(SCENE_NUMBER::SCENE3g);
 			mainMenu = false;
 		}
 		
 
->>>>>>> Stashed changes
 		SDL_Delay(timer->GetSleepTime(fps));
 	}
 	/*while (BuildNewScene(SCENE_NUMBER::SCENEUI))

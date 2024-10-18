@@ -24,35 +24,65 @@ float rand(float seed)
 
 void main()
 {
+    // Calculate the unique index for the current work item
     uint index = gl_GlobalInvocationID.x + yDispatch * gl_GlobalInvocationID.y;
+
+    // Generate a unique seed for each particle
     float seed = randSeed * float(index);
+
+    // Calculate the time step for the simulation
     float deltaTime = 1.0f / simSpeed;
 
+    // Get the current position of the particle from the buffer
     vec3 pos = buf.posData[index];
+
+    // Normalize the forward direction vector
     vec3 direction = normalize(-forwardVector);
 
-    // Generate a random point within a cone
-    float angle = acos(1.0 - rand(seed) * (1.0 - cos(radians(30.0)))); // 30-degree cone
-    float azimuth = rand(seed * 2.0) * 2.0 * 3.14159; // Random azimuth angle
+    // Generate a random point within a cone for particle spread
+    // Random angle within the cone
+    float angle = acos(1.0 - rand(seed + 1.0) * (1.0 - cos(radians(180.0)))); // 50-degree cone
 
+    // Random azimuth angle around the cone
+    float azimuth = rand(seed +2) * 2.0 * 3.14159; // Full circle (2 * PI)
+
+    // Calculate the direction vector within the cone
     vec3 coneDirection = vec3(sin(angle) * cos(azimuth), sin(angle) * sin(azimuth), cos(angle));
     coneDirection = normalize(coneDirection);
 
-    // Adjust the cone direction to align with the forwardVector
-    vec3 adjustedDirection = normalize(mix(direction, coneDirection, 0.5));
+    // Mix the forward direction with the cone direction to align the particle spread with the forward vector
+    vec3 adjustedDirection = normalize(mix(direction, coneDirection, 0.9));
 
+    // Generate a random force magnitude for each particle
     float forceMag = 0.1 * rand(seed);
+
+    // Calculate the force vector applied to the particle
     vec3 force = adjustedDirection * forceMag;
-    vec3 accel = force / 0.1; // Use your mass here
 
+    // Calculate the acceleration of the particle (assuming mass = 0.1)
+    vec3 accel = force / 0.1;
+  
+
+    // Update the particle position using its velocity and acceleration
     pos += buf2.vel[index] * deltaTime + 0.5f * accel * deltaTime * deltaTime;
-    buf2.vel[index] += accel * deltaTime;
 
-    if (length(pos) > 3) {
+
+    //cap the particle speed
+    if((length(buf2.vel[index]) > 1.8) == false){
+        // Update the particle velocity
+        buf2.vel[index] += accel * deltaTime;
+    }
+
+    
+
+    // Reset the particle position if it moves too far
+    if (length(pos) > 2)
+    {
         pos = vec3(0.0, 0.0, 0.0);
     }
 
-    buf.posData[index] = pos; // Write to the buffer
+    // Write the updated position back to the buffer
+    buf.posData[index] = pos;
 }
 
 

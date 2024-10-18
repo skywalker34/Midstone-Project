@@ -6,6 +6,7 @@
 #include <vector>
 #include "Trackball.h"
 #include "Camera.h"
+#include "PlayerController.h"
 using namespace MATH;
 
 /// Forward declarations 
@@ -21,6 +22,8 @@ class Scene5g : public Scene {
 private:
 
 
+	Shader* normalShader;
+
 	Shader* shader = nullptr;
 
 	Shader* loadVertsToBuffer = nullptr;
@@ -28,6 +31,7 @@ private:
 	ComputeShader* computeShader = nullptr;
 
 	Mesh* sphere = nullptr;
+	Mesh* ship = nullptr;
 
 	bool drawInWireMode = false;
 	float time = 0;
@@ -38,7 +42,9 @@ private:
 	Camera camera;
 
 	Matrix4 sphereModelMatrix;
-	Matrix4 marioModelMatrix;
+	Matrix4 shipModelMatrix;
+
+	PlayerController playerController;
 
 	GLuint posBuffer;
 	GLuint velBuffer;

@@ -1,1 +1,41 @@
+Fri Oct 18 11:42:11 2024
+[INFO]: Starting the SceneManager
+[INFO]: OpenGL version: 4.6.0 - Build 30.0.101.1029
+[INFO]: Graphics card vendor Intel
+[INFO]: Graphics card name Intel(R) Iris(R) Xe Graphics
+[INFO]: GLSL Version 4.60 - Build 30.0.101.1029
+[INFO]: Created Scene3p: 
+[INFO]: Loading assets Scene3p: 
+[INFO]: Uniforms:
+"forwardVector" loc:3
+"randSeed" loc:1
+"simSpeed" loc:2
+"yDispatch" loc:0
+
+[INFO]: Uniforms:
+"modelMatrix" loc:0
+
+[INFO]: Uniforms:
+"modelMatrix" loc:0
+"projectionMatrix" loc:1
+"viewMatrix" loc:2
+"screen" loc:3
+
+[INFO]: Uniforms:
+"modelMatrix" loc:2
+"projectionMatrix" loc:0
+"viewMatrix" loc:1
+"meshColor" loc:3
+
+[INFO]: Uniforms:
+"modelMatrix" loc:2
+"projectionMatrix" loc:0
+"viewMatrix" loc:1
+"skyboxTexture" loc:3
+
+[INFO]: Uniforms:
+"modelMatrix" loc:2
+"projectionMatrix" loc:0
+"viewMatrix" loc:1
+"skyboxTexture" loc:3
 

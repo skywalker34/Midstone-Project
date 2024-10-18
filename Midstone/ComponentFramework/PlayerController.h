@@ -18,13 +18,14 @@ class PlayerController
 		
 		Actor clickGrid;
 		Trackball trackball;
-		Transform transform;
+		
 		DualQuat line;
 		DualQuat line2;
 		Vec3 clickPos;
 		float planeDepth = 0;
 
 	public:
+		Transform transform; //temporary public
 		Camera camera;
 		bool has3DClick = false;
 		bool hasDQLine = false;
