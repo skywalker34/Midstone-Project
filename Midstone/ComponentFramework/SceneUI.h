@@ -5,6 +5,7 @@
 #include "Scene.h"
 #include "Vector.h"
 #include <Matrix.h>
+#include "Button.h"
 
 using namespace MATH;
 
@@ -25,7 +26,8 @@ public:
 	//float xPixel;
 	SDL_Renderer* screenRenderer;
 
-
+	Button* startButton; // Start button
+	
 	const char* backgroundTex;
 	Body* background;
 

@@ -90,6 +90,7 @@ void SceneManager::Run() {
 		}
 		else if(currentScene->switchButton) {
 			currentScene->switchButton = false;
+			//SDL_Quit();
 			BuildNewScene(SCENE_NUMBER::SCENE3g);
 			mainMenu = false;
 		}

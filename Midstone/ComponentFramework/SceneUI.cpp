@@ -12,9 +12,6 @@ using namespace std;
 
 
 
-
-
-
 SceneUI::SceneUI(SDL_Window* sdlWindow_)
 {
 	window = sdlWindow_;
@@ -29,7 +26,7 @@ SceneUI::SceneUI(SDL_Window* sdlWindow_)
 }
 
 bool SceneUI::OnCreate() {
-	Debug::Info("Loading assets Scene0: ", __FILE__, __LINE__);
+	Debug::Info("Loading assets SceneUI: ", __FILE__, __LINE__);
 	
 	//Create renderer for window
 	screenRenderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
@@ -53,6 +50,7 @@ bool SceneUI::OnCreate() {
 	// Load the bodies's textures
 	backgroundTexture = loadImage(backgroundTex);
 
+	//startButton->Render(25,25);
 	
 	
 	return true;
@@ -88,6 +86,7 @@ void SceneUI::HandleEvents(const SDL_Event& sdlEvent)
 		case SDL_SCANCODE_M:
 			switchButton = true;
 			cout << "pressed" << std::endl;
+			SDL_QUIT;
 			break;
 		}
 	}
@@ -96,7 +95,7 @@ void SceneUI::HandleEvents(const SDL_Event& sdlEvent)
 
 void SceneUI::Update(const float deltaTime)
 {
-	
+	//startButton = new Button(0, 0);
 		
 }
 
