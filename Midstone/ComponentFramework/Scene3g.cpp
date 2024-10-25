@@ -29,8 +29,9 @@ bool Scene3g::OnCreate() {
 	//create an enemy spawn point (its random but with a set magnitude(distance) from the origin
 
 	
-	
-	
+	//TODO: make this planet an actor
+	mesh = new Mesh("meshes/Sphere.obj");
+	mesh->OnCreate();
 
 	
 
@@ -71,7 +72,7 @@ bool Scene3g::OnCreate() {
 		std::cout << "Controller failed ... we have a problem\n";
 	}
 
-	playerFleet[activeShip]->displayRange = true;
+	
 
 	printf("On Create finished!!!!!");
 	return true;
@@ -83,6 +84,8 @@ void Scene3g::OnDestroy() {
 	Debug::Info("Deleting assets Scene0: ", __FILE__, __LINE__);
 
 	
+	mesh->OnDestroy();
+	delete mesh;
 
 	
 
@@ -237,7 +240,7 @@ void Scene3g::Update(const float deltaTime) {
 		for (FriendlyShip* ship : playerFleet) { //first we loop through every oen of the player's ships
 			
 			ship->color = BLUE;//all friendly ships are blue except the active ship TEMPORARY REMOVE LATER
-
+			
 			
 			std::vector<Bullet*> temp = ship->getBullets(); //get a reference to all the bullets that ship has fired
 
@@ -260,11 +263,15 @@ void Scene3g::Update(const float deltaTime) {
 					}
 				}
 			}
+			
 
 			ship->Update(deltaTime);//call their update functions
-			
+			ship->displayRange = false;
 		}
 		
+		playerFleet[activeShip]->color = GREEN;	//temporary to turn the selected ship green
+		playerFleet[activeShip]->displayRange = true;
+
 		for (int i = 0; i < enemyFleet.size(); i++) {
 			enemyFleet[i]->Update(deltaTime);
 			if (enemyFleet[i]->deleteMe) {
@@ -301,7 +308,12 @@ void Scene3g::Render() const {
 	}
 
 
-	
+	glUseProgram(shader->GetProgram());
+	glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+	glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, modelMatrix);
+	glUniform4fv(shader->GetUniformID("meshColor"), 1, Vec4(0.2f, 0.2f, 0.2f, 0.2f));
+	mesh->Render(GL_TRIANGLES);
 
 	glUseProgram(shader->GetProgram());
 	glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
