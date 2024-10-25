@@ -261,5 +261,11 @@
     <None Include="shaders\textureVert.glsl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="shaders\bulletFrag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\bulletVert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

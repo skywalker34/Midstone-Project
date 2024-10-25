@@ -196,6 +196,8 @@
     <Text Include="GameEngineLog.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\bulletFrag.glsl" />
+    <None Include="shaders\bulletVert.glsl" />
     <None Include="shaders\computer.glsl" />
     <None Include="shaders\defaultFrag.glsl" />
     <None Include="shaders\defaultVert.glsl" />

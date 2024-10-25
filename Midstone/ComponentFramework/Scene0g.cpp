@@ -28,8 +28,8 @@ bool Scene0g::OnCreate() {
 	if (friendlyShip.OnCreate() == false) {
 		std::cout << "ship failed we have a problem";
 	}
-	friendlyShip.model.mesh = new Mesh("meshes/Cube.obj");
-	friendlyShip.model.mesh->OnCreate();
+	//friendlyShip->model.mesh = new Mesh("meshes/Cube.obj");
+	//riendlyShip->model.mesh->OnCreate();
 	//added a pointer to fix the double transforms
 	friendlyShip.transform.setPos(Vec3(3.0f, 0, 0));
 
@@ -59,8 +59,8 @@ void Scene0g::OnDestroy() {
 	mesh->OnDestroy();
 	delete mesh;
 
-	friendlyShip.model.mesh->OnDestroy();
-	delete friendlyShip.model.mesh;
+	//friendlyShip.model.mesh->OnDestroy();
+	//delete friendlyShip.model.mesh;
 
 	shader->OnDestroy();
 	delete shader;
@@ -148,7 +148,7 @@ void Scene0g::Render() const {
 	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, modelMatrix);
 	mesh->Render(GL_TRIANGLES);
 	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, friendlyShip.shipModelMatrix);
-	friendlyShip.model.mesh->Render(GL_TRIANGLES);
+	//friendlyShip.model.mesh->Render(GL_TRIANGLES);
 	glUseProgram(0);
 }
 

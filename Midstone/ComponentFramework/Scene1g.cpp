@@ -58,7 +58,7 @@ bool Scene1g::OnCreate() {
 	
 
 	for (int i = 0; i <= startingFleetSize; i++) {
-		enemyFleet.push_back(new EnemyShip(Vec3(fmod(rand(), 5), fmod(rand(), 5), fmod(rand(), 5))));
+		//enemyFleet.push_back(new EnemyShip(Vec3(fmod(rand(), 5), fmod(rand(), 5), fmod(rand(), 5))));
 	}
 	for (EnemyShip* ship : enemyFleet) {
 		ship->OnCreate();

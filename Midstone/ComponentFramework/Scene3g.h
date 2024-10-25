@@ -9,6 +9,7 @@
 #include <Matrix.h>
 #include "Collision.h"
 #include "Vector.h"
+
 #include "EnemySpawner.h"
 using namespace MATH;
 
@@ -17,11 +18,19 @@ union SDL_Event;
 class Mesh;
 class Shader;
 class Bullet;
+class Model;
 
 class Scene3g : public Scene {
 private:
 
 	Shader* shader;
+	Shader* bulletShader;
+
+	Model friendlyShipModel;
+	Model enemyShipModel;
+	Model bulletModel;
+	Model sphereModel;
+	Model planeModel;
 	
 
 	EnemySpawner enemySpawnPoint = EnemySpawner(7, 5);

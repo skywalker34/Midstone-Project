@@ -14,7 +14,7 @@ Model::Model(std::string meshName_)
 
 bool Model::OnCreate()
 {
-	std::cout << "Loading :" + fileName << std::endl;
+	std::cout << std::endl << "Loading :" + fileName << std::endl;
 	mesh = new Mesh(fileName.c_str());
 	
 	if(mesh->OnCreate() == false) return false;

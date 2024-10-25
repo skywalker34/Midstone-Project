@@ -29,7 +29,7 @@ class EnemyShip :
 		bool deleteMe = false;//flag to tell the scene when to delete this ship
 
 		EnemyShip();
-		EnemyShip(Vec3 pos);
+		EnemyShip(Vec3 pos, Model* model_);
 
 		void setTarget(Vec3 target_);
 		Vec3 getTargetDirection();

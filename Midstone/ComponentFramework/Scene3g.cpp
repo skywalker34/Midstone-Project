@@ -9,6 +9,7 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "Body.h"
+#include "Model.h"
 
 #include <chrono>
 
@@ -34,11 +35,39 @@ bool Scene3g::OnCreate() {
 	mesh->OnCreate();
 
 	
+	friendlyShipModel = Model("midstone_ship.obj");
+	
+	if (friendlyShipModel.OnCreate() == false) {
+		printf("Model failed to load");
+	}
 
+
+	enemyShipModel = Model("enemyShip.obj");
+	if (enemyShipModel.OnCreate() == false) {
+		printf("Model failed to load");
+	}
+
+	bulletModel = Model("Bullet.obj");
+
+	if (bulletModel.OnCreate() == false) {
+		printf("Model failed to load");
+	}
+
+	sphereModel = Model("Sphere.obj");
+	
+	if (sphereModel.OnCreate() == false) {
+		printf("Model failed to load");
+	}
+	
+
+	planeModel = Model("Plane.obj");
+	if (planeModel.OnCreate() == false) {
+		printf("Model failed to load");
+	}
 	
 
 	for (int i = 0; i < startingFleetSize; i++) {
-		enemyFleet.push_back(new EnemyShip(Vec3(5, 5, 0)));
+		enemyFleet.push_back(new EnemyShip(Vec3(5, 5, 0), &enemyShipModel));
 
 
 	}
@@ -50,7 +79,7 @@ bool Scene3g::OnCreate() {
 	
 	
 	for (int i = 0; i < startingFleetSize; i++) {
-		playerFleet.push_back(new FriendlyShip());
+		playerFleet.push_back(new FriendlyShip(&friendlyShipModel, &bulletModel));
 	}
 
 
@@ -68,6 +97,13 @@ bool Scene3g::OnCreate() {
 		std::cout << "Shader failed ... we have a problem\n";
 	}
 
+	bulletShader = new Shader("shaders/bulletVert.glsl", "shaders/bulletFrag.glsl");
+	if (bulletShader->OnCreate() == false) {
+		std::cout << "Shader failed ... we have a problem\n";
+	}
+
+
+	playerController.CreateGrid(&planeModel);
 	if (playerController.OnCreate() == false) {
 		std::cout << "Controller failed ... we have a problem\n";
 	}
@@ -87,7 +123,15 @@ void Scene3g::OnDestroy() {
 	mesh->OnDestroy();
 	delete mesh;
 
-	
+	friendlyShipModel.OnDestroy();
+
+	enemyShipModel.OnDestroy();
+
+	bulletModel.OnDestroy();
+
+	sphereModel.OnDestroy();
+
+	playerController.OnDestroy();
 
 	for (FriendlyShip* ship : playerFleet) {
 		ship->OnDestroy();
@@ -175,7 +219,7 @@ void Scene3g::Update(const float deltaTime) {
 
 	enemySpawnPoint.Update(deltaTime);
 	if (enemySpawnPoint.canSpawn == true) {
-		enemyFleet.push_back(new EnemyShip(enemySpawnPoint.position));
+		enemyFleet.push_back(new EnemyShip(enemySpawnPoint.position, &enemyShipModel));
 		enemyFleet.back()->OnCreate();
 		enemySpawnPoint.canSpawn = false;
 	}
@@ -213,7 +257,7 @@ void Scene3g::Update(const float deltaTime) {
 				Plane pM = M.plane;//grab the plane part of the flector
 				Vec4 vM = M.point;
 
-				float radius = 1;//hardcoded for now until sphere and collision classes are up
+				float radius = playerFleet[i]->collisionSphere->r;//hardcoded for now until sphere and collision classes are up
 				float dSquared = (radius * radius) - (VMath::mag(vM) * VMath::mag(vM)); // d^2 = r^2 - (*<M>3)^2
 				//pretty sure I'm doing this part wrong (*<M>3)^2
 
@@ -249,7 +293,7 @@ void Scene3g::Update(const float deltaTime) {
 			for (EnemyShip* targetShip : enemyFleet) { //now loop through each enemy to detect if an enmy is in range
 				if (ship->canFire == true) { //before checking if enemy is in range check if the ship is even allowed to shoot yet
 					if (COLLISION::SphereSphereCollisionDetected(&ship->detectionSphere, targetShip->collisionSphere)) {	//check if enemy ship is in range
-						std::cout << "COLLISION!" << std::endl;
+					
 						ship->targetDirection = VMath::normalize(targetShip->transform.getPos() - ship->transform.getPos()); //if the enemy is in range get the direction from our ship to the enemy
 						ship->Fire();//fire a bullet at the enemy
 						std::vector<Bullet*> temp = ship->getBullets(); //if the ship fired just update the temp list of bullets
@@ -290,7 +334,7 @@ void Scene3g::Update(const float deltaTime) {
 	}
 
 	
-
+	
 }
 
 void Scene3g::Render() const {
@@ -315,23 +359,40 @@ void Scene3g::Render() const {
 	glUniform4fv(shader->GetUniformID("meshColor"), 1, Vec4(0.2f, 0.2f, 0.2f, 0.2f));
 	mesh->Render(GL_TRIANGLES);
 
-	glUseProgram(shader->GetProgram());
-	glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
-	glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+	
 
 	
+
+
 	for (FriendlyShip* ship : playerFleet) {
 		//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
+		glUseProgram(shader->GetProgram());
+		glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+		glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
 		ship->Render(shader);
+
+		glUseProgram(bulletShader->GetProgram());
+		glUniformMatrix4fv(bulletShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+		glUniformMatrix4fv(bulletShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+		ship->RenderBullets(bulletShader);
 	}
+
+
 
 	for (EnemyShip* ship : enemyFleet) {
 		//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
 		if (ship->deleteMe == false) { //shouldn't have to have this if here...
+			glUseProgram(shader->GetProgram());
+			glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+			glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
 			ship->Render(shader);
 		}
 	}
 
+	
+	glUseProgram(shader->GetProgram());
+	glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+	glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
 	playerController.Render(shader);
 
 

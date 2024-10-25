@@ -19,6 +19,8 @@ class Bullet :
     
     Vec4 color = ORANGE;
 
+    Model** modelTemp; //until I think of something better this is "temporary"...
+
     //Functions
     //OnCreate();
     //OnDestroy()
@@ -29,7 +31,7 @@ class Bullet :
 public:
     bool deleteMe = false;
     Bullet();
-    Bullet(Transform spawnPos, float speed_, Vec3 forward_);
+    Bullet(Transform spawnPos, float speed_, Vec3 forward_, Model** model_);
     bool OnCreate();
     void OnDestroy();
     void Update(const float deltaTime);

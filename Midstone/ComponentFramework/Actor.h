@@ -10,7 +10,7 @@ public:
 	//Known actors: Planet, Ships(Friendlyship, enemyship)
 	//MATHEX::Sphere collider;
 	Transform transform;
-	Model model;
+	Model* model;
 
 
 	
@@ -18,8 +18,9 @@ public:
 
 	Actor();
 	virtual bool OnCreate();
+	virtual void OnDestroy();
 
-	Actor(Transform transform_, Model model_);
+	Actor(Transform transform_, Model* model_);
 	void Render(Shader* shader) const;
 	// Functions:
 	// render
