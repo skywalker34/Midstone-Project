@@ -54,6 +54,8 @@ void FriendlyShip::OnDestroy()
 
 	rangeSphere.OnDestroy();
 
+
+	delete collisionSphere;
 	
 	for (Bullet* bullet : bullets) {
 		bullet->OnDestroy();

@@ -1,5 +1,7 @@
 #pragma once
 #include "Actor.h"
+#include "Model.h"
+
 class Planet : 
     public Actor
 {
@@ -13,8 +15,19 @@ class Planet :
 
     //inherited from actor:
         //Transform transform;
-        //Model model;
+        //Model* model;
 
+    int health;
+    float radius; 
 
+public:
+    Planet();
+    Planet(float radius_, int health_, Model* model_, Vec3 pos);
+    bool OnCreate();
+    void OnDestroy();
+    void Update(float deltaTime);
+    void Render(Shader* shader) const; 
+
+    void takeDame(int damage);
 };
 

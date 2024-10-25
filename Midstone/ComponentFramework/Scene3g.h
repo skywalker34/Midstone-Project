@@ -9,6 +9,7 @@
 #include <Matrix.h>
 #include "Collision.h"
 #include "Vector.h"
+#include "Planet.h"
 
 #include "EnemySpawner.h"
 using namespace MATH;
@@ -40,6 +41,8 @@ private:
 	Mesh* mesh;
 	PlayerController playerController;
 	Vec3 shipWaypoint;
+
+	Planet planet;
 
 	std::vector<FriendlyShip*> playerFleet;
 	std::vector<EnemyShip*> enemyFleet;

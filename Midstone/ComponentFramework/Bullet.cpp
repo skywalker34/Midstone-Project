@@ -47,6 +47,11 @@ void Bullet::Update(const float deltaTime)
 
 void Bullet::Render(Shader* shader) const
 {
+
+
+
+	
+
 	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, transform.toModelMatrix());
 	//glUniform4fv(shader->GetUniformID("meshColor"), 1, color);
 	(*modelTemp)->mesh->Render(GL_TRIANGLES);

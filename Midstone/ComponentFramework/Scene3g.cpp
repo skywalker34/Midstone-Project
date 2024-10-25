@@ -110,6 +110,10 @@ bool Scene3g::OnCreate() {
 
 	
 
+	planet = Planet(30.0f, 5, &sphereModel, ORIGIN);
+	planet.OnCreate();
+
+
 	printf("On Create finished!!!!!");
 	return true;
 
@@ -145,6 +149,8 @@ void Scene3g::OnDestroy() {
 
 	shader->OnDestroy();
 	delete shader;
+
+	planet.OnDestroy();
 
 
 }
@@ -245,8 +251,7 @@ void Scene3g::Update(const float deltaTime) {
 			DualQuat line = playerController.getLine();
 			line = DQMath::normalize(line);
 
-			Vec3 test = line ^ Plane(0, 0, 1, 0);
-			test.print("line test: ");
+			
 
 
 			//loop through the spheres
@@ -371,10 +376,16 @@ void Scene3g::Render() const {
 		glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
 		ship->Render(shader);
 
+
+
+
+		
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //temporary line
 		glUseProgram(bulletShader->GetProgram());
 		glUniformMatrix4fv(bulletShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 		glUniformMatrix4fv(bulletShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
 		ship->RenderBullets(bulletShader);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //temporary line
 	}
 
 
@@ -394,6 +405,8 @@ void Scene3g::Render() const {
 	glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 	glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
 	playerController.Render(shader);
+
+	planet.Render(shader);
 
 
 	glUseProgram(0);

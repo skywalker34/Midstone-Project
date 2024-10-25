@@ -29,7 +29,7 @@ void Camera::SetView(const Transform t_)
 }
 	
 Camera::Camera() {
-	projection = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);
+	projection = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 500.0f);
 	transform.setOrientation( Quaternion(1.0f, Vec3(0.0f, 0.0f, 0.0f)));
 	transform.setPos(Vec3(0.0f, 0.0f, 0.0));
 
