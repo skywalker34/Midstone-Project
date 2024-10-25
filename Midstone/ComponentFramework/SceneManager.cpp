@@ -70,19 +70,15 @@ void SceneManager::Run() {
 	isRunning = true;
 	
 
-	while (isRunning && mainMenu) {
+	/*while (isRunning && mainMenu) {
 		HandleEvents();
-		if (currentScene->switchButton) {
-			currentScene->switchButton = false;
-			BuildNewScene(SCENE_NUMBER::SCENE1g);
-			mainMenu = false;
-		}
+		
 		timer->UpdateFrameTicks();
 		currentScene->Update(timer->GetDeltaTime());
 		currentScene->Render();
 
 		SDL_Delay(timer->GetSleepTime(fps));
-	}
+	}*/
 	while (isRunning) 
 	{
 		HandleEvents();
