@@ -40,6 +40,7 @@ private:
 
 	int activeShip = 0;
 	int startingFleetSize = 1;
+	int enemyIndex = 0;
 	
 	bool drawInWireMode;
 	bool isGameRunning = true;
