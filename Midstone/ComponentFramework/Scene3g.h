@@ -51,6 +51,8 @@ private:
 	int activeShip = 0;
 	int startingFleetSize = 8;
 	
+	float timeElapsed;
+
 	bool drawInWireMode;
 	bool isGameRunning = true;
 

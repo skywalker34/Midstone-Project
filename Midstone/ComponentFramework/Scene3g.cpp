@@ -46,7 +46,7 @@ bool Scene3g::OnCreate() {
 		printf("Model failed to load");
 	}
 
-	sphereModel = Model("Sphere.obj", std::vector<std::string>{"planet_d.png",  "planet_s.png"});
+	sphereModel = Model("Sphere.obj", std::vector<std::string>{"planet_d.png",  "planet_s.png", "cloud_map.png"});
 	if (sphereModel.OnCreate() == false) {
 		printf("Model failed to load");
 	}
@@ -227,6 +227,11 @@ void Scene3g::HandleEvents(const SDL_Event& sdlEvent) {
 }
 
 void Scene3g::Update(const float deltaTime) {
+
+
+	timeElapsed += deltaTime; 
+
+	planet.Update(deltaTime);
 
 	enemySpawnPoint.Update(deltaTime);
 	if (enemySpawnPoint.canSpawn == true) {

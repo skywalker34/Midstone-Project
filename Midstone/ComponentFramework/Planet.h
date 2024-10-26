@@ -19,6 +19,7 @@ class Planet :
 
     int health;
     float radius; 
+    Transform atmosphere;
 
 public:
     Planet();

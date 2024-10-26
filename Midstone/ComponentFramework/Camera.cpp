@@ -48,12 +48,12 @@ void Camera::OnDestroy() {
 Camera::~Camera() {}
 
 bool Camera::OnCreate() {
-	skybox = new SkyBox("textures/skybox_front.png",
-		"textures/skybox_back.png",
-		"textures/skybox_up.png",
-		"textures/skybox_down.png",
-		"textures/skybox_right.png",
-		"textures/skybox_left.png");
+	skybox = new SkyBox("textures/simple_skybox/skybox_front.png",
+		"textures/simple_skybox/skybox_back.png",
+		"textures/simple_skybox/skybox_up.png",
+		"textures/simple_skybox/skybox_down.png",
+		"textures/simple_skybox/skybox_right.png",
+		"textures/simple_skybox/skybox_left.png");
 
 	if (skybox->OnCreate() == false) {
 		return false;

@@ -15,7 +15,7 @@ PlayerController::PlayerController()
 bool PlayerController::OnCreate()
 {
 	//here for future improvements
-	transform.setPos(Vec3(0, 0, 50));
+	transform.setPos(Vec3(0, 0, 75));
 	
 	
 
