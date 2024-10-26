@@ -5,10 +5,12 @@
 #include "Scene0g.h"
 #include "Scene0p.h"
 #include "Scene1g.h"
+#include "SceneUI.h"
 #include "Scene2g.h"
 #include "Scene3g.h"
+#include "Scene5g.h"
 
-
+//SceneUI ans;
 
 
 SceneManager::SceneManager(): 
@@ -54,7 +56,9 @@ bool SceneManager::Initialize(std::string name_, int width_, int height_) {
 
 	/********************************   Default first scene   ***********************/
 
-	BuildNewScene(SCENE_NUMBER::SCENE3g); 
+
+	BuildNewScene(SCENE_NUMBER::SCENE5g); 
+
 
 	/********************************************************************************/
 	return true;
@@ -64,15 +68,44 @@ bool SceneManager::Initialize(std::string name_, int width_, int height_) {
 void SceneManager::Run() {
 	timer->Start();
 	isRunning = true;
-	while (isRunning) {
+	
+
+	/*while (isRunning && mainMenu) {
+		HandleEvents();
+		
+		timer->UpdateFrameTicks();
+		currentScene->Update(timer->GetDeltaTime());
+		currentScene->Render();
+
+		SDL_Delay(timer->GetSleepTime(fps));
+	}*/
+	while (isRunning) 
+	{
 		HandleEvents();
 		timer->UpdateFrameTicks();
 		currentScene->Update(timer->GetDeltaTime());
 		currentScene->Render();
 		
-		SDL_GL_SwapWindow(window->getWindow());
+		if (!mainMenu) {
+			SDL_GL_SwapWindow(window->getWindow());
+		}
+		else if(currentScene->switchButton) {
+			currentScene->switchButton = false;
+			BuildNewScene(SCENE_NUMBER::SCENE3g);
+			mainMenu = false;
+		}
+		
+
 		SDL_Delay(timer->GetSleepTime(fps));
 	}
+	/*while (BuildNewScene(SCENE_NUMBER::SCENEUI))
+	{
+		if (ans.switchButton == true)
+		{
+			BuildNewScene(SCENE_NUMBER::SCENE0g);
+			
+		}
+	}*/
 }
 
 void SceneManager::HandleEvents() {
@@ -97,7 +130,7 @@ void SceneManager::HandleEvents() {
 				break;
 			case SDL_SCANCODE_F2:
 				currentSceneNumber -= 1;
-				BuildNewScene(SCENE_NUMBER::SCENE0g);
+				BuildNewScene(SCENE_NUMBER::SCENE1g);
 				break;
 			case SDL_SCANCODE_F3:
 			case SDL_SCANCODE_F4:
@@ -160,6 +193,21 @@ bool SceneManager::BuildNewScene(SCENE_NUMBER scene) {
 		currentScene = new Scene3g();
 		status = currentScene->OnCreate();
 		//if (currentSceneNumber == 2) break;
+		break;
+
+	case SCENE_NUMBER::SCENEUI:
+		currentScene = new SceneUI(window->getWindow());
+		mainMenu = true;
+		status = currentScene->OnCreate();
+		//if (currentSceneNumber == 2) break;
+		 
+		break;
+
+	case SCENE_NUMBER::SCENE5g:
+		currentScene = new Scene5g();
+		status = currentScene->OnCreate();
+		//if (currentSceneNumber == 2) break;
+
 		break;
 
 	default:

@@ -20,13 +20,22 @@ bool FriendlyShip::OnCreate()
 	if (model.OnCreate() == false) return false;
 	printf("Ship Created! \n");
 	
+	rangeSphere = Model("Sphere.obj");
+
+	if (rangeSphere.OnCreate() == false) return false;
+	printf("Ship Created! \n");
+	rangeSphereT = transform;
+	rangeSphereT.setScale(Vec3(range, range, range)); //sphere mesh has radius of 2 units wo when we scale it by range we have to divide to get the actual range
+	//we may want to go into 3dsmax and make a unit sphere 
+
+
 	Fire();
 	return true;
 }
 
 void FriendlyShip::OnDestroy()
 {
-	
+	rangeSphere.OnDestroy();
 	model.OnDestroy();
 	for (Bullet* bullet : bullets) {
 		bullet->OnDestroy();
@@ -62,6 +71,9 @@ void FriendlyShip::Update(const float deltaTime)
 		body->vel = Vec3();
 	}
 	detectionSphere.center = transform.getPos();//update teh collision sphere to match the ships position
+	if (displayRange) {
+		rangeSphereT.setPos(detectionSphere.center);
+	}
 }
 
 void FriendlyShip::Render(Shader* shader) const
@@ -73,6 +85,13 @@ void FriendlyShip::Render(Shader* shader) const
 	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, transform.toModelMatrix());
 	glUniform4fv(shader->GetUniformID("meshColor"), 1, color);
 	model.mesh->Render(GL_TRIANGLES);
+
+	if (displayRange) {
+		
+		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, rangeSphereT.toModelMatrix());
+		glUniform4fv(shader->GetUniformID("meshColor"), 1, color);
+		rangeSphere.mesh->Render(GL_TRIANGLES);
+	}
 }
 
 void FriendlyShip::Fire()
@@ -98,6 +117,8 @@ void FriendlyShip::moveToDestination(Vec3 destination_)
 		body->vel = speed * VMath::normalize(movingDirection);
 	}
 	else {
+
+		
 		Vec3 diff =  destination - transform.getPos(); //"draw" a vector between the 2 points
 		movingDirection = VMath::normalize(diff);//"convert" thevector into just a direction (normalize)
 		body->vel = movingDirection * speed; //tell the ship to move along that vector
