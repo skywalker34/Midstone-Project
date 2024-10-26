@@ -273,5 +273,11 @@
     <None Include="shaders\planetVert.glsl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="shaders\friendlyShipFrag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\friendlyShipVert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

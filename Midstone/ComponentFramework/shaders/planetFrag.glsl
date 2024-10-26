@@ -19,7 +19,7 @@ void main() {
 	//vec4 ka = vec4(0.001, 0.001, 0.001, 0.0);
 
 	vec4 kd = vec4(1, 1, 1, 0.0);
-	vec4 ka = vec4(0.001, 0.001, 0.001, 0.0);
+	vec4 ka = vec4(0.1, 0.1, 0.1, 0.0);
 	vec4 kt = texture(diffTexture,textureCoords); 
 
 //	kd = vec4(0,0,0,1);

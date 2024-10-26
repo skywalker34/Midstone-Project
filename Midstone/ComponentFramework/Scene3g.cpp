@@ -30,7 +30,7 @@ bool Scene3g::OnCreate() {
 
 	///////////////////////////////////////////////////////////////MODELS\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 	
-	friendlyShipModel = Model("midstone_ship.obj");
+	friendlyShipModel = Model("midstone_ship.obj", std::vector<std::string>{"Ship_Colour_Mask.png"});
 	if (friendlyShipModel.OnCreate() == false) {
 		printf("Model failed to load");
 	}
@@ -61,7 +61,7 @@ bool Scene3g::OnCreate() {
 	///////////////////////////////////////////////////ACTORS\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 	for (int i = 0; i < startingFleetSize; i++) {
-		enemyFleet.push_back(new EnemyShip(Vec3(5, 5, 0), &enemyShipModel));
+		enemyFleet.push_back(new EnemyShip(Vec3(500, 500, 0), &enemyShipModel));
 
 
 	}
@@ -77,9 +77,19 @@ bool Scene3g::OnCreate() {
 	}
 
 
-	for (FriendlyShip* ship : playerFleet) {
-		ship->OnCreate();
-		ship->transform.setPos(Vec3(0.0f, 0, 0));
+	//spawn the ships in a radius around the planet
+
+	int numShips = playerFleet.size();
+	float radius = 50.0f;
+
+	for (int i = 0; i < numShips; ++i)
+	{
+		float angle = 2.0f * M_PI * i / numShips; // Calculate the angle for each ship
+		float x = radius * cos(angle);            // Calculate x position
+		float z = radius * sin(angle);            // Calculate z position
+
+		playerFleet[i]->OnCreate();
+		playerFleet[i]->transform.setPos(Vec3(x, 0.0f, z)); // Position ship
 	}
 
 	planet = Planet(30.0f, 5, &sphereModel, ORIGIN);
@@ -102,7 +112,11 @@ bool Scene3g::OnCreate() {
 		std::cout << "Shader failed ... we have a problem\n";
 	}
 
-
+	friendlyShipShader = new Shader("shaders/friendlyShipVert.glsl", "shaders/friendlyShipFrag.glsl");
+	if (friendlyShipShader->OnCreate() == false)
+	{
+		std::cout << "Shader failed ... we have a problem\n";
+	}
 	/////////////////////////////////////////////////////MISC\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 	playerController.CreateGrid(&planeModel);
@@ -376,17 +390,21 @@ void Scene3g::Render() const {
 
 
 	for (FriendlyShip* ship : playerFleet) {
-		//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
-		glUseProgram(shader->GetProgram());
-		glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
-		glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-		ship->Render(shader);
-
-
-
-
-		
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //temporary line
+		//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
+		glUseProgram(friendlyShipShader->GetProgram());
+		glUniformMatrix4fv(friendlyShipShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+		glUniformMatrix4fv(friendlyShipShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+		glUniform3fv(friendlyShipShader->GetUniformID("lightPos"), 1, lightPos);
+		glUniform4fv(friendlyShipShader->GetUniformID("primaryColour"), 1, ORANGE);
+		glUniform4fv(friendlyShipShader->GetUniformID("secondaryColour"), 1, GREY);
+		glUniform4fv(friendlyShipShader->GetUniformID("tertiaryColour"), 1, BLUE);
+		ship->Render(friendlyShipShader);
+
+
+
+
+
 		glUseProgram(bulletShader->GetProgram());
 		glUniformMatrix4fv(bulletShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 		glUniformMatrix4fv(bulletShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
@@ -416,8 +434,8 @@ void Scene3g::Render() const {
 	glUseProgram(planetShader->GetProgram());
 	glUniformMatrix4fv(planetShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 	glUniformMatrix4fv(planetShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-	glUniform4fv(planetShader->GetUniformID("lightPos"), 1, lightPos);
-	glUniform4fv(planetShader->GetUniformID("cameraPos"), 1, playerController.camera.transform.getPos());
+	glUniform3fv(planetShader->GetUniformID("lightPos"), 1, lightPos);
+	glUniform3fv(planetShader->GetUniformID("cameraPos"), 1, playerController.camera.transform.getPos());
 	planet.Render(planetShader);
 	
 

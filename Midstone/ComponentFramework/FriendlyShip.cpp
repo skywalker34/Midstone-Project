@@ -17,7 +17,7 @@ FriendlyShip::FriendlyShip()
 
 FriendlyShip::FriendlyShip(Model* model_, Model* bulletModel_)
 {
-	transform = Transform(Vec3(0.0f, 0.0f, 0.0f), Quaternion(1.0f, Vec3(0.0f, 0.0f, 0.0f)), Vec3(2.0f, 2.0f, 2.0f));
+	transform = Transform(Vec3(0.0f, 0.0f, 0.0f), Quaternion(1.0f, Vec3(0.0f, 0.0f, 0.0f)), Vec3(4.0f, 4.0f, 4.0f));
 	body = new Body(&transform, Vec3(), Vec3(), 1);
 
 
@@ -42,7 +42,7 @@ bool FriendlyShip::OnCreate()
 
 
 	
-	collisionSphere = new Sphere(transform.getPos(), 1.5f);
+	collisionSphere = new Sphere(transform.getPos(), 5.0f);
 
 	return true;
 }
@@ -107,22 +107,27 @@ void FriendlyShip::Update(const float deltaTime)
 	if (displayRange) {
 		rangeSphereT.setPos(detectionSphere.center);
 	}
+
+	collisionSphere->center = transform.getPos();
 }
 
 void FriendlyShip::Render(Shader* shader) const
 {
 
+	model->BindTextures(0,0);
 
 	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, transform.toModelMatrix());
-	glUniform4fv(shader->GetUniformID("meshColor"), 1, color);
+	
 	model->mesh->Render(GL_TRIANGLES);
 
 	if (displayRange) {
 		
 		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, rangeSphereT.toModelMatrix());
-		glUniform4fv(shader->GetUniformID("meshColor"), 1, color);
+		//glUniform4fv(shader->GetUniformID("meshColor"), 1, color);
 		rangeSphere.mesh->Render(GL_TRIANGLES);
 	}
+
+	model->UnbindTextures();
 }
 
 void FriendlyShip::RenderBullets(Shader* shader) const
