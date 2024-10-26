@@ -14,7 +14,7 @@ bool Bullet::OnCreate()
 {
 	/*modelTemp = Model("Sphere.obj");
 	if (modelTemp.OnCreate() == false) return false;*/
-	transform.setScale(0.8f, 0.8f, 0.8f);
+	transform.setScale(0.5f, 0.5f, 0.5f);
 
 	collisionSphere = new Sphere(transform.getPos(), 1.0f); //set the collision sphere
 

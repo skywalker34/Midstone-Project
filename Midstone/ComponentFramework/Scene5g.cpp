@@ -41,7 +41,7 @@ bool Scene5g::OnCreate() {
 
 	//Don't let the names fool you, this shader no longer has anything to do with textures (anymore)
 	//I'm just too lazy to change the names at the moment
-	shader = new Shader("shaders/textureVert.glsl", "shaders/textureFrag.glsl");
+	shader = new Shader("shaders/particleVert.glsl", "shaders/particleFrag.glsl");
 	if (shader->OnCreate() == false) {
 		std::cout << "Shader failed ... we have a problem\n";
 	}

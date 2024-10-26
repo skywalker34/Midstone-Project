@@ -255,16 +255,22 @@
     <None Include="shaders\loadVerticiesVert.glsl">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="shaders\textureFrag.glsl">
+    <None Include="shaders\particleFrag.glsl">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="shaders\textureVert.glsl">
+    <None Include="shaders\particleVert.glsl">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="shaders\bulletFrag.glsl">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="shaders\bulletVert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\planetFrag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\planetVert.glsl">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

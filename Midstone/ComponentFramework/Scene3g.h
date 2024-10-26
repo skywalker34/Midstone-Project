@@ -26,6 +26,7 @@ private:
 
 	Shader* shader;
 	Shader* bulletShader;
+	Shader* planetShader;
 
 	Model friendlyShipModel;
 	Model enemyShipModel;
@@ -37,8 +38,8 @@ private:
 	EnemySpawner enemySpawnPoint = EnemySpawner(7, 5);
 
 	
-	Matrix4 modelMatrix;
-	Mesh* mesh;
+	Vec3 lightPos = Vec3(0.0f, 50.0f, 0.0f);
+
 	PlayerController playerController;
 	Vec3 shipWaypoint;
 

@@ -38,9 +38,12 @@ void Planet::Update(float deltaTime)
 
 void Planet::Render(Shader* shader) const
 {
+	model->BindTextures(0, 1);//honestly don't know how to not hardcode this
+
 	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, transform.toModelMatrix());
-	glUniform4fv(shader->GetUniformID("meshColor"), 1, GREY);
 	model->mesh->Render(GL_TRIANGLES);
+
+	model->UnbindTextures();
 }
 
 void Planet::takeDame(int damage)
