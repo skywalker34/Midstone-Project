@@ -244,7 +244,6 @@ void Scene3g::Update(const float deltaTime) {
 
 			if (ship->canFire == true) { //before checking if enemy is in range check if the ship is even allowed to shoot yet
 				if (COLLISION::SphereSphereCollisionDetected(&ship->detectionSphere, targetShip->collisionSphere)) {	//check if enemy ship is in range
-					//std::cout << "COLLISION!" << std::endl;
 					ship->targetDirection = VMath::normalize(targetShip->transform.getPos() - ship->transform.getPos()); //if the enemy is in range get the direction from our ship to the enemy
 					ship->Fire();//fire a bullet at the enemy
 					std::vector<Bullet*> temp = ship->getBullets(); //if the ship fired just update the temp list of bullets
@@ -260,8 +259,12 @@ void Scene3g::Update(const float deltaTime) {
 		}
 		
 		ship->Update(deltaTime);//call their update functions
+		ship->displayRange = false;
 	}
-	
+
+	playerFleet[activeShip]->color = GREEN;	//temporary to turn the selected ship green
+	playerFleet[activeShip]->displayRange = true;
+
 	for (int i = 0; i < enemyFleet.size(); i++) {
 		enemyFleet[i]->Update(deltaTime);
 		if (enemyFleet[i]->deleteMe) {
