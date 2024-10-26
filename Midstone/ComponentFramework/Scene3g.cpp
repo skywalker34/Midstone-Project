@@ -23,31 +23,19 @@ Scene3g::~Scene3g() {
 
 bool Scene3g::OnCreate() {
 	Debug::Info("Loading assets Scene0: ", __FILE__, __LINE__);
-	
-	
-	
-	//create an enemy spawn point (its random but with a set magnitude(distance) from the origin
 
-	
 	//TODO: make this planet an actor
 	mesh = new Mesh("meshes/Sphere.obj");
 	mesh->OnCreate();
-
-	
-
-	
-
+  
+	//create an enemy spawn point (its random but with a set magnitude(distance) from the origin
 	for (int i = 0; i < startingFleetSize; i++) {
 		enemyFleet.push_back(new EnemyShip(Vec3(5, 5, 0)));
-
-
 	}
 	for (EnemyShip* ship : enemyFleet) {
 		ship->OnCreate();
-		
-
+		ship->setIndex(enemyIndex);
 	}
-	
 	
 	for (int i = 0; i < startingFleetSize; i++) {
 		playerFleet.push_back(new FriendlyShip());
@@ -173,124 +161,122 @@ void Scene3g::HandleEvents(const SDL_Event& sdlEvent) {
 
 void Scene3g::Update(const float deltaTime) {
 
+	if (!isGameRunning) return;
+
 	enemySpawnPoint.Update(deltaTime);
 	if (enemySpawnPoint.canSpawn == true) {
+		enemyIndex++;
 		enemyFleet.push_back(new EnemyShip(enemySpawnPoint.position));
 		enemyFleet.back()->OnCreate();
+		enemyFleet.back()->setIndex(enemyIndex);
 		enemySpawnPoint.canSpawn = false;
 	}
 	
-	if (isGameRunning) {
-		playerController.Update(deltaTime);
+	playerController.Update(deltaTime);
 		
 
-		if (playerController.has3DClick) {
-
-			
-			shipWaypoint = playerController.getClickPos();
-			playerFleet[activeShip]->moveToDestination(shipWaypoint);
-			
-			
-			
-		}
-
-		//super temporay will need to be moved
-		if (playerController.hasDQLine) {
-
-
-			DualQuat line = playerController.getLine();
-			line = DQMath::normalize(line);
-
-			Vec3 test = line ^ Plane(0, 0, 1, 0);
-			test.print("line test: ");
-
-
-			//loop through the spheres
-			for (int i = 0; i < playerFleet.size(); i++) {
-				Vec4 centrePoint = playerFleet[i]->transform.getPos();
-				
-				Flector M = centrePoint * line;
-				Plane pM = M.plane;//grab the plane part of the flector
-				Vec4 vM = M.point;
-
-				float radius = 1;//hardcoded for now until sphere and collision classes are up
-				float dSquared = (radius * radius) - (VMath::mag(vM) * VMath::mag(vM)); // d^2 = r^2 - (*<M>3)^2
-				//pretty sure I'm doing this part wrong (*<M>3)^2
-
-				if (dSquared > 0) { //if d^2 > 0 then the line and sphere intersect
-					activeShip = i;
-
-					Vec4 i1 = line ^ (M.plane + Plane(0, 0, 0, sqrt(dSquared))) * -1;
-					i1 = i1 / i1.w;
-					i1.print("Intersection Point 1");
-
-
-
-					Vec4 i2 = line ^ (M.plane + Plane(0, 0, 0, -sqrt(dSquared))) * -1;
-					i2 = i2 / i2.w;
-					i2.print("Intersection Point 2");
-				}
-				
-
-
-			}
-		}
-
-		//below can probably be a recursive function?
-		for (FriendlyShip* ship : playerFleet) { //first we loop through every oen of the player's ships
-			
-			ship->color = BLUE;//all friendly ships are blue except the active ship TEMPORARY REMOVE LATER
-			
-			
-			std::vector<Bullet*> temp = ship->getBullets(); //get a reference to all the bullets that ship has fired
-
-			
-
-			for (EnemyShip* targetShip : enemyFleet) { //now loop through each enemy to detect if an enmy is in range
-				if (ship->canFire == true) { //before checking if enemy is in range check if the ship is even allowed to shoot yet
-					if (COLLISION::SphereSphereCollisionDetected(&ship->detectionSphere, targetShip->collisionSphere)) {	//check if enemy ship is in range
-						std::cout << "COLLISION!" << std::endl;
-						ship->targetDirection = VMath::normalize(targetShip->transform.getPos() - ship->transform.getPos()); //if the enemy is in range get the direction from our ship to the enemy
-						ship->Fire();//fire a bullet at the enemy
-						std::vector<Bullet*> temp = ship->getBullets(); //if the ship fired just update the temp list of bullets
-					}
-				}
-				
-				for (Bullet* bullet : temp) { //now we loop through each bullet to see if any would hit this enemy ship
-					if (COLLISION::SphereSphereCollisionDetected(bullet->collisionSphere, targetShip->collisionSphere)) {
-						bullet->deleteMe = true; //tell the ship to delete the bullet
-						targetShip->Hit();
-					}
-				}
-			}
-			
-
-			ship->Update(deltaTime);//call their update functions
-			ship->displayRange = false;
-		}
-		
-		playerFleet[activeShip]->color = GREEN;	//temporary to turn the selected ship green
-		playerFleet[activeShip]->displayRange = true;
-
-		for (int i = 0; i < enemyFleet.size(); i++) {
-			enemyFleet[i]->Update(deltaTime);
-			if (enemyFleet[i]->deleteMe) {
-				enemyFleet[i]->OnDestroy();
-				delete enemyFleet[i];
-				enemyFleet[i] = nullptr;
-				enemyFleet.erase(std::remove(enemyFleet.begin(), enemyFleet.end(), nullptr), enemyFleet.end());
-			}
-			else {
-				enemyFleet[i]->Update(deltaTime);
-			}
-
-			
-		}
-
+	if (playerController.has3DClick) {
+		shipWaypoint = playerController.getClickPos();
+		playerFleet[activeShip]->moveToDestination(shipWaypoint);
 	}
 
-	
+	//super temporay will need to be moved
+	if (playerController.hasDQLine) {
+		DualQuat line = playerController.getLine();
+		line = DQMath::normalize(line);
 
+		Vec3 test = line ^ Plane(0, 0, 1, 0);
+		test.print("line test: ");
+
+		//loop through the spheres
+		for (int i = 0; i < playerFleet.size(); i++) {
+			Vec4 centrePoint = playerFleet[i]->transform.getPos();
+			Flector M = centrePoint * line;
+			Plane pM = M.plane;//grab the plane part of the flector
+			Vec4 vM = M.point;
+
+			float radius = 1;//hardcoded for now until sphere and collision classes are up
+			float dSquared = (radius * radius) - (VMath::mag(vM) * VMath::mag(vM)); // d^2 = r^2 - (*<M>3)^2
+			//pretty sure I'm doing this part wrong (*<M>3)^2
+
+			if (dSquared > 0) { //if d^2 > 0 then the line and sphere intersect
+				activeShip = i;
+
+				Vec4 i1 = line ^ (M.plane + Plane(0, 0, 0, sqrt(dSquared))) * -1;
+				i1 = i1 / i1.w;
+				i1.print("Intersection Point 1");
+
+
+				Vec4 i2 = line ^ (M.plane + Plane(0, 0, 0, -sqrt(dSquared))) * -1;
+				i2 = i2 / i2.w;
+				i2.print("Intersection Point 2");
+			}
+		}
+	}
+
+	//below can probably be a recursive function?
+	for (FriendlyShip* ship : playerFleet) { //first we loop through every oen of the player's ships
+		ship->color = BLUE;//all friendly ships are blue except the active ship TEMPORARY REMOVE LATER
+		std::vector<Bullet*> temp = ship->getBullets(); //get a reference to all the bullets that ship has fired
+		Vec3 closestEnemy = Vec3(10, 0, 0); // remove
+		float minDistance = 100; // remove
+
+		for (EnemyShip* targetShip : enemyFleet) { //now loop through each enemy to detect if an enmy is in range
+			if (!ship->isMoving && VMath::mag(ship->transform.getPos() - targetShip->transform.getPos()) < minDistance) {
+				minDistance = VMath::mag(ship->transform.getPos() - targetShip->transform.getPos());
+				closestEnemy = targetShip->transform.getPos();
+				if (ship->currentTargetIndex == targetShip->shipIndex) {
+					Quaternion targetQuad = QMath::lookAt(closestEnemy, UP);
+					ship->transform.setOrientation(targetQuad);
+
+				}
+				else {
+					ship->slerpT = ship->slerpT >= 1 ? 0 : ship->slerpT + deltaTime;
+					ship->rotateTowardTarget(closestEnemy);
+					ship->canFire = false;
+					if (ship->slerpT >= 1) {
+						ship->currentTargetIndex = targetShip->shipIndex;
+					}
+				}
+				
+			}
+			
+
+			if (ship->canFire == true) { //before checking if enemy is in range check if the ship is even allowed to shoot yet
+				if (COLLISION::SphereSphereCollisionDetected(&ship->detectionSphere, targetShip->collisionSphere)) {	//check if enemy ship is in range
+					ship->targetDirection = VMath::normalize(targetShip->transform.getPos() - ship->transform.getPos()); //if the enemy is in range get the direction from our ship to the enemy
+					ship->Fire();//fire a bullet at the enemy
+					std::vector<Bullet*> temp = ship->getBullets(); //if the ship fired just update the temp list of bullets
+				}
+			}
+			
+			for (Bullet* bullet : temp) { //now we loop through each bullet to see if any would hit this enemy ship
+				if (COLLISION::SphereSphereCollisionDetected(bullet->collisionSphere, targetShip->collisionSphere)) {
+					bullet->deleteMe = true; //tell the ship to delete the bullet
+					targetShip->Hit();
+				}
+			}
+		}
+		
+		ship->Update(deltaTime);//call their update functions
+		ship->displayRange = false;
+	}
+
+	playerFleet[activeShip]->color = GREEN;	//temporary to turn the selected ship green
+	playerFleet[activeShip]->displayRange = true;
+
+	for (int i = 0; i < enemyFleet.size(); i++) {
+		enemyFleet[i]->Update(deltaTime);
+		if (enemyFleet[i]->deleteMe) {
+			enemyFleet[i]->OnDestroy();
+			delete enemyFleet[i];
+			enemyFleet[i] = nullptr;
+			enemyFleet.erase(std::remove(enemyFleet.begin(), enemyFleet.end(), nullptr), enemyFleet.end());
+		}
+		else {
+			enemyFleet[i]->Update(deltaTime);
+		}
+	}
 }
 
 void Scene3g::Render() const {

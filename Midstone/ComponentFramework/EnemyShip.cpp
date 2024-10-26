@@ -51,6 +51,11 @@ void EnemyShip::OnDestroy()
 
 }
 
+void EnemyShip::setIndex(int index)
+{
+	shipIndex = index;
+}
+
 void EnemyShip::Update(const float deltaTime)
 {
 	body->ApplyForce(getTargetDirection() * speed);	//shouldn't have to do this every frame we nay want to move it

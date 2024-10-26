@@ -27,6 +27,7 @@ class EnemyShip :
 
 	public:
 		bool deleteMe = false;//flag to tell the scene when to delete this ship
+		int shipIndex;
 
 		EnemyShip();
 		EnemyShip(Vec3 pos);
@@ -36,6 +37,7 @@ class EnemyShip :
 
 		bool OnCreate() override;
 		void OnDestroy();
+		void setIndex(int index);
 		void Update(const float deltaTime);
 		void Render(Shader* shader) const;
 		//called when the enemy ship is hit by a projectile
