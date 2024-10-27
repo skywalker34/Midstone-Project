@@ -18,6 +18,9 @@ class FriendlyShip :
 
 
 		Model rangeSphere;
+
+		Model* bulletModel;
+
 		Transform rangeSphereT;
 		bool displayRange = false;
 		//Inherited:
@@ -31,6 +34,8 @@ class FriendlyShip :
 		std::vector<Bullet*> bullets;
 		ShipController controller;
 		Vec3 destination = Vec3(0, 0, 0);
+
+
 
 		Vec3 targetDirection = Vec3(0, 0, 0);
 		Vec3 movingDirection;
@@ -46,18 +51,22 @@ class FriendlyShip :
 		float slerpT = 0;
 		float newAngle = 0;
 		const float projectileSpeed = 0.1;//the distance (units/frame) this ship's projectile moves
-		float range = 5.0f;
+
+		float range = 50.0f;
 		int currentTargetIndex = 0;
+
 
 		Sphere detectionSphere;
 
 		FriendlyShip();
+		FriendlyShip(Model* model_, Model* bulletModel_);
 		bool OnCreate() override; //probably a way to do this without ovveriding
 								//problem I was having is that ship inherits from actor so actor On creates model but the mesh is loaded in ship
 								//might be a solution with filepaths (leaving this here so I don't forget)
 		void OnDestroy();
 		void Update(const float deltaTime);
 		void Render(Shader* shader) const;
+		void RenderBullets(Shader* shader) const;
 		bool wouldIntersectPlanet = false;
 		void Fire();
 		void moveToDestination(Vec3 destination);

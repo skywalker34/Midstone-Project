@@ -196,15 +196,21 @@
     <Text Include="GameEngineLog.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\bulletFrag.glsl" />
+    <None Include="shaders\bulletVert.glsl" />
     <None Include="shaders\computer.glsl" />
     <None Include="shaders\defaultFrag.glsl" />
     <None Include="shaders\defaultVert.glsl" />
+    <None Include="shaders\friendlyShipFrag.glsl" />
+    <None Include="shaders\friendlyShipVert.glsl" />
     <None Include="shaders\loadVerticiesFrag.glsl" />
     <None Include="shaders\loadVerticiesVert.glsl" />
+    <None Include="shaders\planetFrag.glsl" />
+    <None Include="shaders\planetVert.glsl" />
     <None Include="shaders\skyboxFrag.glsl" />
     <None Include="shaders\skyboxVert.glsl" />
-    <None Include="shaders\textureFrag.glsl" />
-    <None Include="shaders\textureVert.glsl" />
+    <None Include="shaders\particleFrag.glsl" />
+    <None Include="shaders\particleVert.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

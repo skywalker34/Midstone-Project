@@ -5,6 +5,7 @@
 #include <QMath.h>
 #include "Actor.h"
 #include "Shader.h"
+#include "Model.h"
 using namespace MATH;
 
 union SDL_Event;
@@ -25,6 +26,9 @@ class PlayerController
 		float planeDepth = 0;
 
 	public:
+		PlayerController();
+
+
 		Transform transform; //temporary public
 		Camera camera;
 		bool has3DClick = false;
@@ -34,6 +38,8 @@ class PlayerController
 		void handleEvents(const SDL_Event& sdlEvent);
 		void Update(const float deltaTime);
 		void Render(Shader* shader) const;
+
+		void CreateGrid(Model* model_);
 		Vec3 getClickPos();//returns the position of a 3d click
 		Vec3 get3DClickCoords(float sdl_X, float sdl_Y);
 		DualQuat getLine() { hasDQLine = false;  return line2; };

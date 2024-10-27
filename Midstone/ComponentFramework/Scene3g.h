@@ -9,6 +9,8 @@
 #include <Matrix.h>
 #include "Collision.h"
 #include "Vector.h"
+#include "Planet.h"
+
 #include "EnemySpawner.h"
 using namespace MATH;
 
@@ -17,20 +19,32 @@ union SDL_Event;
 class Mesh;
 class Shader;
 class Bullet;
+class Model;
 
 class Scene3g : public Scene {
 private:
 
 	Shader* shader;
+	Shader* bulletShader;
+	Shader* planetShader;
+	Shader* friendlyShipShader;
+
+	Model friendlyShipModel;
+	Model enemyShipModel;
+	Model bulletModel;
+	Model sphereModel;
+	Model planeModel;
 	
 
-	EnemySpawner enemySpawnPoint = EnemySpawner(7, 5);
+	EnemySpawner enemySpawnPoint = EnemySpawner(200, 5);
 
 	
-	Matrix4 modelMatrix;
-	Mesh* mesh;
+	Vec3 lightPos = Vec3(0.0f, 75.0f, -150.0f);
+
 	PlayerController playerController;
 	Vec3 shipWaypoint;
+
+	Planet planet;
 
 	std::vector<FriendlyShip*> playerFleet;
 	std::vector<EnemyShip*> enemyFleet;
@@ -39,6 +53,10 @@ private:
 	int startingFleetSize = 8;
 	int enemyIndex = 0;
 	
+	float timeElapsed;
+
+	int score = 0;
+
 	bool drawInWireMode;
 	bool isGameRunning = true;
 

@@ -6,12 +6,18 @@
 
 
 
+PlayerController::PlayerController()
+{
+}
+
+
+
 bool PlayerController::OnCreate()
 {
 	//here for future improvements
-	transform.setPos(Vec3(0, 0, 20));
+	transform.setPos(Vec3(0, 0, 75));
 	
-	clickGrid = Actor(Transform(), Model("Plane.obj"));
+	
 
 	if (camera.OnCreate() == false) return false;
 
@@ -19,6 +25,18 @@ bool PlayerController::OnCreate()
 	return true;
 	
 }
+
+void PlayerController::OnDestroy()
+{
+	clickGrid.OnDestroy();
+}
+
+void PlayerController::CreateGrid(Model* model_)
+{
+	clickGrid = Actor(Transform(), model_);
+	clickGrid.OnCreate();
+}
+
 
 void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 {
@@ -142,6 +160,8 @@ void PlayerController::Render(Shader* shader) const
 {
 	clickGrid.Render(shader);
 }
+
+
 
 Vec3 PlayerController::getClickPos()
 {

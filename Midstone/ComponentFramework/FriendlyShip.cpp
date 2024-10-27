@@ -2,9 +2,11 @@
 #include "Sphere.h"
 
 
+
+//depreciated
 FriendlyShip::FriendlyShip()
 {
-	transform = Transform(Vec3(0.0f, 0.0f, 0.0f), Quaternion(1.0f, Vec3(0.0f, 0.0f, 0.0f)), Vec3(0.02f, 0.02f, 0.02f));
+	transform = Transform(Vec3(0.0f, 0.0f, 0.0f), Quaternion(1.0f, Vec3(0.0f, 0.0f, 0.0f)), Vec3(1.0f, 1.0f, 1.0f));
 	body = new Body(&transform, Vec3(), Vec3(), 1);
 
 	
@@ -13,11 +15,21 @@ FriendlyShip::FriendlyShip()
 	
 }
 
+FriendlyShip::FriendlyShip(Model* model_, Model* bulletModel_)
+{
+	transform = Transform(Vec3(0.0f, 0.0f, 0.0f), Quaternion(1.0f, Vec3(0.0f, 0.0f, 0.0f)), Vec3(4.0f, 4.0f, 4.0f));
+	body = new Body(&transform, Vec3(), Vec3(), 1);
+
+
+	model = model_;
+	bulletModel = bulletModel_;
+}
+
 bool FriendlyShip::OnCreate()
 {
-	model = Model("Ship.obj");
+	
 	detectionSphere = Sphere(transform.getPos(), range);
-	if (model.OnCreate() == false) return false;
+	
 	printf("Ship Created! \n");
 	
 	rangeSphere = Model("Sphere.obj");
@@ -29,18 +41,29 @@ bool FriendlyShip::OnCreate()
 	//we may want to go into 3dsmax and make a unit sphere 
 
 
-	Fire();
+	
+	collisionSphere = new Sphere(transform.getPos(), 5.0f);
+
 	return true;
 }
 
 void FriendlyShip::OnDestroy()
 {
+
+	model = nullptr;
+
 	rangeSphere.OnDestroy();
-	model.OnDestroy();
+
+
+	delete collisionSphere;
+	
 	for (Bullet* bullet : bullets) {
 		bullet->OnDestroy();
 		delete bullet;
 	}
+
+	delete model;
+
 }
 
 void FriendlyShip::Update(const float deltaTime)
@@ -71,35 +94,51 @@ void FriendlyShip::Update(const float deltaTime)
 		body->vel = Vec3();
 	}
 	detectionSphere.center = transform.getPos();//update teh collision sphere to match the ships position
+	collisionSphere->center = transform.getPos();
+
+
 	if (displayRange) {
 		rangeSphereT.setPos(detectionSphere.center);
 	}
+
+	
 }
 
 void FriendlyShip::Render(Shader* shader) const
 {
-	for (Bullet* bullet : bullets) {
-		bullet->Render(shader);
-	}
+
+	model->BindTextures(0,0);
 
 	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, transform.toModelMatrix());
-	glUniform4fv(shader->GetUniformID("meshColor"), 1, color);
-	model.mesh->Render(GL_TRIANGLES);
+	
+	model->mesh->Render(GL_TRIANGLES);
 
 	if (displayRange) {
 		
 		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, rangeSphereT.toModelMatrix());
-		glUniform4fv(shader->GetUniformID("meshColor"), 1, color);
-		rangeSphere.mesh->Render(GL_TRIANGLES);
+		//glUniform4fv(shader->GetUniformID("meshColor"), 1, color);
+		rangeSphere.mesh->Render(GL_LINES);
+	}
+
+	model->UnbindTextures();
+}
+
+void FriendlyShip::RenderBullets(Shader* shader) const
+{
+	for (Bullet* bullet : bullets) {
+		bullet->Render(shader);
 	}
 }
 
 void FriendlyShip::Fire()
 {
+
+	
+
 	canFire = false; 
 	timeSinceShot = 0;
 	//the third parameter here "BACKWARD" should instead be the direction the ship is facing
-	bullets.push_back(new Bullet(transform, 0.1f, targetDirection));
+	bullets.push_back(new Bullet(transform, 0.1f, targetDirection, &bulletModel));
 	if (bullets.back()->OnCreate() == false) {
 		printf("Bullet failed! /n");
 	}

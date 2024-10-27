@@ -114,6 +114,7 @@ bool SkyBox::LoadImages() {
 
 void SkyBox::Render() const {
 	//render the skybox
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 	cubeMesh->Render();
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);

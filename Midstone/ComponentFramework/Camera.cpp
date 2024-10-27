@@ -29,7 +29,7 @@ void Camera::SetView(const Transform t_)
 }
 	
 Camera::Camera() {
-	projection = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);
+	projection = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 500.0f);
 	transform.setOrientation( Quaternion(1.0f, Vec3(0.0f, 0.0f, 0.0f)));
 	transform.setPos(Vec3(0.0f, 0.0f, 0.0));
 
@@ -48,12 +48,12 @@ void Camera::OnDestroy() {
 Camera::~Camera() {}
 
 bool Camera::OnCreate() {
-	skybox = new SkyBox("textures/skybox_front.png",
-		"textures/skybox_back.png",
-		"textures/skybox_up.png",
-		"textures/skybox_down.png",
-		"textures/skybox_right.png",
-		"textures/skybox_left.png");
+	skybox = new SkyBox("textures/simple_skybox/skybox_front.png",
+		"textures/simple_skybox/skybox_back.png",
+		"textures/simple_skybox/skybox_up.png",
+		"textures/simple_skybox/skybox_down.png",
+		"textures/simple_skybox/skybox_right.png",
+		"textures/simple_skybox/skybox_left.png");
 
 	if (skybox->OnCreate() == false) {
 		return false;

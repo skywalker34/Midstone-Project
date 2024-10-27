@@ -30,7 +30,7 @@ class EnemyShip :
 		int shipIndex;
 
 		EnemyShip();
-		EnemyShip(Vec3 pos);
+		EnemyShip(Vec3 pos, Model* model_);
 
 		void setTarget(Vec3 target_);
 		Vec3 getTargetDirection();
