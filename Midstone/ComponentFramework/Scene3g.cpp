@@ -24,6 +24,7 @@ Scene3g::~Scene3g() {
 
 bool Scene3g::OnCreate() {
 	Debug::Info("Loading assets Scene0: ", __FILE__, __LINE__);
+
 	
 	
 
@@ -69,14 +70,11 @@ bool Scene3g::OnCreate() {
 
 		enemyFleet.push_back(new EnemyShip(Vec3(x, 0, z), &enemyShipModel));
 
-
 	}
 	for (EnemyShip* ship : enemyFleet) {
 		ship->OnCreate();
-		
-
+		ship->setIndex(enemyIndex);
 	}
-	
 	
 	for (int i = 0; i < startingFleetSize; i++) {
 		playerFleet.push_back(new FriendlyShip(&friendlyShipModel, &bulletModel));
@@ -253,21 +251,26 @@ void Scene3g::HandleEvents(const SDL_Event& sdlEvent) {
 void Scene3g::Update(const float deltaTime) {
 
 
+
 	timeElapsed += deltaTime; 
 
 	planet.Update(deltaTime);
 
+
+
+	if (!isGameRunning) return;
+
 	enemySpawnPoint.Update(deltaTime);
 	if (enemySpawnPoint.canSpawn == true) {
-		enemyFleet.push_back(new EnemyShip(enemySpawnPoint.position, &enemyShipModel));
+		enemyIndex++;
+		enemyFleet.push_back(new EnemyShip(enemySpawnPoint.position));
+
 		enemyFleet.back()->OnCreate();
+		enemyFleet.back()->setIndex(enemyIndex);
 		enemySpawnPoint.canSpawn = false;
 	}
 	
-	playerController.Update(deltaTime);
-	if (isGameRunning) {
-		
-		
+	playerController.Update(deltaTime);		
 
 		if (playerController.has3DClick) {
 
@@ -295,40 +298,35 @@ void Scene3g::Update(const float deltaTime) {
 				{
 					activeShip = i;
 				}
-				
+							
+
+	//below can probably be a recursive function?
+	for (FriendlyShip* ship : playerFleet) { //first we loop through every oen of the player's ships
+		std::vector<Bullet*> temp = ship->getBullets(); //get a reference to all the bullets that ship has fired
 
 
-			}
-		}
+		for (EnemyShip* targetShip : enemyFleet) { //now loop through each enemy to detect if an enmy is in range
+			if (!ship->isMoving && VMath::mag(ship->transform.getPos() - targetShip->transform.getPos()) < minDistance) {
+				minDistance = VMath::mag(ship->transform.getPos() - targetShip->transform.getPos());
+				closestEnemy = targetShip->transform.getPos();
+				if (ship->currentTargetIndex == targetShip->shipIndex) {
+					Quaternion targetQuad = QMath::lookAt(closestEnemy, UP);
+					ship->transform.setOrientation(targetQuad);
 
-		//below can probably be a recursive function?
-		for (FriendlyShip* ship : playerFleet) { //first we loop through every oen of the player's ships
-			
-			
-			
-			
-			std::vector<Bullet*> temp = ship->getBullets(); //get a reference to all the bullets that ship has fired
 
-			
-
-			for (EnemyShip* targetShip : enemyFleet) { //now loop through each enemy to detect if an enmy is in range
-				if (ship->canFire == true) { //before checking if enemy is in range check if the ship is even allowed to shoot yet
-					if (COLLISION::SphereSphereCollisionDetected(&ship->detectionSphere, targetShip->collisionSphere)) {	//check if enemy ship is in range
-					
-						ship->targetDirection = VMath::normalize(targetShip->transform.getPos() - ship->transform.getPos()); //if the enemy is in range get the direction from our ship to the enemy
-						ship->Fire();//fire a bullet at the enemy
-						std::vector<Bullet*> temp = ship->getBullets(); //if the ship fired just update the temp list of bullets
+				}
+				else {
+					ship->slerpT = ship->slerpT >= 1 ? 0 : ship->slerpT + deltaTime;
+					ship->rotateTowardTarget(closestEnemy);
+					ship->canFire = false;
+					if (ship->slerpT >= 1) {
+						ship->currentTargetIndex = targetShip->shipIndex;
 					}
 				}
 				
-				for (Bullet* bullet : temp) { //now we loop through each bullet to see if any would hit this enemy ship
-					if (COLLISION::SphereSphereCollisionDetected(bullet->collisionSphere, targetShip->collisionSphere)) {
-						bullet->deleteMe = true; //tell the ship to delete the bullet
-						targetShip->Hit();
-					}
-				}
 			}
 			
+
 
 			ship->Update(deltaTime);//call their update functions
 			ship->displayRange = false;
@@ -349,16 +347,47 @@ void Scene3g::Update(const float deltaTime) {
 			}
 			else {
 				enemyFleet[i]->Update(deltaTime);
+			if (ship->canFire == true) { //before checking if enemy is in range check if the ship is even allowed to shoot yet
+				if (COLLISION::SphereSphereCollisionDetected(&ship->detectionSphere, targetShip->collisionSphere)) {	//check if enemy ship is in range
+					ship->targetDirection = VMath::normalize(targetShip->transform.getPos() - ship->transform.getPos()); //if the enemy is in range get the direction from our ship to the enemy
+					ship->Fire();//fire a bullet at the enemy
+					std::vector<Bullet*> temp = ship->getBullets(); //if the ship fired just update the temp list of bullets
+				}
 			}
-
 			
+			for (Bullet* bullet : temp) { //now we loop through each bullet to see if any would hit this enemy ship
+				if (COLLISION::SphereSphereCollisionDetected(bullet->collisionSphere, targetShip->collisionSphere)) {
+					bullet->deleteMe = true; //tell the ship to delete the bullet
+					targetShip->Hit();
+				}
+			}
 		}
-
+		
+		ship->Update(deltaTime);//call their update functions
+		ship->displayRange = false;
 	}
+
 
 	std::cout << std::endl << "Score: " << score << std::endl;
 	std::cout << "Time Elapsed " << timeElapsed << std::endl;
 	
+
+
+	playerFleet[activeShip]->displayRange = true;
+
+	for (int i = 0; i < enemyFleet.size(); i++) {
+		enemyFleet[i]->Update(deltaTime);
+		if (enemyFleet[i]->deleteMe) {
+			enemyFleet[i]->OnDestroy();
+			delete enemyFleet[i];
+			enemyFleet[i] = nullptr;
+			enemyFleet.erase(std::remove(enemyFleet.begin(), enemyFleet.end(), nullptr), enemyFleet.end());
+		}
+		else {
+			enemyFleet[i]->Update(deltaTime);
+		}
+	}
+
 }
 
 void Scene3g::Render() const {

@@ -51,7 +51,10 @@ class FriendlyShip :
 		float slerpT = 0;
 		float newAngle = 0;
 		const float projectileSpeed = 0.1;//the distance (units/frame) this ship's projectile moves
+
 		float range = 50.0f;
+		int currentTargetIndex = 0;
+
 
 		Sphere detectionSphere;
 
@@ -69,6 +72,7 @@ class FriendlyShip :
 		void moveToDestination(Vec3 destination);
 		void rotateTowardTarget(Vec3 target);
 		bool hasReachDestination();
+		void setTargetEnemy(Vec3 target);
 
 		std::vector<Bullet*>& getBullets() {
 			return bullets; 

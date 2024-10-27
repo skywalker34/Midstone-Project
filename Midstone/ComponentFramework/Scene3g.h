@@ -51,6 +51,7 @@ private:
 
 	int activeShip = 0;
 	int startingFleetSize = 8;
+	int enemyIndex = 0;
 	
 	float timeElapsed;
 

@@ -68,17 +68,11 @@ void FriendlyShip::OnDestroy()
 
 void FriendlyShip::Update(const float deltaTime)
 {
-
-
 	
-
-	if (canFire == false) {
+	if (!canFire) {
 		timeSinceShot += deltaTime;
-		if (timeSinceShot >= rateOfFire) {
-			canFire = true;
-		}
+		canFire = timeSinceShot >= rateOfFire && !isMoving;
 	}
-
 
 	for (int i = 0; i < bullets.size(); i++) {
 		bullets[i]->Update(deltaTime);
@@ -90,8 +84,6 @@ void FriendlyShip::Update(const float deltaTime)
 		}
 	}
 
-
-
 	if (isMoving) {
 		slerpT = slerpT >= 1 ? 1 : slerpT + deltaTime;
 		body->Update(deltaTime);
@@ -101,8 +93,6 @@ void FriendlyShip::Update(const float deltaTime)
 	else {
 		body->vel = Vec3();
 	}
-
-	
 	detectionSphere.center = transform.getPos();//update teh collision sphere to match the ships position
 	collisionSphere->center = transform.getPos();
 
@@ -186,6 +176,12 @@ void FriendlyShip::rotateTowardTarget(Vec3 target)
 	else {
 		initialDirection = target;
 	}
+}
+
+void FriendlyShip::setTargetEnemy(Vec3 target)
+{
+	targetDirection = target;
+	rotateTowardTarget(target);
 }
 
 bool FriendlyShip::hasReachDestination()
