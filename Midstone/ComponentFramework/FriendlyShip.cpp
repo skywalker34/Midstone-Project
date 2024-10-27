@@ -104,11 +104,14 @@ void FriendlyShip::Update(const float deltaTime)
 
 	
 	detectionSphere.center = transform.getPos();//update teh collision sphere to match the ships position
+	collisionSphere->center = transform.getPos();
+
+
 	if (displayRange) {
 		rangeSphereT.setPos(detectionSphere.center);
 	}
 
-	collisionSphere->center = transform.getPos();
+	
 }
 
 void FriendlyShip::Render(Shader* shader) const
@@ -124,7 +127,7 @@ void FriendlyShip::Render(Shader* shader) const
 		
 		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, rangeSphereT.toModelMatrix());
 		//glUniform4fv(shader->GetUniformID("meshColor"), 1, color);
-		rangeSphere.mesh->Render(GL_TRIANGLES);
+		rangeSphere.mesh->Render(GL_LINES);
 	}
 
 	model->UnbindTextures();
@@ -139,6 +142,9 @@ void FriendlyShip::RenderBullets(Shader* shader) const
 
 void FriendlyShip::Fire()
 {
+
+	
+
 	canFire = false; 
 	timeSinceShot = 0;
 	//the third parameter here "BACKWARD" should instead be the direction the ship is facing

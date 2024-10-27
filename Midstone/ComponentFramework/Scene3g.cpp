@@ -36,7 +36,7 @@ bool Scene3g::OnCreate() {
 	}
 
 
-	enemyShipModel = Model("enemyShip.obj");
+	enemyShipModel = Model("Midstone_Enemy.obj");
 	if (enemyShipModel.OnCreate() == false) {
 		printf("Model failed to load");
 	}
@@ -61,7 +61,13 @@ bool Scene3g::OnCreate() {
 	///////////////////////////////////////////////////ACTORS\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 	for (int i = 0; i < startingFleetSize; i++) {
-		enemyFleet.push_back(new EnemyShip(Vec3(500, 500, 0), &enemyShipModel));
+		int numShips = startingFleetSize;
+		float radius = 75.0f;
+		float angle = 2.0f * M_PI * i / numShips; // Calculate the angle for each ship
+		float x = radius * cos(angle);            // Calculate x position
+		float z = radius * sin(angle);            // Calculate z position
+
+		enemyFleet.push_back(new EnemyShip(Vec3(x, 0, z), &enemyShipModel));
 
 
 	}
@@ -88,8 +94,9 @@ bool Scene3g::OnCreate() {
 		float x = radius * cos(angle);            // Calculate x position
 		float z = radius * sin(angle);            // Calculate z position
 
-		playerFleet[i]->OnCreate();
+		
 		playerFleet[i]->transform.setPos(Vec3(x, 0.0f, z)); // Position ship
+		playerFleet[i]->OnCreate();
 	}
 
 	planet = Planet(30.0f, 5, &sphereModel, ORIGIN);
@@ -167,6 +174,9 @@ void Scene3g::OnDestroy() {
 
 	planetShader->OnDestroy();
 	delete planetShader;
+
+	friendlyShipShader->OnDestroy();
+	delete friendlyShipShader;
 
 
 	planet.OnDestroy();
@@ -254,8 +264,9 @@ void Scene3g::Update(const float deltaTime) {
 		enemySpawnPoint.canSpawn = false;
 	}
 	
+	playerController.Update(deltaTime);
 	if (isGameRunning) {
-		playerController.Update(deltaTime);
+		
 		
 
 		if (playerController.has3DClick) {
@@ -273,35 +284,16 @@ void Scene3g::Update(const float deltaTime) {
 
 
 			DualQuat line = playerController.getLine();
-			line = DQMath::normalize(line);
+			
 
 			
 
 
 			//loop through the spheres
 			for (int i = 0; i < playerFleet.size(); i++) {
-				Vec4 centrePoint = playerFleet[i]->transform.getPos();
-				
-				Flector M = centrePoint * line;
-				Plane pM = M.plane;//grab the plane part of the flector
-				Vec4 vM = M.point;
-
-				float radius = playerFleet[i]->collisionSphere->r;//hardcoded for now until sphere and collision classes are up
-				float dSquared = (radius * radius) - (VMath::mag(vM) * VMath::mag(vM)); // d^2 = r^2 - (*<M>3)^2
-				//pretty sure I'm doing this part wrong (*<M>3)^2
-
-				if (dSquared > 0) { //if d^2 > 0 then the line and sphere intersect
+				if (COLLISION::LineSphereCollisionDetected(playerFleet[i]->collisionSphere, line))
+				{
 					activeShip = i;
-
-					Vec4 i1 = line ^ (M.plane + Plane(0, 0, 0, sqrt(dSquared))) * -1;
-					i1 = i1 / i1.w;
-					i1.print("Intersection Point 1");
-
-
-
-					Vec4 i2 = line ^ (M.plane + Plane(0, 0, 0, -sqrt(dSquared))) * -1;
-					i2 = i2 / i2.w;
-					i2.print("Intersection Point 2");
 				}
 				
 
@@ -312,7 +304,7 @@ void Scene3g::Update(const float deltaTime) {
 		//below can probably be a recursive function?
 		for (FriendlyShip* ship : playerFleet) { //first we loop through every oen of the player's ships
 			
-			ship->color = BLUE;//all friendly ships are blue except the active ship TEMPORARY REMOVE LATER
+			
 			
 			
 			std::vector<Bullet*> temp = ship->getBullets(); //get a reference to all the bullets that ship has fired
@@ -342,7 +334,7 @@ void Scene3g::Update(const float deltaTime) {
 			ship->displayRange = false;
 		}
 		
-		playerFleet[activeShip]->color = GREEN;	//temporary to turn the selected ship green
+		
 		playerFleet[activeShip]->displayRange = true;
 
 		for (int i = 0; i < enemyFleet.size(); i++) {
@@ -352,6 +344,8 @@ void Scene3g::Update(const float deltaTime) {
 				delete enemyFleet[i];
 				enemyFleet[i] = nullptr;
 				enemyFleet.erase(std::remove(enemyFleet.begin(), enemyFleet.end(), nullptr), enemyFleet.end());
+
+				score += 1;
 			}
 			else {
 				enemyFleet[i]->Update(deltaTime);
@@ -362,7 +356,8 @@ void Scene3g::Update(const float deltaTime) {
 
 	}
 
-	
+	std::cout << std::endl << "Score: " << score << std::endl;
+	std::cout << "Time Elapsed " << timeElapsed << std::endl;
 	
 }
 
@@ -404,10 +399,11 @@ void Scene3g::Render() const {
 
 
 
-
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //temporary line
 		glUseProgram(bulletShader->GetProgram());
 		glUniformMatrix4fv(bulletShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 		glUniformMatrix4fv(bulletShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+		glUniform3fv(bulletShader->GetUniformID("cameraPos"), 1, playerController.camera.transform.getPos());
 		ship->RenderBullets(bulletShader);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //temporary line
 	}

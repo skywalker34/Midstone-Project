@@ -1,6 +1,7 @@
 #ifndef COLLISION_H
 #define COLLISION_H
 #include "Sphere.h"
+#include "DQMath.h"
 
 //From Game Physics
 using namespace MATHEX;
@@ -11,6 +12,7 @@ using namespace MATH;
 namespace COLLISION {
 	// Checks if two spheres have collided and return true or false.
 	bool SphereSphereCollisionDetected(const Sphere* body1, const Sphere* body2);
+	bool LineSphereCollisionDetected(const Sphere* body, const DualQuat line);
 
 	// If a collision has occurred do something
 	//void SphereSphereCollisionResponse(Sphere* body1, Sphere* body2);

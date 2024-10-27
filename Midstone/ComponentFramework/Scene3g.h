@@ -54,6 +54,8 @@ private:
 	
 	float timeElapsed;
 
+	int score = 0;
+
 	bool drawInWireMode;
 	bool isGameRunning = true;
 

@@ -51,7 +51,7 @@ class FriendlyShip :
 		float slerpT = 0;
 		float newAngle = 0;
 		const float projectileSpeed = 0.1;//the distance (units/frame) this ship's projectile moves
-		float range = 5.0f;
+		float range = 50.0f;
 
 		Sphere detectionSphere;
 

@@ -8,7 +8,6 @@ layout(location = 2) in vec2 uvCoord;
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
-uniform vec3 lightPos;
 uniform vec3 cameraPos;
 
 layout(location = 0) out vec3 vertNormal;

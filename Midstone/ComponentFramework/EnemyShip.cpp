@@ -1,5 +1,6 @@
 #include "EnemyShip.h"
-
+#include"QMath.h"
+#include"Constants.h"
 
 
 EnemyShip::EnemyShip()
@@ -8,7 +9,7 @@ EnemyShip::EnemyShip()
 
 EnemyShip::EnemyShip(Vec3 pos, Model* model_)
 {
-	transform = Transform(pos, Quaternion(1.0f, Vec3(0.0f, 0.0f, 0.0f)), Vec3(0.02f, 0.02f, 0.02f));
+	transform = Transform(pos, Quaternion(1.0f, Vec3(0.0f, 0.0f, 0.0f)), Vec3(1.0f, 1.0f, 1.0f));
 	body = new Body(&transform, Vec3(), Vec3(), 1);
 	
 	model = model_;
@@ -57,6 +58,7 @@ void EnemyShip::Update(const float deltaTime)
 	body->ApplyForce(getTargetDirection() * speed);	//shouldn't have to do this every frame we nay want to move it
 	body->Update(deltaTime);
 
+	transform.setOrientation(QMath::lookAt(getTargetDirection(), UP));
 	collisionSphere->center = transform.getPos();
 }
 
