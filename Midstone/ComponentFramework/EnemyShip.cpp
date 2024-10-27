@@ -65,9 +65,12 @@ void EnemyShip::Update(const float deltaTime)
 void EnemyShip::Render(Shader* shader) const
 {
 	if (model != nullptr) {
+		model->BindTextures(0,0);
 		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, transform.toModelMatrix());
 		glUniform4fv(shader->GetUniformID("meshColor"), 1, Vec4((health / 5.0f) + 0.1f, 0.0f, 0.0f, 0.0f)); //for now just make the color correlate directly with health (5 is a temp hardcoded max health value)
 		model->mesh->Render(GL_TRIANGLES);
+		model->UnbindTextures();
+
 	}
 }
 

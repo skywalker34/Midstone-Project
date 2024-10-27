@@ -36,7 +36,7 @@ bool Scene3g::OnCreate() {
 	}
 
 
-	enemyShipModel = Model("Midstone_Enemy.obj");
+	enemyShipModel = Model("Midstone_Enemy.obj", std::vector<std::string>{"EShip_Colour_Mask.png"});
 	if (enemyShipModel.OnCreate() == false) {
 		printf("Model failed to load");
 	}
@@ -413,10 +413,17 @@ void Scene3g::Render() const {
 	for (EnemyShip* ship : enemyFleet) {
 		//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
 		if (ship->deleteMe == false) { //shouldn't have to have this if here...
-			glUseProgram(shader->GetProgram());
-			glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
-			glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-			ship->Render(shader);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //temporary line
+			//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
+			glUseProgram(friendlyShipShader->GetProgram());
+			glUniformMatrix4fv(friendlyShipShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+			glUniformMatrix4fv(friendlyShipShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+			glUniform3fv(friendlyShipShader->GetUniformID("lightPos"), 1, lightPos);
+			glUniform4fv(friendlyShipShader->GetUniformID("primaryColour"), 1, PURPLE);
+			glUniform4fv(friendlyShipShader->GetUniformID("secondaryColour"), 1, GREY);
+			glUniform4fv(friendlyShipShader->GetUniformID("tertiaryColour"), 1, RED);
+			ship->Render(friendlyShipShader);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //temporary line
 		}
 	}
 

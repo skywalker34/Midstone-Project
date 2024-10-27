@@ -27,6 +27,7 @@ const Vec4 GREEN = Vec4(0.0f, 1.0f, 0.0f, 1.0f);
 const Vec4 BLUE = Vec4(0.0f, 0.0f, 1.0f, 1.0f);
 const Vec4 ORANGE = Vec4(1, 0.6, 0.0f, 1.0f);
 const Vec4 WHITE = Vec4(1, 1, 1, 1);
+const Vec4 PURPLE = Vec4(0.5f, 0.0f, 0.5f, 1.0f);
 const Vec4 GREY = Vec4(0.2f, 0.2f, 0.2f, 1.0f);
 
 #endif
