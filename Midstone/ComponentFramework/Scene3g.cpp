@@ -25,112 +25,10 @@ Scene3g::~Scene3g() {
 bool Scene3g::OnCreate() {
 	Debug::Info("Loading assets Scene0: ", __FILE__, __LINE__);
 
-	
-	
-
-
-	///////////////////////////////////////////////////////////////MODELS\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-	
-	friendlyShipModel = Model("midstone_ship.obj", std::vector<std::string>{"Ship_Colour_Mask.png"});
-	if (friendlyShipModel.OnCreate() == false) {
-		printf("Model failed to load");
-	}
-
-
-	enemyShipModel = Model("Midstone_Enemy.obj", std::vector<std::string>{"EShip_Colour_Mask.png"});
-	if (enemyShipModel.OnCreate() == false) {
-		printf("Model failed to load");
-	}
-
-	bulletModel = Model("Bullet.obj");
-	if (bulletModel.OnCreate() == false) {
-		printf("Model failed to load");
-	}
-
-	sphereModel = Model("Sphere.obj", std::vector<std::string>{"planet_d.png",  "planet_s.png", "cloud_map.png"});
-	if (sphereModel.OnCreate() == false) {
-		printf("Model failed to load");
-	}
-	
-
-	planeModel = Model("Plane.obj");
-	if (planeModel.OnCreate() == false) {
-		printf("Model failed to load");
-	}
-	
-
-	///////////////////////////////////////////////////ACTORS\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-
-	for (int i = 0; i < startingFleetSize; i++) {
-		int numShips = startingFleetSize;
-		float radius = 75.0f;
-		float angle = 2.0f * M_PI * i / numShips; // Calculate the angle for each ship
-		float x = radius * cos(angle);            // Calculate x position
-		float z = radius * sin(angle);            // Calculate z position
-
-		enemyFleet.push_back(new EnemyShip(Vec3(x, 0, z), &enemyShipModel));
-
-	}
-	for (EnemyShip* ship : enemyFleet) {
-		ship->OnCreate();
-		ship->setIndex(enemyIndex);
-	}
-	
-	for (int i = 0; i < startingFleetSize; i++) {
-		playerFleet.push_back(new FriendlyShip(&friendlyShipModel, &bulletModel));
-	}
-
-
-	//spawn the ships in a radius around the planet
-
-	int numShips = playerFleet.size();
-	float radius = 50.0f;
-
-	for (int i = 0; i < numShips; ++i)
-	{
-		float angle = 2.0f * M_PI * i / numShips; // Calculate the angle for each ship
-		float x = radius * cos(angle);            // Calculate x position
-		float z = radius * sin(angle);            // Calculate z position
-
-		
-		playerFleet[i]->transform.setPos(Vec3(x, 0.0f, z)); // Position ship
-		playerFleet[i]->OnCreate();
-	}
-
-	planet = Planet(30.0f, 5, &sphereModel, ORIGIN);
-	planet.OnCreate();
-	
-	////////////////////////////////////////////////////////SHADERS\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-
-	shader = new Shader("shaders/defaultVert.glsl", "shaders/defaultFrag.glsl");
-	if (shader->OnCreate() == false) {
-		std::cout << "Shader failed ... we have a problem\n";
-	}
-
-	bulletShader = new Shader("shaders/bulletVert.glsl", "shaders/bulletFrag.glsl");
-	if (bulletShader->OnCreate() == false) {
-		std::cout << "Shader failed ... we have a problem\n";
-	}
-
-	planetShader = new Shader("shaders/planetVert.glsl", "shaders/planetFrag.glsl");
-	if (planetShader->OnCreate() == false) {
-		std::cout << "Shader failed ... we have a problem\n";
-	}
-
-	friendlyShipShader = new Shader("shaders/friendlyShipVert.glsl", "shaders/friendlyShipFrag.glsl");
-	if (friendlyShipShader->OnCreate() == false)
-	{
-		std::cout << "Shader failed ... we have a problem\n";
-	}
-	/////////////////////////////////////////////////////MISC\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-
-	playerController.CreateGrid(&planeModel);
-	if (playerController.OnCreate() == false) {
-		std::cout << "Controller failed ... we have a problem\n";
-	}
-
-	
-	////////////////////////////////////////////////////////////END\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+	createModels();
+	createActors();
+	createShaders();
+	createClickGrid();
 
 	printf("On Create finished!!!!!");
 	return true;
@@ -140,9 +38,6 @@ bool Scene3g::OnCreate() {
 
 void Scene3g::OnDestroy() {
 	Debug::Info("Deleting assets Scene0: ", __FILE__, __LINE__);
-
-	
-
 
 	friendlyShipModel.OnDestroy();
 
@@ -250,113 +145,23 @@ void Scene3g::HandleEvents(const SDL_Event& sdlEvent) {
 
 void Scene3g::Update(const float deltaTime) {
 
-
+	if (!isGameRunning) return;
+	
 	timeElapsed += deltaTime;
 
 	planet.Update(deltaTime);
 	playerController.Update(deltaTime);
 
-	if (!isGameRunning) return;
-
-	enemySpawnPoint.Update(deltaTime);
-	if (enemySpawnPoint.canSpawn == true) {
-		enemyIndex++;
-		enemyFleet.push_back(new EnemyShip(enemySpawnPoint.position, &enemyShipModel));
-		enemyFleet.back()->OnCreate();
-		enemyFleet.back()->setIndex(enemyIndex);
-		enemySpawnPoint.canSpawn = false;
-	}
+	SpawnEnemy(deltaTime);
+	SetActiveShip();
+	UpdatePlayerFleet(deltaTime);
+	UpdateEnemyFleet(deltaTime);
 
 	
-
-
-	if (playerController.has3DClick) {
-		shipWaypoint = playerController.getClickPos();
-		playerFleet[activeShip]->moveToDestination(shipWaypoint);
-	}
-
-	if (playerController.hasDQLine) {
-		DualQuat line = playerController.getLine();
-
-		//loop through the spheres
-		for (int i = 0; i < playerFleet.size(); i++) {
-			if (COLLISION::LineSphereCollisionDetected(playerFleet[i]->collisionSphere, line))
-			{
-				activeShip = i;
-			}
-		}
-	}
-
-	//below can probably be a recursive function?
-	for (FriendlyShip* ship : playerFleet) { //first we loop through every oen of the player's ships
-		
-		std::vector<Bullet*> temp = ship->getBullets(); //get a reference to all the bullets that ship has fired
-		Vec3 closestEnemy = Vec3(10, 0, 0); // remove
-		float minDistance = 100; // remove
-
-		for (EnemyShip* targetShip : enemyFleet) { //now loop through each enemy to detect if an enmy is in range
-			if (!ship->isMoving && VMath::mag(ship->transform.getPos() - targetShip->transform.getPos()) < minDistance) {
-				minDistance = VMath::mag(ship->transform.getPos() - targetShip->transform.getPos());
-				closestEnemy = targetShip->transform.getPos();
-				if (ship->currentTargetIndex == targetShip->shipIndex) {
-					Quaternion targetQuad = QMath::lookAt(closestEnemy, UP);
-					ship->transform.setOrientation(targetQuad);
-
-				}
-				else {
-					ship->slerpT = ship->slerpT >= 1 ? 0 : ship->slerpT + deltaTime;
-					ship->rotateTowardTarget(closestEnemy);
-					ship->canFire = false;
-					if (ship->slerpT >= 1) {
-						ship->currentTargetIndex = targetShip->shipIndex;
-					}
-				}
-
-			}
-
-
-			if (ship->canFire == true) { //before checking if enemy is in range check if the ship is even allowed to shoot yet
-				if (COLLISION::SphereSphereCollisionDetected(&ship->detectionSphere, targetShip->collisionSphere)) {	//check if enemy ship is in range
-					ship->targetDirection = VMath::normalize(targetShip->transform.getPos() - ship->transform.getPos()); //if the enemy is in range get the direction from our ship to the enemy
-					ship->Fire();//fire a bullet at the enemy
-					std::vector<Bullet*> temp = ship->getBullets(); //if the ship fired just update the temp list of bullets
-				}
-			}
-
-			for (Bullet* bullet : temp) { //now we loop through each bullet to see if any would hit this enemy ship
-				if (COLLISION::SphereSphereCollisionDetected(bullet->collisionSphere, targetShip->collisionSphere)) {
-					bullet->deleteMe = true; //tell the ship to delete the bullet
-					targetShip->Hit();
-				}
-			}
-		}
-
-		ship->Update(deltaTime);//call their update functions
-		ship->displayRange = false;
-	}
-
-
-	playerFleet[activeShip]->displayRange = true;
-
-	for (int i = 0; i < enemyFleet.size(); i++) {
-		enemyFleet[i]->Update(deltaTime);
-		if (enemyFleet[i]->deleteMe) {
-			enemyFleet[i]->OnDestroy();
-			delete enemyFleet[i];
-			enemyFleet[i] = nullptr;
-			enemyFleet.erase(std::remove(enemyFleet.begin(), enemyFleet.end(), nullptr), enemyFleet.end());
-		}
-		else {
-			enemyFleet[i]->Update(deltaTime);
-		}
-	}
-
-
 
 	std::cout << std::endl << "Score: " << score << std::endl;
 	std::cout << "Time Elapsed " << timeElapsed << std::endl;
 }
-
 
 void Scene3g::Render() const {
 	/// Set the background color then clear the screen
@@ -376,9 +181,9 @@ void Scene3g::Render() const {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
-	
 
-	
+
+
 
 
 	for (FriendlyShip* ship : playerFleet) {
@@ -424,7 +229,7 @@ void Scene3g::Render() const {
 		}
 	}
 
-	
+
 	glUseProgram(shader->GetProgram());
 	glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 	glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
@@ -437,12 +242,227 @@ void Scene3g::Render() const {
 	glUniform3fv(planetShader->GetUniformID("lightPos"), 1, lightPos);
 	glUniform3fv(planetShader->GetUniformID("cameraPos"), 1, playerController.camera.transform.getPos());
 	planet.Render(planetShader);
-	
+
 
 
 	glUseProgram(0);
 }
 
+void Scene3g::SpawnEnemy(const float deltaTime)
+{
+	enemySpawnPoint.Update(deltaTime);
+	if (enemySpawnPoint.canSpawn == true) {
+		enemyIndex++;
+		enemyFleet.push_back(new EnemyShip(enemySpawnPoint.position, &enemyShipModel));
+		enemyFleet.back()->OnCreate();
+		enemyFleet.back()->setIndex(enemyIndex);
+		enemySpawnPoint.canSpawn = false;
+	}
+}
+
+void Scene3g::SetActiveShip()
+{
+	if (playerController.has3DClick) {
+		shipWaypoint = playerController.getClickPos();
+		playerFleet[activeShip]->moveToDestination(shipWaypoint);
+	}
+
+	if (playerController.hasDQLine) {
+		DualQuat line = playerController.getLine();
+
+		//loop through the spheres
+		for (int i = 0; i < playerFleet.size(); i++) {
+			if (COLLISION::LineSphereCollisionDetected(playerFleet[i]->collisionSphere, line))
+			{
+				activeShip = i;
+			}
+		}
+	}
+}
+
+void Scene3g::UpdatePlayerFleet(const float deltaTime)
+{
+	//below can probably be a recursive function?
+	for (FriendlyShip* ship : playerFleet) {																				//first we loop through every oen of the player's ships
+
+		std::vector<Bullet*> temp = ship->getBullets();																		//get a reference to all the bullets that ship has fired
+
+		for (EnemyShip* targetShip : enemyFleet) {																			//now loop through each enemy to detect if an enmy is in range
+			RotateTowardEnemy(ship, targetShip, deltaTime);
+
+			if (ship->canFire == true) {																					//before checking if enemy is in range check if the ship is even allowed to shoot yet
+				if (COLLISION::SphereSphereCollisionDetected(&ship->detectionSphere, targetShip->collisionSphere)) {		//check if enemy ship is in range
+					ship->targetDirection = VMath::normalize(targetShip->transform.getPos() - ship->transform.getPos());	//if the enemy is in range get the direction from our ship to the enemy
+					ship->Fire();
+					std::vector<Bullet*> temp = ship->getBullets();															//if the ship fired just update the temp list of bullets
+				}
+			}
+
+			for (Bullet* bullet : temp) {																					//now we loop through each bullet to see if any would hit this enemy ship
+				if (COLLISION::SphereSphereCollisionDetected(bullet->collisionSphere, targetShip->collisionSphere)) {
+					bullet->deleteMe = true;																				//tell the ship to delete the bullet
+					targetShip->Hit();
+				}
+			}
+		}
+
+		ship->Update(deltaTime);																							//call their update functions
+		ship->displayRange = false;
+	}
+
+	playerFleet[activeShip]->displayRange = true;
+}
+
+void Scene3g::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip, const float deltaTime)
+{
+	if (!ship->isMoving) {
+		ship->FindClosestEnemy(targetShip);
+		if (ship->currentTargetIndex == targetShip->shipIndex) {
+			Quaternion targetQuad = QMath::lookAt(ship->closestEnemyPosition, UP);
+			ship->transform.setOrientation(targetQuad);
+		}
+		else {
+			ship->slerpT = ship->slerpT >= 1 ? 0 : ship->slerpT + deltaTime;
+			ship->rotateTowardTarget(ship->closestEnemyPosition);
+			ship->canFire = false;
+			if (ship->slerpT >= 1) {
+				ship->currentTargetIndex = targetShip->shipIndex;
+			}
+		}
+
+	}
+}
+
+void Scene3g::UpdateEnemyFleet(const float deltaTime)
+{
+	for (int i = 0; i < enemyFleet.size(); i++) {
+		enemyFleet[i]->Update(deltaTime);
+		if (enemyFleet[i]->deleteMe) {
+			enemyFleet[i]->OnDestroy();
+			delete enemyFleet[i];
+			enemyFleet[i] = nullptr;
+			enemyFleet.erase(std::remove(enemyFleet.begin(), enemyFleet.end(), nullptr), enemyFleet.end());
+		}
+		else {
+			enemyFleet[i]->Update(deltaTime);
+		}
+	}
+
+	/*for (EnemyShip* enemy : enemyFleet) {
+		enemy->Update(deltaTime);
+		if (enemy->deleteMe) {
+			enemy->OnDestroy();
+			delete enemy;
+			enemy = nullptr;
+			enemyFleet.erase(std::remove(enemyFleet.begin(), enemyFleet.end(), nullptr), enemyFleet.end());
+		}
+		else {
+			enemy->Update(deltaTime);
+		}
+	}*/
+}
+
+void Scene3g::createModels()
+{
+	friendlyShipModel = Model("midstone_ship.obj", std::vector<std::string>{"Ship_Colour_Mask.png"});
+	if (friendlyShipModel.OnCreate() == false) {
+		printf("Model failed to load");
+	}
 
 
+	enemyShipModel = Model("Midstone_Enemy.obj", std::vector<std::string>{"EShip_Colour_Mask.png"});
+	if (enemyShipModel.OnCreate() == false) {
+		printf("Model failed to load");
+	}
 
+	bulletModel = Model("Bullet.obj");
+	if (bulletModel.OnCreate() == false) {
+		printf("Model failed to load");
+	}
+
+	sphereModel = Model("Sphere.obj", std::vector<std::string>{"planet_d.png", "planet_s.png", "cloud_map.png"});
+	if (sphereModel.OnCreate() == false) {
+		printf("Model failed to load");
+	}
+
+
+	planeModel = Model("Plane.obj");
+	if (planeModel.OnCreate() == false) {
+		printf("Model failed to load");
+	}
+}
+
+void Scene3g::createActors()
+{
+	for (int i = 0; i < startingFleetSize; i++) {
+		int numShips = startingFleetSize;
+		float radius = 75.0f;
+		float angle = 2.0f * M_PI * i / numShips;										// Calculate the angle for each ship
+		float x = radius * cos(angle);													// Calculate x position
+		float z = radius * sin(angle);													// Calculate z position
+
+		enemyFleet.push_back(new EnemyShip(Vec3(x, 0, z), &enemyShipModel));
+
+	}
+	for (EnemyShip* ship : enemyFleet) {
+		ship->OnCreate();
+		ship->setIndex(enemyIndex);
+	}
+
+	for (int i = 0; i < startingFleetSize; i++) {
+		playerFleet.push_back(new FriendlyShip(&friendlyShipModel, &bulletModel));
+	}
+
+
+	//spawn the ships in a radius around the planet
+
+	int numShips = playerFleet.size();
+	float radius = 50.0f;
+
+	for (int i = 0; i < numShips; ++i)
+	{
+		float angle = 2.0f * M_PI * i / numShips;										// Calculate the angle for each ship
+		float x = radius * cos(angle);													// Calculate x position
+		float z = radius * sin(angle);													// Calculate z position
+
+
+		playerFleet[i]->transform.setPos(Vec3(x, 0.0f, z));
+		playerFleet[i]->OnCreate();
+		playerFleet[i]->closestEnemyPosition = enemyFleet.back()->transform.getPos();	// Set initail target
+	}
+
+	planet = Planet(30.0f, 5, &sphereModel, ORIGIN);
+	planet.OnCreate();
+}
+
+void Scene3g::createShaders()
+{
+	shader = new Shader("shaders/defaultVert.glsl", "shaders/defaultFrag.glsl");
+	if (shader->OnCreate() == false) {
+		std::cout << "Shader failed ... we have a problem\n";
+	}
+
+	bulletShader = new Shader("shaders/bulletVert.glsl", "shaders/bulletFrag.glsl");
+	if (bulletShader->OnCreate() == false) {
+		std::cout << "Shader failed ... we have a problem\n";
+	}
+
+	planetShader = new Shader("shaders/planetVert.glsl", "shaders/planetFrag.glsl");
+	if (planetShader->OnCreate() == false) {
+		std::cout << "Shader failed ... we have a problem\n";
+	}
+
+	friendlyShipShader = new Shader("shaders/friendlyShipVert.glsl", "shaders/friendlyShipFrag.glsl");
+	if (friendlyShipShader->OnCreate() == false)
+	{
+		std::cout << "Shader failed ... we have a problem\n";
+	}
+}
+
+void Scene3g::createClickGrid()
+{
+	playerController.CreateGrid(&planeModel);
+	if (playerController.OnCreate() == false) {
+		std::cout << "Controller failed ... we have a problem\n";
+	}
+}

@@ -8,6 +8,8 @@
 #include <vector>
 #include <QMath.h>
 #include <VMath.h>
+#include "EnemyShip.h"
+
 using namespace MATH;
 using namespace MATHEX;
 
@@ -34,12 +36,10 @@ class FriendlyShip :
 		std::vector<Bullet*> bullets;
 		ShipController controller;
 		Vec3 destination = Vec3(0, 0, 0);
-
-
-
 		Vec3 targetDirection = Vec3(0, 0, 0);
 		Vec3 movingDirection;
 		Vec3 initialDirection = FORWARD;
+		Vec3 closestEnemyPosition;
 
 		Vec4 color = BLUE;
 		bool isMoving = false;
@@ -54,7 +54,7 @@ class FriendlyShip :
 
 		float range = 50.0f;
 		int currentTargetIndex = 0;
-
+		bool wouldIntersectPlanet = false;
 
 		Sphere detectionSphere;
 
@@ -67,12 +67,12 @@ class FriendlyShip :
 		void Update(const float deltaTime);
 		void Render(Shader* shader) const;
 		void RenderBullets(Shader* shader) const;
-		bool wouldIntersectPlanet = false;
+		
 		void Fire();
 		void moveToDestination(Vec3 destination);
 		void rotateTowardTarget(Vec3 target);
 		bool hasReachDestination();
-		void setTargetEnemy(Vec3 target);
+		void FindClosestEnemy(EnemyShip* enemy);
 
 		std::vector<Bullet*>& getBullets() {
 			return bullets; 

@@ -69,6 +69,15 @@ public:
 	virtual void Update(const float deltaTime) override;
 	virtual void Render() const override;
 	virtual void HandleEvents(const SDL_Event& sdlEvent) override;
+	void SpawnEnemy(const float deltaTime);
+	void SetActiveShip();
+	void RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip, const float deltaTime);
+	void UpdatePlayerFleet(const float deltaTime);
+	void UpdateEnemyFleet(const float deltaTime);
+	void createModels();
+	void createActors();
+	void createShaders();
+	void createClickGrid();
 };
 
 
