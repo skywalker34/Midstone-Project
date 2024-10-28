@@ -130,11 +130,17 @@ void FriendlyShip::RenderBullets(Shader* shader) const
 	}
 }
 
+void FriendlyShip::FindClosestEnemy(EnemyShip* enemy)
+{	
+	float currentTargetDistance = VMath::mag(transform.getPos() - closestEnemyPosition);
+	float potentialTargetDistance = VMath::mag(transform.getPos() - enemy->transform.getPos());
+	if (potentialTargetDistance < currentTargetDistance) {
+		closestEnemyPosition = enemy->transform.getPos();
+	}
+}
+
 void FriendlyShip::Fire()
 {
-
-	
-
 	canFire = false; 
 	timeSinceShot = 0;
 	//the third parameter here "BACKWARD" should instead be the direction the ship is facing
@@ -176,12 +182,6 @@ void FriendlyShip::rotateTowardTarget(Vec3 target)
 	else {
 		initialDirection = target;
 	}
-}
-
-void FriendlyShip::setTargetEnemy(Vec3 target)
-{
-	targetDirection = target;
-	rotateTowardTarget(target);
 }
 
 bool FriendlyShip::hasReachDestination()
