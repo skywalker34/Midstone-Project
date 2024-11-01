@@ -1,5 +1,5 @@
-#ifndef SCENE2G_H
-#define SCENE2G_H
+#ifndef SCENEUI2_H
+#define SCENEUI2_H
 #include "Scene.h"
 #include "Vector.h"
 #include "PlayerController.h"
@@ -20,25 +20,8 @@ union SDL_Event;
 class Mesh;
 class Shader;
 
-class Scene2g : public Scene {
+class SceneUI2 : public Scene {
 private:
-
-	Shader* shader;
-	Mesh* mesh;
-	Matrix4 projectionMatrix;
-	Matrix4 viewMatrix;
-	Matrix4 modelMatrix;
-	PlayerController playerController;
-	Vec3 destination = Vec3(0, 3.0f, 0);
-	Vec3 axis;
-	Vec3 shipWaypoint;
-	Vec3 enemySpawnPoint = Vec3(5.0f, 5.0f, 0);
-	Quaternion newPosition;
-	std::vector<FriendlyShip*> playerFleet;
-	std::vector<EnemyShip*> enemyFleet;
-
-	int activeShip = 0;
-	int startingFleetSize = 8;
 	
 	bool drawInWireMode;
 	bool isGameRunning = true;
@@ -48,9 +31,9 @@ private:
 	bool show_demo_window;
 
 public:
-	explicit Scene2g();
-	Scene2g(Window* window_);
-	virtual ~Scene2g();
+	explicit SceneUI2();
+	SceneUI2(Window* window_);
+	virtual ~SceneUI2();
 
 	virtual bool OnCreate() override;
 	virtual void OnDestroy() override;
@@ -60,4 +43,4 @@ public:
 };
 
 
-#endif // SCENE2G_H #pragma once
+#endif // SCENEUI2_H #pragma once
