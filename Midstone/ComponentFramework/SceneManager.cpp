@@ -6,9 +6,12 @@
 #include "Scene0p.h"
 #include "Scene1g.h"
 #include "SceneUI.h"
+#include "SceneUI2.h"
 #include "Scene2g.h"
 #include "Scene3g.h"
 #include "Scene5g.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 //SceneUI ans;
 
@@ -57,7 +60,7 @@ bool SceneManager::Initialize(std::string name_, int width_, int height_) {
 	/********************************   Default first scene   ***********************/
 
 
-	BuildNewScene(SCENE_NUMBER::SCENE3g); 
+	BuildNewScene(SCENE_NUMBER::SCENEUI2); 
 
 
 	/********************************************************************************/
@@ -184,7 +187,7 @@ bool SceneManager::BuildNewScene(SCENE_NUMBER scene) {
 		break;*/
 
 	case SCENE_NUMBER::SCENE2g:
-		currentScene = new Scene2g();
+		currentScene = new Scene2g(window);
 		status = currentScene->OnCreate();
 		//if (currentSceneNumber == 2) break;
 		break;
@@ -201,6 +204,12 @@ bool SceneManager::BuildNewScene(SCENE_NUMBER scene) {
 		status = currentScene->OnCreate();
 		//if (currentSceneNumber == 2) break;
 		 
+		break;
+	case SCENE_NUMBER::SCENEUI2:
+		currentScene = new SceneUI2(window);
+		status = currentScene->OnCreate();
+		//if (currentSceneNumber == 2) break;
+
 		break;
 
 	case SCENE_NUMBER::SCENE5g:

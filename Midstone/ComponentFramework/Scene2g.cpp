@@ -10,9 +10,20 @@
 #include "Shader.h"
 #include "Body.h"
 
-Scene2g::Scene2g() : shader{ nullptr }, mesh{ nullptr },
-drawInWireMode{ true } {
+Scene2g::Scene2g(Window* window_) : shader{ nullptr }, mesh{ nullptr },
+drawInWireMode{ true }, show_demo_window {true} {
 	Debug::Info("Created Scene2g: ", __FILE__, __LINE__);
+	window = window_;
+
+	// ImGUI stuff for initialize from Scotties Vid.
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	//Setup Dear ImGui Style
+	ImGui::StyleColorsDark();
+	// Setup Platform/Renderer backends
+	ImGui_ImplSDL2_InitForOpenGL(window->getWindow(), window->getContext());
+	ImGui_ImplOpenGL3_Init("#version 450");
 }
 
 Scene2g::~Scene2g() {
@@ -57,8 +68,6 @@ bool Scene2g::OnCreate() {
 	projectionMatrix = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);
 	viewMatrix = MMath::lookAt(Vec3(0.0f, 0.0f, 5.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
 	modelMatrix.loadIdentity();
-	
-
 
 	printf("On Create finished!!!!!");
 	return true;
@@ -89,11 +98,17 @@ void Scene2g::OnDestroy() {
 	shader->OnDestroy();
 	delete shader;
 
+	// Cleanup
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+	ImGui::DestroyContext();
+
 
 }
 
 void Scene2g::HandleEvents(const SDL_Event& sdlEvent) {
 	playerController.handleEvents(sdlEvent);
+	ImGui_ImplSDL2_ProcessEvent(&sdlEvent); // ImGui HandleEvents
 	//basically whats happening here is that the player controller has a boolean flag thats basically saying "I have something to tell you scenemanager"
 	//the scene knows to check for this flag and to recieve the message so the playercontroller does not need to have a reference to the scene
 	//its basically just throwing out this variable and hoping something is listening
@@ -161,9 +176,6 @@ void Scene2g::Update(const float deltaTime) {
 		playerFleet[activeShip]->color = GREEN;	//temporary to turn the selected ship green
 
 	}
-
-	
-
 }
 
 void Scene2g::Render() const {
@@ -200,6 +212,17 @@ void Scene2g::Render() const {
 	}
 
 	playerController.Render(shader);
+
+	// IMGUI STUFF
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
+	ImGui::NewFrame();
+	//if (show_demo_window)
+	//{
+		ImGui::ShowDemoWindow();
+	//}
+	ImGui::Render(); // Calling This before CurrentScene render wont work
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 	glUseProgram(0);
 }
