@@ -342,5 +342,11 @@
     <None Include="shaders\friendlyShipVert.glsl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="shaders\clickGridFrag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\clickGridVert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

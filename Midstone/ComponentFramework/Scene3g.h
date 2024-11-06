@@ -28,6 +28,7 @@ private:
 	Shader* bulletShader;
 	Shader* planetShader;
 	Shader* friendlyShipShader;
+	Shader* gridShader;
 
 	Model friendlyShipModel;
 	Model enemyShipModel;
@@ -49,7 +50,7 @@ private:
 	std::vector<FriendlyShip*> playerFleet;
 	std::vector<EnemyShip*> enemyFleet;
 
-	int activeShip = 0;
+	int activeShip = -1;
 	int startingFleetSize = 8;
 	int enemyIndex = 0;
 	
@@ -59,6 +60,7 @@ private:
 
 	bool drawInWireMode;
 	bool isGameRunning = true;
+	bool isGivingOrders = false;
 
 public:
 	explicit Scene3g();
@@ -78,6 +80,9 @@ public:
 	void createActors();
 	void createShaders();
 	void createClickGrid();
+	void DestroyEnenmy(int index);
+
+	void GameOver();
 };
 
 

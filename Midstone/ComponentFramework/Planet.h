@@ -29,6 +29,8 @@ public:
     void Update(float deltaTime);
     void Render(Shader* shader) const; 
 
-    void takeDame(int damage);
+    void takeDamage(int damage);
+
+    int GetHealth() { return health; }
 };
 

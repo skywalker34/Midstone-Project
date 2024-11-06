@@ -33,7 +33,9 @@ void PlayerController::OnDestroy()
 
 void PlayerController::CreateGrid(Model* model_)
 {
-	clickGrid = Actor(Transform(), model_);
+	Transform t;
+	t.setScale(20, 20, 1);
+	clickGrid = Actor(t, model_);
 	clickGrid.OnCreate();
 }
 
@@ -158,7 +160,12 @@ void PlayerController::Update(const float deltaTime)
 
 void PlayerController::Render(Shader* shader) const
 {
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	clickGrid.model->BindTextures(0,0);
 	clickGrid.Render(shader);
+	clickGrid.model->UnbindTextures();
+	glDisable(GL_BLEND);
 }
 
 

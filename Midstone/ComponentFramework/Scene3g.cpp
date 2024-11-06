@@ -14,7 +14,7 @@
 #include <chrono>
 
 Scene3g::Scene3g() : shader{ nullptr }, 
-drawInWireMode{ true } {
+drawInWireMode{ false } {
 	Debug::Info("Created Scene0: ", __FILE__, __LINE__);
 }
 
@@ -29,6 +29,8 @@ bool Scene3g::OnCreate() {
 	createActors();
 	createShaders();
 	createClickGrid();
+
+	
 
 	printf("On Create finished!!!!!");
 	return true;
@@ -149,7 +151,7 @@ void Scene3g::Update(const float deltaTime) {
 	
 	timeElapsed += deltaTime;
 
-	planet.Update(deltaTime);
+	
 	playerController.Update(deltaTime);
 
 	SpawnEnemy(deltaTime);
@@ -157,10 +159,15 @@ void Scene3g::Update(const float deltaTime) {
 	UpdatePlayerFleet(deltaTime);
 	UpdateEnemyFleet(deltaTime);
 
-	
+	planet.Update(deltaTime);
+	if (planet.GetHealth() < 0) {
 
-	std::cout << std::endl << "Score: " << score << std::endl;
-	std::cout << "Time Elapsed " << timeElapsed << std::endl;
+		//temp for now
+		GameOver();
+	}
+
+	//std::cout << std::endl << "Score: " << score << std::endl;
+	//std::cout << "Time Elapsed " << timeElapsed << std::endl;
 }
 
 void Scene3g::Render() const {
@@ -229,11 +236,7 @@ void Scene3g::Render() const {
 		}
 	}
 
-
-	glUseProgram(shader->GetProgram());
-	glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
-	glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-	playerController.Render(shader);
+	
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //temporary line
 	glUseProgram(planetShader->GetProgram());
@@ -244,7 +247,13 @@ void Scene3g::Render() const {
 	planet.Render(planetShader);
 
 
-
+	if (isGivingOrders) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //temporary line
+		glUseProgram(gridShader->GetProgram());
+		glUniformMatrix4fv(gridShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+		glUniformMatrix4fv(gridShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+		playerController.Render(gridShader);
+	}
 	glUseProgram(0);
 }
 
@@ -265,6 +274,8 @@ void Scene3g::SetActiveShip()
 	if (playerController.has3DClick) {
 		shipWaypoint = playerController.getClickPos();
 		playerFleet[activeShip]->moveToDestination(shipWaypoint);
+		isGivingOrders = false;
+		activeShip = -1;
 	}
 
 	if (playerController.hasDQLine) {
@@ -275,6 +286,7 @@ void Scene3g::SetActiveShip()
 			if (COLLISION::LineSphereCollisionDetected(playerFleet[i]->collisionSphere, line))
 			{
 				activeShip = i;
+				isGivingOrders = true;
 			}
 		}
 	}
@@ -310,7 +322,9 @@ void Scene3g::UpdatePlayerFleet(const float deltaTime)
 		ship->displayRange = false;
 	}
 
-	playerFleet[activeShip]->displayRange = true;
+	if (activeShip >= 0) {
+		playerFleet[activeShip]->displayRange = true;
+	}
 }
 
 void Scene3g::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip, const float deltaTime)
@@ -338,13 +352,18 @@ void Scene3g::UpdateEnemyFleet(const float deltaTime)
 	for (int i = 0; i < enemyFleet.size(); i++) {
 		enemyFleet[i]->Update(deltaTime);
 		if (enemyFleet[i]->deleteMe) {
-			enemyFleet[i]->OnDestroy();
-			delete enemyFleet[i];
-			enemyFleet[i] = nullptr;
-			enemyFleet.erase(std::remove(enemyFleet.begin(), enemyFleet.end(), nullptr), enemyFleet.end());
+			DestroyEnenmy(i);
 		}
 		else {
 			enemyFleet[i]->Update(deltaTime);
+
+			if (COLLISION::SphereSphereCollisionDetected(enemyFleet[i]->collisionSphere, planet.collisionSphere)) {
+				planet.takeDamage(1);
+
+				DestroyEnenmy(i);
+			}
+
+
 		}
 	}
 
@@ -361,6 +380,26 @@ void Scene3g::UpdateEnemyFleet(const float deltaTime)
 		}
 	}*/
 }
+
+
+
+void Scene3g::DestroyEnenmy(int index)
+{
+	enemyFleet[index]->OnDestroy();
+	delete enemyFleet[index];
+	enemyFleet[index] = nullptr;
+	enemyFleet.erase(std::remove(enemyFleet.begin(), enemyFleet.end(), nullptr), enemyFleet.end());
+}
+
+void Scene3g::GameOver()
+{
+	//END GAME LOGIC HERE PLEASE
+	std::cout << "\033[32m" << "GAMEOVER!" << "\033[0m" << std::endl;
+}
+
+
+
+
 
 void Scene3g::createModels()
 {
@@ -386,7 +425,7 @@ void Scene3g::createModels()
 	}
 
 
-	planeModel = Model("Plane.obj");
+	planeModel = Model("Plane.obj", std::vector<std::string>{"Grid.png"});
 	if (planeModel.OnCreate() == false) {
 		printf("Model failed to load");
 	}
@@ -454,6 +493,12 @@ void Scene3g::createShaders()
 
 	friendlyShipShader = new Shader("shaders/friendlyShipVert.glsl", "shaders/friendlyShipFrag.glsl");
 	if (friendlyShipShader->OnCreate() == false)
+	{
+		std::cout << "Shader failed ... we have a problem\n";
+	}
+
+	gridShader = new Shader("shaders/clickGridVert.glsl", "shaders/clickGridFrag.glsl");
+	if (gridShader->OnCreate() == false) 
 	{
 		std::cout << "Shader failed ... we have a problem\n";
 	}
