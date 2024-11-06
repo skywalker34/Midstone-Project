@@ -132,6 +132,7 @@
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="EnemyShip.cpp" />
     <ClCompile Include="EnemySpawner.cpp" />
+    <ClCompile Include="ExhaustTrail.cpp" />
     <ClCompile Include="FriendlyShip.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="imgui_demo.cpp" />
@@ -175,6 +176,7 @@
     <ClInclude Include="Debug.h" />
     <ClInclude Include="EnemyShip.h" />
     <ClInclude Include="EnemySpawner.h" />
+    <ClInclude Include="ExhaustTrail.h" />
     <ClInclude Include="FriendlyShip.h" />
     <ClInclude Include="imconfig.h" />
     <ClInclude Include="imgui.h" />

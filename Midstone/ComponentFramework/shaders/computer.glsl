@@ -87,6 +87,7 @@ void main()
 
     // Get the current position of the particle from the buffer
     vec3 pos = buf.posData[index];
+    
 
 
     
@@ -98,7 +99,7 @@ void main()
 //
     // Generate a random point within a cone for particle spread
     // Random angle within the cone
-    float angle = acos(1.0 - rand(seed + 1.0) * (1.0 - cos(radians(50.0)))); // 50-degree cone
+    float angle = acos(1.0 - rand(seed + 1.0) * (1.0 - cos(radians(180.0)))); // 50-degree cone
 
     // Random azimuth angle around the cone
     float azimuth = rand(seed +2) * 2.0 * 3.14159; // Full circle (2 * PI)
@@ -112,7 +113,7 @@ void main()
     
 
     // Generate a random force magnitude for each particle
-    float forceMag = 0.1 * rand(seed);
+    float forceMag = 2 * rand(seed);
 
   
 
@@ -136,7 +137,7 @@ void main()
     
 
     // Reset the particle position if it moves too far
-    if (length(pos) > 2)
+    if (length(pos) > 2.4)
     {
         pos = vec3(0.0, 0.0, 0.0);
     }

@@ -11,6 +11,8 @@
 #include "Body.h"
 #include "Model.h"
 
+#include "ComputeShader.h"
+
 #include <chrono>
 
 Scene3g::Scene3g() : shader{ nullptr }, 
@@ -24,6 +26,28 @@ Scene3g::~Scene3g() {
 
 bool Scene3g::OnCreate() {
 	Debug::Info("Loading assets Scene0: ", __FILE__, __LINE__);
+
+	
+
+
+	computeShader = new ComputeShader("shaders/computer.glsl");	//create the compute shader
+	if (computeShader->OnCreate() == false) {
+		std::cout << "Shader failed ... we have a problem\n";
+	}
+
+	loadVertsToBuffer = new Shader("shaders/loadVerticiesVert.glsl", "shaders/loadVerticiesFrag.glsl");
+	if (loadVertsToBuffer->OnCreate() == false) {
+		std::cout << "Shader failed ... we have a problem\n";
+	}
+
+
+	particleShader = new Shader("shaders/particleVert.glsl", "shaders/particleFrag.glsl");
+	if (particleShader->OnCreate() == false) {
+		std::cout << "Shader failed ... we have a problem\n";
+	}
+
+	particleMesh = new Mesh("meshes/Mario.obj");
+	particleMesh->OnCreate();
 
 	createModels();
 	createActors();
@@ -73,6 +97,12 @@ void Scene3g::OnDestroy() {
 
 
 	planet.OnDestroy();
+
+	computeShader->OnDestroy();
+	delete computeShader;
+
+	loadVertsToBuffer->OnDestroy();
+	delete loadVertsToBuffer;
 
 
 }
@@ -144,13 +174,15 @@ void Scene3g::HandleEvents(const SDL_Event& sdlEvent) {
 }
 
 void Scene3g::Update(const float deltaTime) {
+	
+	playerController.Update(deltaTime);
 
 	if (!isGameRunning) return;
 	
 	timeElapsed += deltaTime;
 
 	planet.Update(deltaTime);
-	playerController.Update(deltaTime);
+	
 
 	SpawnEnemy(deltaTime);
 	SetActiveShip();
@@ -226,8 +258,17 @@ void Scene3g::Render() const {
 			glUniform4fv(friendlyShipShader->GetUniformID("tertiaryColour"), 1, RED);
 			ship->Render(friendlyShipShader);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //temporary line
+
+
+			
+			
+			ship->exhaustTrail.Render( particleShader, computeShader);
+
 		}
 	}
+
+
+
 
 
 	glUseProgram(shader->GetProgram());
@@ -245,6 +286,8 @@ void Scene3g::Render() const {
 
 
 
+
+
 	glUseProgram(0);
 }
 
@@ -255,6 +298,7 @@ void Scene3g::SpawnEnemy(const float deltaTime)
 		enemyIndex++;
 		enemyFleet.push_back(new EnemyShip(enemySpawnPoint.position, &enemyShipModel));
 		enemyFleet.back()->OnCreate();
+		enemyFleet.back()->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
 		enemyFleet.back()->setIndex(enemyIndex);
 		enemySpawnPoint.canSpawn = false;
 	}
@@ -337,6 +381,7 @@ void Scene3g::UpdateEnemyFleet(const float deltaTime)
 {
 	for (int i = 0; i < enemyFleet.size(); i++) {
 		enemyFleet[i]->Update(deltaTime);
+		
 		if (enemyFleet[i]->deleteMe) {
 			enemyFleet[i]->OnDestroy();
 			delete enemyFleet[i];
@@ -406,6 +451,7 @@ void Scene3g::createActors()
 	}
 	for (EnemyShip* ship : enemyFleet) {
 		ship->OnCreate();
+		ship->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
 		ship->setIndex(enemyIndex);
 	}
 

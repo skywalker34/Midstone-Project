@@ -29,7 +29,9 @@ void main() {
 //
 //    position += buf.data[gl_VertexID];
 
-    vec4 localPos =  vVertex + vec4(buf.data[gl_VertexID], 1.0);
+    vec4 localPos =   vec4(buf.data[gl_VertexID], 1.0);
+
+    
     vec3 position = (modelMatrix * localPos).xyz;
 
 

@@ -51,6 +51,8 @@ void EnemyShip::OnDestroy()
 	body->OnDestroy();
 	delete body;
 
+	exhaustTrail.OnDestroy();
+
 }
 
 void EnemyShip::setIndex(int index)
@@ -65,6 +67,8 @@ void EnemyShip::Update(const float deltaTime)
 
 	transform.setOrientation(QMath::lookAt(getTargetDirection(), UP));
 	collisionSphere->center = transform.getPos();
+
+	exhaustTrail.modelMat = transform.toModelMatrix();
 }
 
 void EnemyShip::Render(Shader* shader) const

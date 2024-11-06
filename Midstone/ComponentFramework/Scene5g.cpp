@@ -160,15 +160,15 @@ bool Scene5g::OnCreate() {
 
 	playerController.transform.setPos(0, 0, 2);
 
-	ship = new Mesh("meshes/Graph.obj");
+	ship = new Mesh("meshes/Midstone_Enemy.obj");
 	ship->OnCreate();
 
 
-	shipModelMatrix =   MMath::translate(0.0f,0.0f,0.0f) * MMath::rotate(90.0f, Vec3(0.0f, 1.0f, 0.0f)) * MMath::scale(0.002f, 0.002f, 0.002f);
+	shipModelMatrix =   MMath::translate(0.0f,0.0f,0.0f) * MMath::rotate(90.0f, Vec3(0.0f, 1.0f, 0.0f)) ;
 
-	sphereModelMatrix = MMath::rotate(90.0f, Vec3(0.0f, 1.0f, 0.0f));
+	sphereModelMatrix = MMath::rotate(90.0f, Vec3(0.0f, 1.0f, 0.0f)) ;
 		
-
+	
 	return true;
 }
 
@@ -216,7 +216,12 @@ void Scene5g::Update(const float deltaTime) {
 	else {
 		frameCounter++;
 	}
+	shipPos.x -= deltaTime / 10;
+	shipModelMatrix = MMath::translate(shipPos) * MMath::rotate(90.0f, Vec3(0.0f, 1.0f, 0.0f));
+	//sphereModelMatrix = MMath::translate(-shipPos) * MMath::rotate(90.0f, Vec3(0.0f, 1.0f, 0.0f));
+
 	
+	sphereModelMatrix = shipModelMatrix;
 
 
 
@@ -234,6 +239,8 @@ void Scene5g::Render() const {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 
+
+
 	//bind the buffers
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, posBuffer);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, velBuffer);
@@ -244,7 +251,7 @@ void Scene5g::Render() const {
 		glUniform1i(computeShader->GetUniformID("yDispatch"), 100); //amount of dispatches in the y direction(?) so the GPUs can work in parralel doing these calculations
 		glUniform1f(computeShader->GetUniformID("simSpeed"), 60); //frequency 
 		glUniform1f(computeShader->GetUniformID("randSeed"), time); //frequency 
-		glUniform3fv(computeShader->GetUniformID("forwardVector"), 1, Vec3(0,0,1)); //direction the "ship" is headed
+		glUniform3fv(computeShader->GetUniformID("forwardVector"), 1, Vec3(0,0,-1)); //direction the "ship" is headed
 		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, sphereModelMatrix);
 		glDispatchCompute(100, 100, 1);//make sure the dispatch in the y parameter heres matches that in the uniform above
 		glMemoryBarrier(GL_ALL_BARRIER_BITS);

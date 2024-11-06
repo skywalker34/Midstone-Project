@@ -20,6 +20,7 @@ class Mesh;
 class Shader;
 class Bullet;
 class Model;
+class ComputeShader;
 
 class Scene3g : public Scene {
 private:
@@ -28,6 +29,12 @@ private:
 	Shader* bulletShader;
 	Shader* planetShader;
 	Shader* friendlyShipShader;
+
+	ComputeShader* computeShader = nullptr;
+	Shader* loadVertsToBuffer = nullptr;
+	Shader* particleShader = nullptr;
+
+	Mesh* particleMesh;
 
 	Model friendlyShipModel;
 	Model enemyShipModel;
