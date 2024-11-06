@@ -17,18 +17,70 @@ layout(binding = 1) buffer layoutVel
     vec3 vel[];
 } buf2;
 
-float rand(float seed)
-{
-    return fract(sin(seed) * 43758.5453123);
+
+float rand(float seed) { 
+    return fract(sin(seed) * 43758.5453123); 
 }
+
+// Function to generate a random float between min and max using a seed
+float randomFloat(float min, float max, float seed)
+{
+    return min + rand(seed) * (max - min);
+}
+
+vec3 getRandomVector(float radius, float distance, float seed, vec3 direction)
+{
+    float spreadAngle = atan(radius / distance);
+
+    float randomAngle = randomFloat(-spreadAngle, spreadAngle, seed);
+    float randomAzimuth = randomFloat(0.0, 2.0 * 3.141592, seed + 1.0); // Ensure different seed
+
+    // Calculate the random direction using spherical coordinates
+    vec3 randomDirection;
+    randomDirection.x = sin(randomAngle) * cos(randomAzimuth);
+    randomDirection.y = sin(randomAngle) * sin(randomAzimuth);
+    randomDirection.z = cos(randomAngle);
+
+    // Align the random direction with the weapon direction
+    mat3 rotationMatrix = mat3(
+        vec3(direction.x, direction.y, direction.z),
+        vec3(-direction.y, direction.x, 0.0),
+        vec3(-direction.z, 0.0, direction.x)
+    );
+
+    randomDirection = normalize(rotationMatrix * randomDirection);
+    return randomDirection;
+}
+
+
+// Function to check if a point is within a cone
+bool isPointInCone(vec3 point, vec3 apex, vec3 direction, float angle)
+{
+    // Calculate the vector from the cone's apex to the point
+    vec3 apexToPoint = normalize(point - apex);
+
+    // Normalize the direction vector (cone's axis)
+    vec3 normDirection = normalize(direction);
+
+    // Calculate the cosine of the angle between the two vectors
+    float cosAngle = dot(normDirection, apexToPoint);
+
+    // Calculate the cosine of the cone's angle
+    float cosConeAngle = cos(angle);
+
+    // If cosAngle is greater than cosConeAngle, the point is within the cone
+    return cosAngle > cosConeAngle;
+}
+
+
+
 
 void main()
 {
     // Calculate the unique index for the current work item
     uint index = gl_GlobalInvocationID.x + yDispatch * gl_GlobalInvocationID.y;
-
-    // Generate a unique seed for each particle
-    float seed = randSeed * float(index);
+    //// Generate a unique seed for each particle
+    float seed = randSeed * (float(index) * rand(randSeed));
 
     // Calculate the time step for the simulation
     float deltaTime = 1.0f / simSpeed;
@@ -36,12 +88,17 @@ void main()
     // Get the current position of the particle from the buffer
     vec3 pos = buf.posData[index];
 
+
+    
     // Normalize the forward direction vector
     vec3 direction = normalize(-forwardVector);
 
+
+    
+//
     // Generate a random point within a cone for particle spread
     // Random angle within the cone
-    float angle = acos(1.0 - rand(seed + 1.0) * (1.0 - cos(radians(180.0)))); // 50-degree cone
+    float angle = acos(1.0 - rand(seed + 1.0) * (1.0 - cos(radians(50.0)))); // 50-degree cone
 
     // Random azimuth angle around the cone
     float azimuth = rand(seed +2) * 2.0 * 3.14159; // Full circle (2 * PI)
@@ -51,10 +108,13 @@ void main()
     coneDirection = normalize(coneDirection);
 
     // Mix the forward direction with the cone direction to align the particle spread with the forward vector
-    vec3 adjustedDirection = normalize(mix(direction, coneDirection, 0.9));
+    vec3 adjustedDirection = normalize(mix(direction, coneDirection, 0.5));
+    
 
     // Generate a random force magnitude for each particle
     float forceMag = 0.1 * rand(seed);
+
+  
 
     // Calculate the force vector applied to the particle
     vec3 force = adjustedDirection * forceMag;
@@ -62,7 +122,7 @@ void main()
     // Calculate the acceleration of the particle (assuming mass = 0.1)
     vec3 accel = force / 0.1;
   
-
+    
     // Update the particle position using its velocity and acceleration
     pos += buf2.vel[index] * deltaTime + 0.5f * accel * deltaTime * deltaTime;
 
@@ -87,6 +147,72 @@ void main()
 
 
 
+//// Function to simulate rand() using a seed
+//float rand(float seed) { 
+//    return fract(sin(seed) * 43758.5453123); 
+//}
+//
+//// Function to generate a random float between min and max using a seed
+//float randomFloat(float min, float max, float seed)
+//{
+//    return min + rand(seed) * (max - min);
+//}
+//
+//vec3 getRandomVector(float radius, float dis, float seed, vec3 direction){
+//     float spreadAngle = atan(radius / dis);
+//
+//     float randomAngle = randomFloat(-spreadAngle, spreadAngle, seed);
+//
+//     vec3 randomDirection = vec3(
+//     direction.x + randomFloat(-radius,radius,seed),
+//     direction.y + randomFloat(-radius,radius,seed),
+//     direction.z + randomFloat(-radius,radius,seed)
+//     );
+//
+//     randomDirection = normalize(randomDirection);
+//     return randomDirection;
+//}
+//
+//void main()
+//{
+//    
+//    // Calculate the unique index for the current work item
+//    uint index = gl_GlobalInvocationID.x + yDispatch * gl_GlobalInvocationID.y;
+//    float seed = randSeed * float(index);
+//    float deltaTime = 1.0f / simSpeed;
+//
+//    vec3 pos = buf.posData[index];
+//    vec3 direction = normalize(-forwardVector);
+//
+//    if(pos == vec3(0.0f,0.0f,0.0f)){
+//        direction = getRandomVector(0.1, 1,seed,direction);
+//    }
+//    else{
+//        direction = normalize(buf2.vel[index]);
+//    }
+//    float forceMag = 0.1 * rand(seed);
+//
+//    vec3 force = direction * forceMag;
+//    vec3 accel = force / 0.1;
+//
+//    pos += buf2.vel[index] * deltaTime + 0.5f * accel * deltaTime * deltaTime;
+//    if((length(buf2.vel[index]) ) > 1.8){
+//       // Update the particle velocity
+//       buf2.vel[index] += accel * deltaTime;
+//    }
+//
+//    if (length(pos) > 2)
+//    {
+//        pos = vec3(0.0, 0.0, 0.0);
+//    }
+//
+//
+//    buf.posData[index] = pos;
+//    
+//}
+
+
+
 
 
 
@@ -98,12 +224,67 @@ void main()
 
 
 
-
-
-
-
-
-
+//
+//
+//
+//
+//// Generate a unique seed for each particle
+//    float seed = randSeed * float(index);
+//
+//    // Calculate the time step for the simulation
+//    float deltaTime = 1.0f / simSpeed;
+//
+//    // Get the current position of the particle from the buffer
+//    vec3 pos = buf.posData[index];
+//
+//    // Normalize the forward direction vector
+//    vec3 direction = normalize(-forwardVector);
+//
+//    // Generate a random point within a cone for particle spread
+//    // Random angle within the cone
+//    float angle = acos(1.0 - rand(seed + 1.0) * (1.0 - cos(radians(180.0)))); // 50-degree cone
+//
+//    // Random azimuth angle around the cone
+//    float azimuth = rand(seed +2) * 2.0 * 3.14159; // Full circle (2 * PI)
+//
+//    // Calculate the direction vector within the cone
+//    vec3 coneDirection = vec3(sin(angle) * cos(azimuth), sin(angle) * sin(azimuth), cos(angle));
+//    coneDirection = normalize(coneDirection);
+//
+//    // Mix the forward direction with the cone direction to align the particle spread with the forward vector
+//    vec3 adjustedDirection = normalize(mix(direction, coneDirection, 0.9));
+//
+//    // Generate a random force magnitude for each particle
+//    float forceMag = 0.1 * rand(seed);
+//
+//    // Calculate the force vector applied to the particle
+//    vec3 force = adjustedDirection * forceMag;
+//
+//    // Calculate the acceleration of the particle (assuming mass = 0.1)
+//    vec3 accel = force / 0.1;
+//  
+//
+//    // Update the particle position using its velocity and acceleration
+//    pos += buf2.vel[index] * deltaTime + 0.5f * accel * deltaTime * deltaTime;
+//
+//
+//    //cap the particle speed
+//    if((length(buf2.vel[index]) > 1.8) == false){
+//        // Update the particle velocity
+//        buf2.vel[index] += accel * deltaTime;
+//    }
+//
+//    
+//
+//    // Reset the particle position if it moves too far
+//    if (length(pos) > 2)
+//    {
+//        pos = vec3(0.0, 0.0, 0.0);
+//    }
+//
+//    // Write the updated position back to the buffer
+//    buf.posData[index] = pos;
+//
 
 
 
