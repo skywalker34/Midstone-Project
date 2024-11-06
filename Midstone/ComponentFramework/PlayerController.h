@@ -23,6 +23,7 @@ class PlayerController
 		DualQuat line;
 		DualQuat line2;
 		Vec3 clickPos;
+		Vec3 forwardVector;
 		float planeDepth = 0;
 
 	public:

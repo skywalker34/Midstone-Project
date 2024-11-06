@@ -45,7 +45,20 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 	trackball.HandleEvents(sdlEvent);
 	transform.setOrientation(trackball.getQuat()); //trackball so viewer can "turn their head"
 
-	Vec3 direction = QMath::rotate(-FORWARD, transform.getOrientation()); //gets the direction the camera is facing
+	forwardVector = QMath::rotate(-FORWARD, transform.getOrientation()); //gets the direction the camera is facing
+
+	
+	forwardVector = VMath::normalize(forwardVector);
+
+	// Calculate the left vector
+	Vec3 rightVector = VMath::cross(UP, forwardVector);
+	rightVector = VMath::normalize(rightVector);  // Normalize to get a unit vector
+
+	// Calculate the up vector to ensure it's orthogonal to both forward and left
+	Vec3 upVector = VMath::cross(forwardVector, rightVector);
+	upVector = VMath::normalize(upVector);  // Normalize to get a unit vector
+
+
 	Vec3 v;//temporary
 	switch (sdlEvent.type) {
 	case SDL_KEYDOWN: //code that allows the user to move the camera around
@@ -56,7 +69,7 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 
 			//	below works *marginally* better (still jank af)
 			v = transform.getPos();
-			v += (VMath::normalize(-direction) * CAMERA_SPEED);
+			v += (VMath::normalize(-forwardVector) * CAMERA_SPEED);
 			transform.setPos(v);
 			break;
 
@@ -65,18 +78,39 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 
 
 			v = transform.getPos();
-			v += (VMath::normalize(direction) * CAMERA_SPEED);
+			v += (VMath::normalize(forwardVector) * CAMERA_SPEED);
 			transform.setPos(v);
 			break;
 
 			//future for strafing movement
 		case SDL_SCANCODE_A:
 
-
+			v = transform.getPos();
+			v += (VMath::normalize(-rightVector) * CAMERA_SPEED);
+			transform.setPos(v);
+			//move the camera right
 			break;
 
 		case SDL_SCANCODE_D:
 
+			v = transform.getPos();
+			v += (VMath::normalize(rightVector) * CAMERA_SPEED);
+			transform.setPos(v);
+			//move the camera left
+			break;
+		case SDL_SCANCODE_Q:
+
+			v = transform.getPos();
+			v += (VMath::normalize(upVector) * CAMERA_SPEED);
+			transform.setPos(v);
+			//move the camera UP
+			break;
+		case SDL_SCANCODE_E:
+
+			v = transform.getPos();
+			v += (VMath::normalize(-upVector) * CAMERA_SPEED);
+			transform.setPos(v);
+			//move the camera down
 			break;
 
 		case SDL_SCANCODE_O:
@@ -88,7 +122,7 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 				planeDepth += 1 ;
 			}
 			break;
-		case SDL_SCANCODE_E:
+		case SDL_SCANCODE_K:
 			//switches between orbit and free mode
 			camera.toggleOrbitMode();
 			break;
