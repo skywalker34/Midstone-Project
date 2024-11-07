@@ -46,11 +46,11 @@ class FriendlyShip :
 		bool canFire = true;
 		
 		float timeSinceShot = 0;//the time since the ship has last fired a shot
-		float rateOfFire = 0.2; //how often this ship can shoot (seconds)
+		float rateOfFire = 0.01; //how often this ship can shoot (seconds)
 
 		float slerpT = 0;
 		float newAngle = 0;
-		const float projectileSpeed = 0.1;//the distance (units/frame) this ship's projectile moves
+		const float projectileSpeed = 1.0;//the distance (units/frame) this ship's projectile moves
 
 		float range = 50.0f;
 		int currentTargetIndex = 0;

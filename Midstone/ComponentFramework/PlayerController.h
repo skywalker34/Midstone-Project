@@ -23,10 +23,17 @@ class PlayerController
 		DualQuat line;
 		DualQuat line2;
 		Vec3 clickPos;
-		float planeDepth = 0;
+
+		Vec3 forwardVector;
+
+		
+		float planeDepth = 1;
 
 	public:
 		PlayerController();
+
+
+		Vec3 hoverPos;
 
 
 		Transform transform; //temporary public
@@ -43,6 +50,8 @@ class PlayerController
 		Vec3 getClickPos();//returns the position of a 3d click
 		Vec3 get3DClickCoords(float sdl_X, float sdl_Y);
 		DualQuat getLine() { hasDQLine = false;  return line2; };
+
+		void updateModelMatrixToFaceCamera(Transform& transform);
 		
 };
 

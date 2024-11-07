@@ -64,7 +64,8 @@ void Planet::Render(Shader* shader) const
 
 }
 
-void Planet::takeDame(int damage)
+void Planet::takeDamage(int damage)
 {
 	health -= damage; 
+	std::cout << "Health: " << health << std::endl;
 }
