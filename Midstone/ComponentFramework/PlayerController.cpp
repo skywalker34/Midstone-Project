@@ -187,7 +187,7 @@ void PlayerController::Update(const float deltaTime)
 {
 	camera.SetView(transform);
 	clickGrid.transform.setOrientation(transform.getOrientation());
-	Vec3 cameraToGrid = VMath::normalize(camera.transform.getPos() - get3DClickCoords(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)) * (CAMERA_TO_ORIGIN + planeDepth);
+	Vec3 cameraToGrid = VMath::normalize(camera.transform.getPos() - get3DClickCoords(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)) * (planeDepth);
 	Vec3 newCridPosition =camera.transform.getPos() - cameraToGrid;
 	clickGrid.transform.setPos(newCridPosition);
 }
@@ -231,19 +231,26 @@ Vec3 PlayerController::get3DClickCoords(float sdl_X, float sdl_Y)
 	// Using the join of two points
 	line = transform.getPos() & sdlPosWorldSpace;
 
-	// Make a plane based off scrollwheel
-	Plane plane = Plane(0, 0, 1, -(-planeDepth));
+	// Make a plane in camera space 
+	Plane planeCameraSpace = Plane(0, 0, 1, -(-planeDepth));
+	// Transform the plane's normal to world space 
+	Vec4 planeNormalCameraSpace = VMath::normalize(Vec4(planeCameraSpace.x, planeCameraSpace.y, planeCameraSpace.z, 0.0f));
 
-	// intersection point is the meet of line and plane
-	Vec4 intersection = line ^ plane;
+	Vec4 planeNormalWorldSpace = MMath::inverse(MATHEX::DQMath::toMatrix4(camera.GetViewDQuaternion())) * planeNormalCameraSpace;
+	Vec3 planeNormal = VMath::normalize(Vec3(planeNormalWorldSpace.x, planeNormalWorldSpace.y, planeNormalWorldSpace.z));
+	// Transform the plane's distance to world space 
+	Vec4 cameraPositionWorldSpace = MMath::inverse(MATHEX::DQMath::toMatrix4(camera.GetViewDQuaternion())) * Vec4(0, 0, 0, 1);
+	float planeDistanceWorldSpace = -(-planeDepth) - VMath::dot(planeNormal, Vec3(cameraPositionWorldSpace)); // Make a plane in world space 
+	Plane planeWorldSpace = Plane(VMath::normalize(planeNormal), planeDistanceWorldSpace);
+	// Calculate intersection point in world space 
 
-	// Divide out the w component
+
+	Vec4 intersection = line ^ planeWorldSpace;
 	intersection = intersection / intersection.w;
 
-		
 
-		
-		
+
+
 
 
 	return Vec3(intersection);

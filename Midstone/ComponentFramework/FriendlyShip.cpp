@@ -43,7 +43,7 @@ bool FriendlyShip::OnCreate()
 
 	
 	collisionSphere = new Sphere(transform.getPos(), 5.0f);
-
+	speed = 5;
 	return true;
 }
 
@@ -82,6 +82,10 @@ void FriendlyShip::Update(const float deltaTime)
 			bullets[i] = nullptr;
 			bullets.erase(std::remove(bullets.begin(), bullets.end(), nullptr), bullets.end());
 		}
+	}
+
+	if (hasReachDestination()) {
+		isMoving = false;
 	}
 
 	if (isMoving) {
@@ -186,7 +190,7 @@ void FriendlyShip::rotateTowardTarget(Vec3 target)
 
 bool FriendlyShip::hasReachDestination()
 {
-	return VMath::mag(body->pos - destination) < 0.1f;
+	return VMath::mag(transform.getPos() - destination) < 1.0f;
 }
 
 

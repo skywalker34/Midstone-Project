@@ -37,6 +37,10 @@ void main() {
 	spec = pow(spec,1.0);
 	vec4 outputColour = (ka + ((diff * kd) + (spec *ks)) * kt) ;	
 
+	if(kt.w == 0){
+		kt=vec4(0.2,0.2,0.2,0.6);
+	}
+
 	//mix with an atmosphere colour at the edges
 	fragColour = kt;
 	
