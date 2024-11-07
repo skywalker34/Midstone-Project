@@ -50,6 +50,8 @@ class PlayerController
 		Vec3 getClickPos();//returns the position of a 3d click
 		Vec3 get3DClickCoords(float sdl_X, float sdl_Y);
 		DualQuat getLine() { hasDQLine = false;  return line2; };
+
+		void updateModelMatrixToFaceCamera(Transform& transform);
 		
 };
 

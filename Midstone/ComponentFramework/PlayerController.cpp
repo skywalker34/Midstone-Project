@@ -194,9 +194,11 @@ void PlayerController::Update(const float deltaTime)
 
 	camera.SetView(transform);
 	clickGrid.transform.setOrientation(transform.getOrientation());
-	Vec3 cameraToGrid = VMath::normalize(camera.transform.getPos() - get3DClickCoords(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)) * (planeDepth);
-	Vec3 newCridPosition =camera.transform.getPos() - cameraToGrid;
-	clickGrid.transform.setPos(newCridPosition);
+
+	/*Vec3 cameraToGrid = VMath::normalize(camera.transform.getPos() - get3DClickCoords(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)) * (planeDepth);
+	Vec3 newCridPosition =camera.transform.getPos() - cameraToGrid;*/
+
+	clickGrid.transform.setPos(get3DClickCoords(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2));
 
 	
 
@@ -223,17 +225,29 @@ Vec3 PlayerController::getClickPos()
 
 Vec3 PlayerController::get3DClickCoords(float sdl_X, float sdl_Y)
 {
-	//below referenced from physics(semester 2) week 14
-	Vec4 sdlPosPixelSpace = Vec4(sdl_X, sdl_Y, 0, 1);
+    // Below referenced from physics (semester 2) week 14
+    Vec4 sdlPosPixelSpace = Vec4(sdl_X, sdl_Y, 0, 1);
 
+    Vec4 sdlPosNDCSpace = MMath::inverse(MMath::viewportNDC(SCREEN_WIDTH, SCREEN_HEIGHT)) * sdlPosPixelSpace;
+    // Let's get the front of the NDC box
+    sdlPosNDCSpace.z = -1.0f;
 
-	Vec4 sdlPosNDCSpace = MMath::inverse(MMath::viewportNDC(SCREEN_WIDTH, SCREEN_HEIGHT)) * sdlPosPixelSpace;
-	// Let's get the front of the NDC box
-	sdlPosNDCSpace.z = -1.0f;
+    Vec4 sdlPosCameraSpace = MMath::inverse(camera.GetProjectionMatrix()) * sdlPosNDCSpace;
+    // Divide out the w component
+    sdlPosCameraSpace = sdlPosCameraSpace / sdlPosCameraSpace.w;
 
-	Vec4 sdlPosCameraSpace = MMath::inverse(camera.GetProjectionMatrix()) * sdlPosNDCSpace;
-	// Divide out the w component
-	sdlPosCameraSpace = sdlPosCameraSpace / sdlPosCameraSpace.w;
+    // Make a line from the camera position to the mouse in camera space
+    line = Vec4(0, 0, 0, 1) & sdlPosCameraSpace;
+
+    // Make a plane in camera space (depth along the z-axis)
+    Plane planeCameraSpace = Plane(0, 0, 1, -planeDepth);
+
+    // Calculate intersection point in camera space
+    Vec4 intersectionCameraSpace = line ^ planeCameraSpace;
+    intersectionCameraSpace = intersectionCameraSpace / intersectionCameraSpace.w;
+
+    // Transform the intersection point to world space
+    Vec4 intersectionWorldSpace = MMath::inverse(MATHEX::DQMath::toMatrix4(camera.GetViewDQuaternion())) * intersectionCameraSpace;
 
 	Vec4 sdlPosWorldSpace = MMath::inverse(MATHEX::DQMath::toMatrix4(camera.GetViewDQuaternion())) * sdlPosCameraSpace;
 
@@ -241,27 +255,6 @@ Vec3 PlayerController::get3DClickCoords(float sdl_X, float sdl_Y)
 	// Using the join of two points
 	line = transform.getPos() & sdlPosWorldSpace;
 
-	// Make a plane in camera space 
-	Plane planeCameraSpace = Plane(0, 0, 1, -(-planeDepth));
-	// Transform the plane's normal to world space 
-	Vec4 planeNormalCameraSpace = VMath::normalize(Vec4(planeCameraSpace.x, planeCameraSpace.y, planeCameraSpace.z, 0.0f));
 
-	Vec4 planeNormalWorldSpace = MMath::inverse(MATHEX::DQMath::toMatrix4(camera.GetViewDQuaternion())) * planeNormalCameraSpace;
-	Vec3 planeNormal = VMath::normalize(Vec3(planeNormalWorldSpace.x, planeNormalWorldSpace.y, planeNormalWorldSpace.z));
-	// Transform the plane's distance to world space 
-	Vec4 cameraPositionWorldSpace = MMath::inverse(MATHEX::DQMath::toMatrix4(camera.GetViewDQuaternion())) * Vec4(0, 0, 0, 1);
-	float planeDistanceWorldSpace = -(-planeDepth) - VMath::dot(planeNormal, Vec3(cameraPositionWorldSpace)); // Make a plane in world space 
-	Plane planeWorldSpace = Plane(VMath::normalize(planeNormal), planeDistanceWorldSpace);
-	// Calculate intersection point in world space 
-
-
-	Vec4 intersection = line ^ planeWorldSpace;
-	intersection = intersection / intersection.w;
-
-
-
-
-
-
-	return Vec3(intersection);
+    return Vec3(intersectionWorldSpace.x, intersectionWorldSpace.y, intersectionWorldSpace.z);
 }
