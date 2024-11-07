@@ -26,11 +26,14 @@ class PlayerController
 
 		Vec3 forwardVector;
 
-
+		
 		float planeDepth = 1;
 
 	public:
 		PlayerController();
+
+
+		Vec3 hoverPos;
 
 
 		Transform transform; //temporary public

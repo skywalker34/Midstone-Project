@@ -106,6 +106,8 @@ void FriendlyShip::Update(const float deltaTime)
 	}
 
 	
+
+	
 }
 
 void FriendlyShip::Render(Shader* shader) const

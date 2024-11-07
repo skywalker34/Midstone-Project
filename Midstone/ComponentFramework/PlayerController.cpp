@@ -185,11 +185,21 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 
 void PlayerController::Update(const float deltaTime)
 {
+
+	int x, y;
+	SDL_GetMouseState(&x, &y);
+
+	hoverPos = get3DClickCoords(x, y);
+
+
 	camera.SetView(transform);
 	clickGrid.transform.setOrientation(transform.getOrientation());
 	Vec3 cameraToGrid = VMath::normalize(camera.transform.getPos() - get3DClickCoords(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)) * (planeDepth);
 	Vec3 newCridPosition =camera.transform.getPos() - cameraToGrid;
 	clickGrid.transform.setPos(newCridPosition);
+
+	
+
 }
 
 void PlayerController::Render(Shader* shader) const

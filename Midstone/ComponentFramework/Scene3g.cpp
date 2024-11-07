@@ -30,7 +30,8 @@ bool Scene3g::OnCreate() {
 	createShaders();
 	createClickGrid();
 
-	
+	testMesh = new Mesh("meshes/Sphere.obj");
+	testMesh->OnCreate();
 
 	printf("On Create finished!!!!!");
 	return true;
@@ -166,6 +167,14 @@ void Scene3g::Update(const float deltaTime) {
 		GameOver();
 	}
 
+	testModelMat = MMath::translate(playerController.hoverPos) * MMath::scale(1,1,1);
+	
+
+	isGivingOrders = true;
+
+	//testModelMat = MMath::translate(Vec3(0, 0, 70)) * MMath::scale(5, 5, 5);
+
+
 	//std::cout << std::endl << "Score: " << score << std::endl;
 	//std::cout << "Time Elapsed " << timeElapsed << std::endl;
 }
@@ -190,7 +199,9 @@ void Scene3g::Render() const {
 
 
 
+	
 
+	
 
 
 	for (FriendlyShip* ship : playerFleet) {
@@ -248,6 +259,15 @@ void Scene3g::Render() const {
 
 
 	if (isGivingOrders) {
+
+		glUseProgram(shader->GetProgram());
+		glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+		glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, testModelMat);
+		glUniform4fv(shader->GetUniformID("meshColor"), 1, ORANGE);
+		testMesh->Render(GL_TRIANGLES);
+
+
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //temporary line
 		glUseProgram(gridShader->GetProgram());
 		glUniformMatrix4fv(gridShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());

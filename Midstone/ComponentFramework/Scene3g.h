@@ -35,6 +35,9 @@ private:
 	Model bulletModel;
 	Model sphereModel;
 	Model planeModel;
+
+	Mesh* testMesh; //DELETE LATER
+	Matrix4 testModelMat;
 	
 
 	EnemySpawner enemySpawnPoint = EnemySpawner(200, 5);
