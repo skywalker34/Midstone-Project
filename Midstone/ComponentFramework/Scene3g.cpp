@@ -240,6 +240,11 @@ void Scene3g::Render() const {
 		glUniform3fv(bulletShader->GetUniformID("cameraPos"), 1, playerController.camera.transform.getPos());
 		ship->RenderBullets(bulletShader);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //temporary line
+
+
+		if (ship->isMoving) {
+			ship->exhaustTrail.Render(particleShader, computeShader);
+		}
 	}
 
 
@@ -475,6 +480,8 @@ void Scene3g::createActors()
 		playerFleet[i]->transform.setPos(Vec3(x, 0.0f, z));
 		playerFleet[i]->OnCreate();
 		playerFleet[i]->closestEnemyPosition = enemyFleet.back()->transform.getPos();	// Set initail target
+
+		playerFleet[i]->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
 	}
 
 	planet = Planet(30.0f, 5, &sphereModel, ORIGIN);
