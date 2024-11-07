@@ -51,6 +51,8 @@ bool LoadTextureFromFile(const char* file_name, GLuint* out_texture, int* out_wi
 	}
 	else
 	{
+		if (f == NULL)
+			return false;
 		fseek(f, 0, SEEK_END);
 		size_t file_size = (size_t)ftell(f);
 		if (file_size == -1)
@@ -62,8 +64,6 @@ bool LoadTextureFromFile(const char* file_name, GLuint* out_texture, int* out_wi
 		IM_FREE(file_data);
 		return ret;
 	}
-	if (f == NULL)
-		return false;
 }
 
 SceneUI2::SceneUI2(Window* window_) : drawInWireMode{ true }, show_demo_window {true} {
@@ -112,7 +112,7 @@ void SceneUI2::Update(const float deltaTime)
 {
 }
 
-void SceneUI2::Render() const 
+void SceneUI2::Render() 
 {
 	/// Set the background color then clear the screen
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -123,28 +123,19 @@ void SceneUI2::Render() const
 	ImGui_ImplSDL2_NewFrame();
 	ImGui::NewFrame();
 
-	// Get window size and position
-	ImVec2 window_pos = ImGui::GetWindowPos();
-	ImVec2 window_size = ImGui::GetWindowSize();
 	int my_image_width = 0;
 	int my_image_height = 0;
 	GLuint my_image_texture = 0;
 	bool ret = LoadTextureFromFile("./textures/StartPhoto.jpg", &my_image_texture, &my_image_width, &my_image_height);
-	//IM_ASSERT(ret);
+	IM_ASSERT(ret);
 	ImDrawList* drawList = ImGui::GetBackgroundDrawList();
 	ImVec2 image_pos = ImVec2(0, 0); // Set image position
 	drawList->AddImage((ImTextureID)(intptr_t)my_image_texture, image_pos, ImVec2(my_image_width / 1.5, my_image_height / 1.5));
 
 	bool p_open = false;
 	ImGui::Begin("A START BUTTON MAYBE?", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-	static int clicked = 0;
 	if (ImGui::Button("START GAME", ImVec2(300, 90)))
-		clicked++;
-	if (clicked & 1)
-	{
-		ImGui::SameLine();
-		ImGui::Text("Thanks for clicking me!");
-	}
+		switchButton = true;
 	ImGui::End();
 
 	//ImGui::ShowDemoWindow();

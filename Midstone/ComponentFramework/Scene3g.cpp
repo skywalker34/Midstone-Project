@@ -177,7 +177,7 @@ void Scene3g::Update(const float deltaTime) {
 	std::cout << "Time Elapsed " << timeElapsed << std::endl;
 }
 
-void Scene3g::Render() const {
+void Scene3g::Render() {
 	/// Set the background color then clear the screen
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -265,10 +265,11 @@ void Scene3g::Render() const {
 	ImGui::End();
 
 	ImGui::Begin("QuitButton", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-	ImGui::Button("Quit to Title", ImVec2(150,30));
+	if(ImGui::Button("Quit to Title", ImVec2(150,30)))
+		switchButton = true;
 	ImGui::End();
 
-	ImGui::ShowDemoWindow();
+	//ImGui::ShowDemoWindow();
 	ImGui::Render(); // Calling This before CurrentScene render wont work
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
