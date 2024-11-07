@@ -178,7 +178,7 @@ void Scene2g::Update(const float deltaTime) {
 	}
 }
 
-void Scene2g::Render() const {
+void Scene2g::Render() {
 	/// Set the background color then clear the screen
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

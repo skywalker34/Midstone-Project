@@ -100,7 +100,7 @@ void SceneUI::Update(const float deltaTime)
 		
 }
 
-void SceneUI::Render() const {
+void SceneUI::Render() {
 	
 	//Clear the Screen
 	SDL_RenderClear(screenRenderer);

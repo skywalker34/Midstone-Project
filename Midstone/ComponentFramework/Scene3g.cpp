@@ -13,9 +13,20 @@
 
 #include <chrono>
 
-Scene3g::Scene3g() : shader{ nullptr }, 
-drawInWireMode{ false } {
+Scene3g::Scene3g(Window* window_) : shader{ nullptr }, 
+drawInWireMode{ true } {
 	Debug::Info("Created Scene0: ", __FILE__, __LINE__);
+	window = window_;
+
+	// ImGUI stuff for initialize from Scotties Vid.
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	//Setup Dear ImGui Style
+	ImGui::StyleColorsDark();
+	// Setup Platform/Renderer backends
+	ImGui_ImplSDL2_InitForOpenGL(window->getWindow(), window->getContext());
+	ImGui_ImplOpenGL3_Init("#version 450");
 }
 
 Scene3g::~Scene3g() {
@@ -79,7 +90,10 @@ void Scene3g::OnDestroy() {
 
 	planet.OnDestroy();
 
-
+	// Cleanup
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+	ImGui::DestroyContext();
 }
 
 void Scene3g::HandleEvents(const SDL_Event& sdlEvent) {
@@ -89,7 +103,7 @@ void Scene3g::HandleEvents(const SDL_Event& sdlEvent) {
 	//basically whats happening here is that the player controller has a boolean flag thats basically saying "I have something to tell you scenemanager"
 	//the scene knows to check for this flag and to recieve the message so the playercontroller does not need to have a reference to the scene
 	//its basically just throwing out this variable and hoping something is listening
-	
+	ImGui_ImplSDL2_ProcessEvent(&sdlEvent); // ImGui HandleEvents
 
 	switch (sdlEvent.type) {
 	case SDL_KEYDOWN:
@@ -183,8 +197,7 @@ void Scene3g::Update(const float deltaTime) {
 	//std::cout << "Time Elapsed " << timeElapsed << std::endl;
 }
 
-
-void Scene3g::Render() const {
+void Scene3g::Render() {
 	/// Set the background color then clear the screen
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -201,12 +214,6 @@ void Scene3g::Render() const {
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-
-
-
-	
-
-	
 
 
 	for (FriendlyShip* ship : playerFleet) {
@@ -262,7 +269,6 @@ void Scene3g::Render() const {
 	glUniform3fv(planetShader->GetUniformID("cameraPos"), 1, playerController.camera.transform.getPos());
 	planet.Render(planetShader);
 
-
 	if (isGivingOrders) {
 
 		glUseProgram(shader->GetProgram());
@@ -279,6 +285,28 @@ void Scene3g::Render() const {
 		glUniformMatrix4fv(gridShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
 		playerController.Render(gridShader);
 	}
+  
+  
+	// IMGUI STUFF
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
+	ImGui::NewFrame();
+
+	bool p_open = false;
+	ImGui::Begin("Timer and Score", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+	ImGui::Text("Time = %f", timeElapsed);
+	ImGui::Text("Score = %i", score);
+	ImGui::End();
+
+	ImGui::Begin("QuitButton", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+	if(ImGui::Button("Quit to Title", ImVec2(150,30)))
+		switchButton = true;
+	ImGui::End();
+
+	//ImGui::ShowDemoWindow();
+	ImGui::Render(); // Calling This before CurrentScene render wont work
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+  
 	glUseProgram(0);
 }
 

@@ -10,6 +10,10 @@
 #include "Collision.h"
 #include "Vector.h"
 #include "Planet.h"
+#include "Window.h"
+#include "imgui.h"
+#include "imgui_impl_sdl2.h"
+#include "imgui_impl_opengl3.h"
 
 #include "EnemySpawner.h"
 using namespace MATH;
@@ -69,14 +73,17 @@ private:
 	bool isGameRunning = true;
 	bool isGivingOrders = false;
 
+	Window* window;
+
 public:
 	explicit Scene3g();
+	Scene3g(Window* window_);
 	virtual ~Scene3g();
 
 	virtual bool OnCreate() override;
 	virtual void OnDestroy() override;
 	virtual void Update(const float deltaTime) override;
-	virtual void Render() const override;
+	virtual void Render() override;
 	virtual void HandleEvents(const SDL_Event& sdlEvent) override;
 	void SpawnEnemy(const float deltaTime);
 	void SetActiveShip();
