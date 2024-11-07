@@ -147,14 +147,27 @@ void FriendlyShip::FindClosestEnemy(EnemyShip* enemy)
 
 void FriendlyShip::Fire()
 {
-	canFire = false; 
-	timeSinceShot = 0;
-	//the third parameter here "BACKWARD" should instead be the direction the ship is facing
-	bullets.push_back(new Bullet(transform, 0.1f, targetDirection, &bulletModel));
-	if (bullets.back()->OnCreate() == false) {
-		printf("Bullet failed! /n");
-	}
+    canFire = false; 
+    timeSinceShot = 0;
+
+    // Calculate the direction the ship is facing
+    
+
+    // Add some randomness to the direction to simulate flak guns
+    float randomOffsetX = static_cast<float>(rand()) / RAND_MAX - 1.0f;
+    float randomOffsetY = static_cast<float>(rand()) / RAND_MAX - 1.0f;
+    float randomOffsetZ = static_cast<float>(rand()) / RAND_MAX - 1.0f;
+    Vec3 randomOffset = VMath::normalize(Vec3(randomOffsetX, randomOffsetY, randomOffsetZ));
+
+    // Adjust the target direction slightly
+    Vec3 adjustedDirection = VMath::normalize(targetDirection + randomOffset * 0.1f); // Adjust the scale as needed
+
+    bullets.push_back(new Bullet(transform, 1.0f, adjustedDirection, &bulletModel));
+    if (bullets.back()->OnCreate() == false) {
+        printf("Bullet failed! \n");
+    }
 }
+
 
 void FriendlyShip::moveToDestination(Vec3 destination_)
 {

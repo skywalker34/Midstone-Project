@@ -122,9 +122,10 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 				planeDepth += 1 ;
 			}
 			break;
-		case SDL_SCANCODE_K:
+		case SDL_SCANCODE_C:
 			//switches between orbit and free mode
 			camera.toggleOrbitMode();
+			
 			break;
 
 
@@ -240,7 +241,7 @@ Vec3 PlayerController::get3DClickCoords(float sdl_X, float sdl_Y)
     line = Vec4(0, 0, 0, 1) & sdlPosCameraSpace;
 
     // Make a plane in camera space (depth along the z-axis)
-    Plane planeCameraSpace = Plane(0, 0, 1, -planeDepth);
+    Plane planeCameraSpace = Plane(0, 0, 1, planeDepth);
 
     // Calculate intersection point in camera space
     Vec4 intersectionCameraSpace = line ^ planeCameraSpace;

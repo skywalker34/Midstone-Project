@@ -40,7 +40,8 @@ private:
 	Matrix4 testModelMat;
 	
 
-	EnemySpawner enemySpawnPoint = EnemySpawner(200, 5);
+	
+	
 
 	
 	Vec3 lightPos = Vec3(0.0f, 75.0f, -150.0f);
@@ -52,6 +53,9 @@ private:
 
 	std::vector<FriendlyShip*> playerFleet;
 	std::vector<EnemyShip*> enemyFleet;
+
+	std::vector<EnemySpawner> enemyFleetSpawners;
+	int enemySpawnerCount = 1;
 
 	int activeShip = -1;
 	int startingFleetSize = 8;

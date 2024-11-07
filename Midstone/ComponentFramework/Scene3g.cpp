@@ -33,6 +33,8 @@ bool Scene3g::OnCreate() {
 	testMesh = new Mesh("meshes/Sphere.obj");
 	testMesh->OnCreate();
 
+	
+	enemyFleetSpawners.push_back(EnemySpawner(200.0f, 5, 5));
 	printf("On Create finished!!!!!");
 	return true;
 
@@ -147,12 +149,9 @@ void Scene3g::HandleEvents(const SDL_Event& sdlEvent) {
 }
 
 void Scene3g::Update(const float deltaTime) {
-
 	if (!isGameRunning) return;
-	
-	timeElapsed += deltaTime;
 
-	
+	timeElapsed += deltaTime;
 	playerController.Update(deltaTime);
 
 	SpawnEnemy(deltaTime);
@@ -162,22 +161,28 @@ void Scene3g::Update(const float deltaTime) {
 
 	planet.Update(deltaTime);
 	if (planet.GetHealth() < 0) {
-
 		//temp for now
 		GameOver();
 	}
 
-	testModelMat = MMath::translate(playerController.hoverPos) * MMath::scale(1,1,1);
-	
+	testModelMat = MMath::translate(playerController.hoverPos) * MMath::scale(1, 1, 1);
 
-	isGivingOrders = true;
+	static float spawnTimer = 0.0f; // Timer for spawning
+	spawnTimer += deltaTime;
+
+	if (spawnTimer >= 60.0f) { //spawn an enemySpawner every minute
+		enemyFleetSpawners.push_back(EnemySpawner(200.0f, 5, 5));
+		enemySpawnerCount++;
+		std::cout << "Enemy Spawners: " << enemySpawnerCount << std::endl;
+		spawnTimer = 0.0f; // Reset the spawn timer
+	}
 
 	//testModelMat = MMath::translate(Vec3(0, 0, 70)) * MMath::scale(5, 5, 5);
-
 
 	//std::cout << std::endl << "Score: " << score << std::endl;
 	//std::cout << "Time Elapsed " << timeElapsed << std::endl;
 }
+
 
 void Scene3g::Render() const {
 	/// Set the background color then clear the screen
@@ -279,23 +284,31 @@ void Scene3g::Render() const {
 
 void Scene3g::SpawnEnemy(const float deltaTime)
 {
-	enemySpawnPoint.Update(deltaTime);
-	if (enemySpawnPoint.canSpawn == true) {
-		enemyIndex++;
-		enemyFleet.push_back(new EnemyShip(enemySpawnPoint.position, &enemyShipModel));
-		enemyFleet.back()->OnCreate();
-		enemyFleet.back()->setIndex(enemyIndex);
-		enemySpawnPoint.canSpawn = false;
+	
+
+	for (int i = 0; i < enemySpawnerCount; i++) {
+		enemyFleetSpawners[i].Update(deltaTime);
+		if (enemyFleetSpawners[i].canSpawn == true) {
+			enemyIndex++;
+			enemyFleet.push_back(new EnemyShip(enemyFleetSpawners[i].position, &enemyShipModel));
+			enemyFleet.back()->OnCreate();
+			enemyFleet.back()->setIndex(enemyIndex);
+			enemyFleetSpawners[i].canSpawn = false;
+		}
 	}
+
+	
 }
 
 void Scene3g::SetActiveShip()
 {
 	if (playerController.has3DClick) {
-		shipWaypoint = playerController.getClickPos();
-		playerFleet[activeShip]->moveToDestination(shipWaypoint);
-		isGivingOrders = false;
-		activeShip = -1;
+		if (activeShip >= 0) {
+			shipWaypoint = playerController.getClickPos();
+			playerFleet[activeShip]->moveToDestination(shipWaypoint);
+			isGivingOrders = false;
+			activeShip = -1;
+		}
 	}
 
 	if (playerController.hasDQLine) {
@@ -343,6 +356,7 @@ void Scene3g::UpdatePlayerFleet(const float deltaTime)
 	}
 
 	if (activeShip >= 0) {
+		isGivingOrders = true;
 		playerFleet[activeShip]->displayRange = true;
 	}
 }
