@@ -39,7 +39,7 @@ class FriendlyShip :
 		Vec3 targetDirection = Vec3(0, 0, 0);
 		Vec3 movingDirection;
 		Vec3 initialDirection = FORWARD;
-		Vec3 closestEnemyPosition;
+		EnemyShip* closestEnemy;
 
 		Vec4 color = BLUE;
 		bool isMoving = false;
