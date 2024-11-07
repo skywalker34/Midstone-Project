@@ -28,15 +28,20 @@ private:
 	Shader* bulletShader;
 	Shader* planetShader;
 	Shader* friendlyShipShader;
+	Shader* gridShader;
 
 	Model friendlyShipModel;
 	Model enemyShipModel;
 	Model bulletModel;
 	Model sphereModel;
 	Model planeModel;
+
+	Mesh* testMesh; //DELETE LATER
+	Matrix4 testModelMat;
 	
 
-	EnemySpawner enemySpawnPoint = EnemySpawner(200, 5);
+	
+	
 
 	
 	Vec3 lightPos = Vec3(0.0f, 75.0f, -150.0f);
@@ -49,7 +54,10 @@ private:
 	std::vector<FriendlyShip*> playerFleet;
 	std::vector<EnemyShip*> enemyFleet;
 
-	int activeShip = 0;
+	std::vector<EnemySpawner> enemyFleetSpawners;
+	int enemySpawnerCount = 1;
+
+	int activeShip = -1;
 	int startingFleetSize = 8;
 	int enemyIndex = 0;
 	
@@ -59,6 +67,7 @@ private:
 
 	bool drawInWireMode;
 	bool isGameRunning = true;
+	bool isGivingOrders = false;
 
 public:
 	explicit Scene3g();
@@ -78,6 +87,9 @@ public:
 	void createActors();
 	void createShaders();
 	void createClickGrid();
+	void DestroyEnenmy(int index);
+
+	void GameOver();
 };
 
 
