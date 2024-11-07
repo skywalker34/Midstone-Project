@@ -10,6 +10,10 @@
 #include "Collision.h"
 #include "Vector.h"
 #include "Planet.h"
+#include "Window.h"
+#include "imgui.h"
+#include "imgui_impl_sdl2.h"
+#include "imgui_impl_opengl3.h"
 
 #include "EnemySpawner.h"
 using namespace MATH;
@@ -60,8 +64,11 @@ private:
 	bool drawInWireMode;
 	bool isGameRunning = true;
 
+	Window* window;
+
 public:
 	explicit Scene3g();
+	Scene3g(Window* window_);
 	virtual ~Scene3g();
 
 	virtual bool OnCreate() override;

@@ -193,7 +193,7 @@ bool SceneManager::BuildNewScene(SCENE_NUMBER scene) {
 		break;
 
 	case SCENE_NUMBER::SCENE3g:
-		currentScene = new Scene3g();
+		currentScene = new Scene3g(window);
 		status = currentScene->OnCreate();
 		//if (currentSceneNumber == 2) break;
 		break;

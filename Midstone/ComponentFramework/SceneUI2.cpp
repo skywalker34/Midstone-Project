@@ -134,10 +134,11 @@ void SceneUI2::Render() const
 	ImDrawList* drawList = ImGui::GetBackgroundDrawList();
 	ImVec2 image_pos = ImVec2(0, 0); // Set image position
 	drawList->AddImage((ImTextureID)(intptr_t)my_image_texture, image_pos, ImVec2(my_image_width / 1.5, my_image_height / 1.5));
-	
-	ImGui::Begin("A START BUTTON MAYBE?");
+
+	bool p_open = false;
+	ImGui::Begin("A START BUTTON MAYBE?", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 	static int clicked = 0;
-	if (ImGui::Button("START?"))
+	if (ImGui::Button("START GAME", ImVec2(300, 90)))
 		clicked++;
 	if (clicked & 1)
 	{
@@ -146,7 +147,7 @@ void SceneUI2::Render() const
 	}
 	ImGui::End();
 
-	ImGui::ShowDemoWindow();
+	//ImGui::ShowDemoWindow();
 	ImGui::Render(); // Calling This before CurrentScene render wont work
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
