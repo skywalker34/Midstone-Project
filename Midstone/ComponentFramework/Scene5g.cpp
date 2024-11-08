@@ -228,7 +228,7 @@ void Scene5g::Update(const float deltaTime) {
 
 }
 
-void Scene5g::Render() const {
+void Scene5g::Render() {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

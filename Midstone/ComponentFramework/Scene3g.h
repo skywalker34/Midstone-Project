@@ -10,6 +10,10 @@
 #include "Collision.h"
 #include "Vector.h"
 #include "Planet.h"
+#include "Window.h"
+#include "imgui.h"
+#include "imgui_impl_sdl2.h"
+#include "imgui_impl_opengl3.h"
 
 #include "EnemySpawner.h"
 using namespace MATH;
@@ -29,6 +33,7 @@ private:
 	Shader* bulletShader;
 	Shader* planetShader;
 	Shader* friendlyShipShader;
+	Shader* gridShader;
 
 	ComputeShader* computeShader = nullptr;
 	Shader* loadVertsToBuffer = nullptr;
@@ -41,9 +46,13 @@ private:
 	Model bulletModel;
 	Model sphereModel;
 	Model planeModel;
+
+	Mesh* testMesh; //DELETE LATER
+	Matrix4 testModelMat;
 	
 
-	EnemySpawner enemySpawnPoint = EnemySpawner(200, 5);
+	
+	
 
 	
 	Vec3 lightPos = Vec3(0.0f, 75.0f, -150.0f);
@@ -56,7 +65,10 @@ private:
 	std::vector<FriendlyShip*> playerFleet;
 	std::vector<EnemyShip*> enemyFleet;
 
-	int activeShip = 0;
+	std::vector<EnemySpawner> enemyFleetSpawners;
+	int enemySpawnerCount = 1;
+
+	int activeShip = -1;
 	int startingFleetSize = 8;
 	int enemyIndex = 0;
 	
@@ -66,15 +78,19 @@ private:
 
 	bool drawInWireMode;
 	bool isGameRunning = true;
+	bool isGivingOrders = false;
+
+	Window* window;
 
 public:
 	explicit Scene3g();
+	Scene3g(Window* window_);
 	virtual ~Scene3g();
 
 	virtual bool OnCreate() override;
 	virtual void OnDestroy() override;
 	virtual void Update(const float deltaTime) override;
-	virtual void Render() const override;
+	virtual void Render() override;
 	virtual void HandleEvents(const SDL_Event& sdlEvent) override;
 	void SpawnEnemy(const float deltaTime);
 	void SetActiveShip();
@@ -85,6 +101,9 @@ public:
 	void createActors();
 	void createShaders();
 	void createClickGrid();
+	void DestroyEnenmy(int index);
+
+	void GameOver();
 };
 
 
