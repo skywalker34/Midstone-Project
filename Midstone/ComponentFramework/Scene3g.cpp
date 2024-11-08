@@ -36,6 +36,9 @@ Scene3g::~Scene3g() {
 bool Scene3g::OnCreate() {
 	Debug::Info("Loading assets Scene0: ", __FILE__, __LINE__);
 
+	SoundEngine->play2D("audio/BackGroundMusic.mp3", true); // Audio For Game 
+	SoundEngine->setSoundVolume(0.3f);
+
 	createModels();
 	createActors();
 	createShaders();
@@ -94,6 +97,8 @@ void Scene3g::OnDestroy() {
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
+
+	SoundEngine->drop(); // Removes Sound from scene
 }
 
 void Scene3g::HandleEvents(const SDL_Event& sdlEvent) {
