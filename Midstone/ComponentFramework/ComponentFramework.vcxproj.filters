@@ -153,6 +153,8 @@
     <ClCompile Include="SceneUI2.cpp">
       <Filter>Source Files\Scenes</Filter>
     </ClCompile>
+    <ClCompile Include="ExhaustTrail.cpp">
+      <Filter>Source Files</Filter>
     <ClCompile Include="SceneGameOver.cpp">
       <Filter>Source Files\Scenes</Filter>
     </ClCompile>
@@ -293,6 +295,8 @@
     <ClInclude Include="SceneUI2.h">
       <Filter>Header Files\Scenes</Filter>
     </ClInclude>
+    <ClInclude Include="ExhaustTrail.h">
+      <Filter>Header Files</Filter>
     <ClInclude Include="SceneGameOver.h">
       <Filter>Header Files\Scenes</Filter>
     </ClInclude>

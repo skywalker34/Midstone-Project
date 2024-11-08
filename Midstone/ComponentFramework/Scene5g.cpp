@@ -55,7 +55,7 @@ bool Scene5g::OnCreate() {
 	sphere = new Mesh("meshes/Mario.obj");
 	sphere->OnCreate();
 
-	sphereModelMatrix = MMath::translate(0.2, -0.08, 0.0f); //if you're going to do ANYTHING with the model matrix make sure it is done BEFORE the verts are loaded into the buffer
+	//sphereModelMatrix = MMath::translate(0.2, -0.08, 0.0f); //if you're going to do ANYTHING with the model matrix make sure it is done BEFORE the verts are loaded into the buffer
 
 
 	if (camera.OnCreate() == false) { //create the camera 
@@ -75,7 +75,7 @@ bool Scene5g::OnCreate() {
 	//give all of our particles a starting velocity so they can orbit 
 	Vec3 initialVelocities[10000];
 	for (int i = 0; i < 10000; i++) {
-		initialVelocities[i] = Vec3(1.0, 0.0, 0.0);
+		initialVelocities[i] = Vec3(0.0, 0.0, 0.0);
 	}
 
 	//store all those velocities in a buffere
@@ -86,9 +86,9 @@ bool Scene5g::OnCreate() {
 
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, posBuffer); //bind the buffer
 	glUseProgram(loadVertsToBuffer->GetProgram());
-	glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, camera.GetProjectionMatrix());
-	glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, camera.GetViewMatrix());
-	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, sphereModelMatrix);
+	glUniformMatrix4fv(loadVertsToBuffer->GetUniformID("projectionMatrix"), 1, GL_FALSE, camera.GetProjectionMatrix());
+	glUniformMatrix4fv(loadVertsToBuffer->GetUniformID("viewMatrix"), 1, GL_FALSE, camera.GetViewMatrix());
+	glUniformMatrix4fv(loadVertsToBuffer->GetUniformID("modelMatrix"), 1, GL_FALSE, sphereModelMatrix);
 	sphere->Render(GL_POINTS); //type of render doesn't really matter as there is nothing to see here
 	glUseProgram(0);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0); //unbind the buffer
@@ -160,15 +160,15 @@ bool Scene5g::OnCreate() {
 
 	playerController.transform.setPos(0, 0, 2);
 
-	ship = new Mesh("meshes/Ship.obj");
+	ship = new Mesh("meshes/Midstone_Enemy.obj");
 	ship->OnCreate();
 
 
-	shipModelMatrix =   MMath::translate(0.0f,0.0f,0.0f) * MMath::rotate(90.0f, Vec3(0.0f, 1.0f, 0.0f)) * MMath::scale(0.002f, 0.002f, 0.002f);
+	shipModelMatrix =   MMath::translate(0.0f,0.0f,0.0f) * MMath::rotate(90.0f, Vec3(0.0f, 1.0f, 0.0f)) ;
 
-	sphereModelMatrix = MMath::translate(0.05,0.0,0.0)*MMath::rotate(180, Vec3(0,1,0)) * shipModelMatrix;
+	sphereModelMatrix = MMath::rotate(90.0f, Vec3(0.0f, 1.0f, 0.0f)) ;
 		
-
+	
 	return true;
 }
 
@@ -216,7 +216,16 @@ void Scene5g::Update(const float deltaTime) {
 	else {
 		frameCounter++;
 	}
+	shipPos.x -= deltaTime / 10;
+	shipModelMatrix = MMath::translate(shipPos) * MMath::rotate(90.0f, Vec3(0.0f, 1.0f, 0.0f));
+	//sphereModelMatrix = MMath::translate(-shipPos) * MMath::rotate(90.0f, Vec3(0.0f, 1.0f, 0.0f));
+
 	
+	sphereModelMatrix = shipModelMatrix;
+
+
+
+
 }
 
 void Scene5g::Render() {
@@ -230,6 +239,8 @@ void Scene5g::Render() {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 
+
+
 	//bind the buffers
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, posBuffer);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, velBuffer);
@@ -240,7 +251,7 @@ void Scene5g::Render() {
 		glUniform1i(computeShader->GetUniformID("yDispatch"), 100); //amount of dispatches in the y direction(?) so the GPUs can work in parralel doing these calculations
 		glUniform1f(computeShader->GetUniformID("simSpeed"), 60); //frequency 
 		glUniform1f(computeShader->GetUniformID("randSeed"), time); //frequency 
-		glUniform3fv(computeShader->GetUniformID("forwardVector"), 1, Vec3(-1,0,0)); //direction the "ship" is headed
+		glUniform3fv(computeShader->GetUniformID("forwardVector"), 1, Vec3(0,0,-1)); //direction the "ship" is headed
 		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, sphereModelMatrix);
 		glDispatchCompute(100, 100, 1);//make sure the dispatch in the y parameter heres matches that in the uniform above
 		glMemoryBarrier(GL_ALL_BARRIER_BITS);

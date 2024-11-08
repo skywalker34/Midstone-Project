@@ -42,5 +42,7 @@ class EnemyShip :
 		void Render(Shader* shader) const;
 		//called when the enemy ship is hit by a projectile
 		void Hit();
+
+		
 };
 

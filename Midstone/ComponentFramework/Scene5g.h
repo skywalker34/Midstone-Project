@@ -38,6 +38,7 @@ private:
 	float prevFrameTime = 0.0f; //time of the previous frame
 	float frameDelta = 0.0f; //time between frames
 
+	Vec3 shipPos = Vec3(0, 0, 0);
 
 	Camera camera;
 

@@ -1,6 +1,8 @@
 #pragma once
 #include "Actor.h"
 #include "Body.h"
+#include "ExhaustTrail.h"
+
 class Body;
 
 class Ship :
@@ -13,6 +15,8 @@ class Ship :
 
         Body* body = nullptr;
         Matrix4 shipModelMatrix;
+
+        ExhaustTrail exhaustTrail;
 
         Ship() {}
         Ship(int health_, int damage_, float speed_);

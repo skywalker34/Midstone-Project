@@ -54,6 +54,7 @@ void FriendlyShip::OnDestroy()
 
 	rangeSphere.OnDestroy();
 
+	exhaustTrail.OnDestroy();
 
 	delete collisionSphere;
 	
@@ -105,9 +106,9 @@ void FriendlyShip::Update(const float deltaTime)
 		rangeSphereT.setPos(detectionSphere.center);
 	}
 
-	
 
-	
+	exhaustTrail.modelMat = transform.toModelMatrix();
+
 }
 
 void FriendlyShip::Render(Shader* shader) const
