@@ -1,5 +1,6 @@
 #include <glew.h>
 #include <iostream>
+#include <fstream>
 #include <SDL.h>
 #include "Scene3g.h"
 #include <MMath.h>
@@ -16,7 +17,7 @@
 #include <chrono>
 
 Scene3g::Scene3g(Window* window_) : shader{ nullptr }, 
-drawInWireMode{ true } {
+drawInWireMode{ false } {
 	Debug::Info("Created Scene0: ", __FILE__, __LINE__);
 	window = window_;
 
@@ -52,8 +53,8 @@ bool Scene3g::OnCreate() {
 		std::cout << "Shader failed ... we have a problem\n";
 	}
 
-
-	par (particleShader->OnCreate() == false) {
+	particleShader = new Shader("shaders/particleVert.glsl", "shaders/particleFrag.glsl");
+	if (particleShader->OnCreate() == false) {
 		std::cout << "Shader failed ... we have a problem\n";
 	}
 
@@ -262,6 +263,7 @@ void Scene3g::Render() {
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //temporary line
 
 
 	for (FriendlyShip* ship : playerFleet) {
@@ -319,13 +321,6 @@ void Scene3g::Render() {
 	}
 
 
-
-
-
-	glUseProgram(shader->GetProgram());
-	glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
-	glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-	playerController.Render(shader);
 
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //temporary line
@@ -393,16 +388,18 @@ void Scene3g::Render() {
 
 void Scene3g::SpawnEnemy(const float deltaTime)
 {
+	for (int i = 0; i < enemySpawnerCount; i++) {
 
-	enemySpawnPoint.Update(deltaTime);
-	if (enemySpawnPoint.canSpawn == true) {
-		enemyIndex++;
-		enemyFleet.push_back(new EnemyShip(enemySpawnPoint.position, &enemyShipModel));
-		enemyFleet.back()->OnCreate();
-		enemyFleet.back()->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
-		enemyFleet.back()->setIndex(enemyIndex);
-		enemySpawnPoint.canSpawn = false;
+		enemyFleetSpawners[i].Update(deltaTime);
+		if (enemyFleetSpawners[i].canSpawn == true) {
+			enemyIndex++;
+			enemyFleet.push_back(new EnemyShip(enemyFleetSpawners[i].position, &enemyShipModel));
+			enemyFleet.back()->OnCreate();
+			enemyFleet.back()->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
+			enemyFleet.back()->setIndex(enemyIndex);
+			enemyFleetSpawners[i].canSpawn = false;
 
+		}
 	}
 
 	
@@ -539,9 +536,34 @@ void Scene3g::GameOver()
 {
 	//END GAME LOGIC HERE PLEASE
 	std::cout << "\033[32m" << "GAMEOVER!" << "\033[0m" << std::endl;
+	SaveStats();
 	gameOverBool = true;
 }
 
+
+void Scene3g::SaveStats() {
+
+
+	// Open a file in write mode
+	std::ofstream outFile("Leaderboard.txt");
+
+	// Check if the file is open
+	if (outFile.is_open()) {
+		// Write the data to the file
+		outFile << "Score: " << score << "\n";
+		outFile << "Time: " << timeElapsed << "\n";
+		outFile <<  "-" << "\n";
+
+		// Close the file
+		outFile.close();
+
+		std::cout << "Data written to file successfully." << std::endl;
+	}
+	else {
+		std::cerr << "Unable to open file for writing." << std::endl;
+	}
+
+}
 
 
 
