@@ -83,10 +83,15 @@ SceneUI2::SceneUI2(Window* window_) : drawInWireMode{ true }, show_demo_window {
 
 SceneUI2::~SceneUI2() {
 	Debug::Info("Deleted Scene2g: ", __FILE__, __LINE__);
+
+
 }
 
 bool SceneUI2::OnCreate() {
 	Debug::Info("Loading assets Scene2g: ", __FILE__, __LINE__);
+
+	SoundEngine->play2D("audio/breakout.mp3", true); // Audio For Main Screen
+
 
 	printf("On Create finished!!!!!");
 	return true;
@@ -101,6 +106,7 @@ void SceneUI2::OnDestroy() {
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
+	SoundEngine->drop(); // Removes Sound from scene
 }
 
 void SceneUI2::HandleEvents(const SDL_Event& sdlEvent) 

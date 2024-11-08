@@ -166,6 +166,9 @@ void FriendlyShip::Fire()
     if (bullets.back()->OnCreate() == false) {
         printf("Bullet failed! \n");
     }
+	Vec3 bulletSpawn = transform.getPos();
+	irrklang::vec3df position(bulletSpawn.x, bulletSpawn.y, bulletSpawn.z);
+	SoundEngine->play3D("audio/LaserShooting.mp3", position, false); // Audio For Shooting Noise
 }
 
 

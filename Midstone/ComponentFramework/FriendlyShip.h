@@ -9,7 +9,9 @@
 #include <QMath.h>
 #include <VMath.h>
 #include "EnemyShip.h"
+#include "irrKlang.h"
 
+using namespace irrklang;
 using namespace MATH;
 using namespace MATHEX;
 
@@ -57,6 +59,7 @@ class FriendlyShip :
 		bool wouldIntersectPlanet = false;
 
 		Sphere detectionSphere;
+		ISoundEngine* SoundEngine = createIrrKlangDevice(); //Sound Device For Shooting Sounds
 
 		FriendlyShip();
 		FriendlyShip(Model* model_, Model* bulletModel_);
