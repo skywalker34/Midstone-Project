@@ -1,7 +1,7 @@
 #include <glew.h>
 #include <iostream>
 #include <SDL.h>
-#include "SceneUI2.h"
+#include "SceneGameOver.h"
 #include <MMath.h>
 #include <QMath.h>
 #include <VMath.h>
@@ -63,7 +63,7 @@ static bool LoadTextureFromFile(const char* file_name, GLuint* out_texture, int*
 	}
 }
 
-SceneUI2::SceneUI2(Window* window_) : drawInWireMode{ true }, show_demo_window {true} {
+SceneGameOver::SceneGameOver(Window* window_) : drawInWireMode{ true }, show_demo_window {true} {
 	Debug::Info("Created Scene2g: ", __FILE__, __LINE__);
 	window = window_;
 
@@ -78,17 +78,12 @@ SceneUI2::SceneUI2(Window* window_) : drawInWireMode{ true }, show_demo_window {
 	ImGui_ImplOpenGL3_Init("#version 450");
 }
 
-SceneUI2::~SceneUI2() {
+SceneGameOver::~SceneGameOver() {
 	Debug::Info("Deleted Scene2g: ", __FILE__, __LINE__);
-
-
 }
 
-bool SceneUI2::OnCreate() {
+bool SceneGameOver::OnCreate() {
 	Debug::Info("Loading assets Scene2g: ", __FILE__, __LINE__);
-
-	SoundEngine->play2D("audio/breakout.mp3", true); // Audio For Main Screen
-
 
 	printf("On Create finished!!!!!");
 	return true;
@@ -96,26 +91,25 @@ bool SceneUI2::OnCreate() {
 
 }
 
-void SceneUI2::OnDestroy() {
+void SceneGameOver::OnDestroy() {
 	Debug::Info("Deleting assets Scene0: ", __FILE__, __LINE__);
 
 	// Cleanup
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
-	SoundEngine->drop(); // Removes Sound from scene
 }
 
-void SceneUI2::HandleEvents(const SDL_Event& sdlEvent) 
+void SceneGameOver::HandleEvents(const SDL_Event& sdlEvent)
 {
 	ImGui_ImplSDL2_ProcessEvent(&sdlEvent); // ImGui HandleEvents
 }
 
-void SceneUI2::Update(const float deltaTime) 
+void SceneGameOver::Update(const float deltaTime)
 {
 }
 
-void SceneUI2::Render() 
+void SceneGameOver::Render()
 {
 	/// Set the background color then clear the screen
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -139,6 +133,7 @@ void SceneUI2::Render()
 	int my_image_width = 0;
 	int my_image_height = 0;
 	GLuint my_image_texture = 0;
+	//PUT NEW IMAGE HERE
 	bool ret = LoadTextureFromFile("./textures/StartPhoto.jpg", &my_image_texture, &my_image_width, &my_image_height);
 	IM_ASSERT(ret);
 	ImDrawList* drawList = ImGui::GetBackgroundDrawList();
@@ -148,7 +143,7 @@ void SceneUI2::Render()
 	bool p_open = false;
 	ImGui::Begin("A START BUTTON MAYBE?", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 	//ImGui::PushFont(font_title);
-	if (ImGui::Button("START GAME", ImVec2(300, 90)))
+	if (ImGui::Button("Main Menu", ImVec2(300, 90)))
 		switchButton = true;
 	//ImGui::PopFont();
 	ImGui::End();

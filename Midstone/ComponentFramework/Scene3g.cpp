@@ -295,12 +295,25 @@ void Scene3g::Render() {
 	// IMGUI STUFF
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame();
+
+	//This is the font stuff if you can find a working one then yeah. But otherwise im gonna keep it default for now.
+	//ImGuiIO& io = ImGui::GetIO();
+	//ImFontConfig config;
+	//config.OversampleH = 2;
+	//io.Fonts->AddFontDefault();
+	//ImFont* textFont = io.Fonts->AddFontFromFileTTF("./fonts/Comic Sans MS.ttf", 23.0f, &config);
+	//IM_ASSERT(textFont != NULL);
+	//io.Fonts->Build();
+
 	ImGui::NewFrame();
 
 	bool p_open = false;
 	ImGui::Begin("Timer and Score", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+	//ImGui::PushFont(textFont);
 	ImGui::Text("Time = %f", timeElapsed);
 	ImGui::Text("Score = %i", score);
+	ImGui::Text("Planet Health: = %i", planet.GetHealth());
+	//ImGui::PopFont();
 	ImGui::End();
 
 	ImGui::Begin("QuitButton", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
@@ -452,6 +465,7 @@ void Scene3g::UpdateEnemyFleet(const float deltaTime)
 
 void Scene3g::DestroyEnenmy(int index)
 {
+	score++;
 	enemyFleet[index]->OnDestroy();
 	delete enemyFleet[index];
 	enemyFleet[index] = nullptr;
@@ -462,6 +476,7 @@ void Scene3g::GameOver()
 {
 	//END GAME LOGIC HERE PLEASE
 	std::cout << "\033[32m" << "GAMEOVER!" << "\033[0m" << std::endl;
+	gameOverBool = true;
 }
 
 
