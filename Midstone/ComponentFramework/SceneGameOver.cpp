@@ -46,10 +46,7 @@ static bool LoadTextureFromFile(const char* file_name, GLuint* out_texture, int*
 {
 	FILE* f;
 	errno_t err;
-	if ((err = fopen_s(&f, file_name, "rb")) != 0)
-	{
-	}
-	else
+	if ((err = fopen_s(&f, file_name, "rb")) == 0)
 	{
 		if (f == NULL)
 			return false;
