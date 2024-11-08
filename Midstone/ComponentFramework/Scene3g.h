@@ -55,7 +55,8 @@ private:
 	
 
 	
-	Vec3 lightPos = Vec3(0.0f, 75.0f, -150.0f);
+	Vec3 lightPos = Vec3(0.0f, 75.0f, 150.0f);
+
 
 	PlayerController playerController;
 	Vec3 shipWaypoint;
@@ -82,6 +83,8 @@ private:
 
 	Window* window;
 
+
+	void SaveStats();
 public:
 	explicit Scene3g();
 	Scene3g(Window* window_);
