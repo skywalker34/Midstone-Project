@@ -29,14 +29,14 @@ bool ExhaustTrail::OnCreate(Camera* cam_, Shader* loadVerts, Mesh* mesh_)
 
 	//give all of our particles a starting velocity so they can orbit 
 	Vec3 initialVelocities[10000];
-	for (int i = 0; i < 10000; i++) {
+	for (int i = 0; i < BUF_SIZE; i++) {
 		initialVelocities[i] = Vec3(0.0, 0.0, 0.0);
 	}
 
 	//store all those velocities in a buffere
 	glGenBuffers(1, &velBuffer);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, velBuffer);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Vec3) * 10000, initialVelocities, GL_DYNAMIC_COPY);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Vec3) * BUF_SIZE, initialVelocities, GL_DYNAMIC_COPY);
 
 
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, posBuffer); //bind the buffer
@@ -71,14 +71,13 @@ void ExhaustTrail::Render(Shader* shader, ComputeShader* comp)
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, posBuffer);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, velBuffer);
 
-	int yDispatch = 100;
 	glUseProgram(comp->GetProgram());
 
-	glUniform1i(comp->GetUniformID("yDispatch"), 100); //amount of dispatches in the y direction(?) so the GPUs can work in parralel doing these calculations
+	glUniform1i(comp->GetUniformID("yDispatch"), YDISPATCH); //amount of dispatches in the y direction(?) so the GPUs can work in parralel doing these calculations
 	glUniform1f(comp->GetUniformID("simSpeed"), 60); //frequency 
 	glUniform1f(comp->GetUniformID("randSeed"), rand());
 	glUniform3fv(comp->GetUniformID("forwardVector"), 1, Vec3(0, 0, -1)); //direction the "ship" is headed
-	glDispatchCompute(100, 100, 1);//make sure the dispatch in the y parameter heres matches that in the uniform above
+	glDispatchCompute(100, YDISPATCH, 1);//make sure the dispatch in the y parameter heres matches that in the uniform above
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
 

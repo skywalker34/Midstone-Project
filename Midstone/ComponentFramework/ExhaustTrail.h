@@ -19,6 +19,9 @@ class ExhaustTrail
 	GLuint posBuffer;
 	GLuint velBuffer;
 
+	const int YDISPATCH = 100;
+	const int BUF_SIZE = 10000;
+
 public:
 		Matrix4 modelMat;
 

@@ -242,7 +242,7 @@ void Scene3g::Render() const {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //temporary line
 
 
-		if (ship->isMoving) {
+		if (ship->isMoving && isGameRunning) {
 			ship->exhaustTrail.Render(particleShader, computeShader);
 		}
 	}
@@ -267,7 +267,7 @@ void Scene3g::Render() const {
 
 			
 			
-			ship->exhaustTrail.Render( particleShader, computeShader);
+			if(isGameRunning) ship->exhaustTrail.Render( particleShader, computeShader);
 
 		}
 	}
