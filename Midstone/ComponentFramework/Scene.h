@@ -1,5 +1,8 @@
 #ifndef SCENE_H
 #define SCENE_H
+#include "irrKlang.h"
+
+using namespace irrklang;
 
 union SDL_Event;
 class Scene  {
@@ -12,5 +15,6 @@ public:
 	virtual void HandleEvents(const SDL_Event &sdlEvent) = 0;
 	bool switchButton = false; //temp flag to allow scenes to communicate with the manager
 	bool gameOverBool = false; //temp flag so when planet dies then GameOver screen occurs
+	ISoundEngine* SoundEngine = createIrrKlangDevice();
 };
 #endif
