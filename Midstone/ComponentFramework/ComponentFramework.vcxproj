@@ -149,6 +149,7 @@
     <ClCompile Include="Scene2g.cpp" />
     <ClCompile Include="Scene3g.cpp" />
     <ClCompile Include="Scene5g.cpp" />
+    <ClCompile Include="SceneGameOver.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Scene0g.cpp" />
@@ -194,6 +195,7 @@
     <ClInclude Include="Scene2g.h" />
     <ClInclude Include="Scene3g.h" />
     <ClInclude Include="Scene5g.h" />
+    <ClInclude Include="SceneGameOver.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Scene0g.h" />

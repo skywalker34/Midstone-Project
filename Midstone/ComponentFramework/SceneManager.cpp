@@ -10,6 +10,7 @@
 #include "Scene2g.h"
 #include "Scene3g.h"
 #include "Scene5g.h"
+#include "SceneGameOver.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -60,7 +61,7 @@ bool SceneManager::Initialize(std::string name_, int width_, int height_) {
 	/********************************   Default first scene   ***********************/
 
 
-	BuildNewScene(SCENE_NUMBER::SCENE3g); 
+	BuildNewScene(SCENE_NUMBER::SCENEUI2); 
 
 
 	/********************************************************************************/
@@ -108,6 +109,12 @@ void SceneManager::Run() {
 			currentScene->switchButton = false;
 			BuildNewScene(SCENE_NUMBER::SCENEUI2);
 			mainMenu = true;
+		}
+		if (!mainMenu && currentScene->gameOverBool)
+		{
+			currentScene->gameOverBool = false;
+			BuildNewScene(SCENE_NUMBER::SCENEGAMEOVER);
+			mainMenu = false;
 		}
 		
 
@@ -227,6 +234,12 @@ bool SceneManager::BuildNewScene(SCENE_NUMBER scene) {
 
 	case SCENE_NUMBER::SCENE5g:
 		currentScene = new Scene5g();
+		status = currentScene->OnCreate();
+		//if (currentSceneNumber == 2) break;
+
+		break;
+	case SCENE_NUMBER::SCENEGAMEOVER:
+		currentScene = new SceneGameOver(window);
 		status = currentScene->OnCreate();
 		//if (currentSceneNumber == 2) break;
 
