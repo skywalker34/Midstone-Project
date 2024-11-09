@@ -20,6 +20,12 @@ layout(location = 4) out vec3 incident;
 
 
 void main() {
+    
+
+    // Convert light position from view space to world space
+    vec3 lightPosWorld = vec3(inverse(viewMatrix) * vec4(lightPos, 1.0));
+
+
 
     vec3 vertexPosWorldSpace = (modelMatrix * vVertex).xyz; 
     incident = normalize(vertexPosWorldSpace - cameraPos);
@@ -31,7 +37,7 @@ void main() {
     vec3 vertDir = normalize(vertPos);
     eyeDir = -vertDir;
 
-    lightDir = normalize(vec3(lightPos) - vertPos); 
+    lightDir = normalize(vec3(lightPos) - vertexPosWorldSpace); 
     gl_Position = projectionMatrix * viewMatrix * modelMatrix * vVertex;
     
 }

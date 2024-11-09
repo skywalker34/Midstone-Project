@@ -15,6 +15,11 @@ class EnemySpawner
 
 	public:
 		bool canSpawn = false;
+
+		int spawnCount = 0;
+
+		int spawnMax;
+
 		Vec3 position; //might want to make a getter/setter instead
 		EnemySpawner();
 
@@ -25,8 +30,9 @@ class EnemySpawner
 		/// The distance the enemy spawner is from the origin (exact position is calculated randomluy
 		/// <param name="spawnRate_"></param>
 		/// the rate (in seconds) at which the enemy will spawn
-		EnemySpawner(float distance_, int spawnRate_);
+		EnemySpawner(float distance_, int spawnRate_, int spawnMax_);
 
 		void Update(const float deltaTime);
+		void RePosition();
 };
 

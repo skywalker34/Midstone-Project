@@ -11,7 +11,7 @@
 #include "Body.h"
 #include "stb_image.h"
 
-bool LoadTextureFromMemory(const void* data, size_t data_size, GLuint* out_texture, int* out_width, int* out_height)
+static bool LoadTextureFromMemory(const void* data, size_t data_size, GLuint* out_texture, int* out_width, int* out_height)
 {
 	// Load from file
 	int image_width = 0;
@@ -42,15 +42,14 @@ bool LoadTextureFromMemory(const void* data, size_t data_size, GLuint* out_textu
 }
 
 // Open and read a file, then forward to LoadTextureFromMemory()
-bool LoadTextureFromFile(const char* file_name, GLuint* out_texture, int* out_width, int* out_height)
+static bool LoadTextureFromFile(const char* file_name, GLuint* out_texture, int* out_width, int* out_height)
 {
 	FILE* f;
 	errno_t err;
-	if ((err = fopen_s(&f, file_name, "rb")) != 0)
+	if ((err = fopen_s(&f, file_name, "rb")) == 0)
 	{
-	}
-	else
-	{
+		if (f == NULL)
+			return false;
 		fseek(f, 0, SEEK_END);
 		size_t file_size = (size_t)ftell(f);
 		if (file_size == -1)
@@ -62,8 +61,6 @@ bool LoadTextureFromFile(const char* file_name, GLuint* out_texture, int* out_wi
 		IM_FREE(file_data);
 		return ret;
 	}
-	if (f == NULL)
-		return false;
 }
 
 SceneUI2::SceneUI2(Window* window_) : drawInWireMode{ true }, show_demo_window {true} {
@@ -83,10 +80,15 @@ SceneUI2::SceneUI2(Window* window_) : drawInWireMode{ true }, show_demo_window {
 
 SceneUI2::~SceneUI2() {
 	Debug::Info("Deleted Scene2g: ", __FILE__, __LINE__);
+
+
 }
 
 bool SceneUI2::OnCreate() {
 	Debug::Info("Loading assets Scene2g: ", __FILE__, __LINE__);
+
+	SoundEngine->play2D("audio/breakout.mp3", true); // Audio For Main Screen
+
 
 	printf("On Create finished!!!!!");
 	return true;
@@ -101,6 +103,7 @@ void SceneUI2::OnDestroy() {
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
+	SoundEngine->drop(); // Removes Sound from scene
 }
 
 void SceneUI2::HandleEvents(const SDL_Event& sdlEvent) 
@@ -112,7 +115,7 @@ void SceneUI2::Update(const float deltaTime)
 {
 }
 
-void SceneUI2::Render() const 
+void SceneUI2::Render() 
 {
 	/// Set the background color then clear the screen
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -121,32 +124,36 @@ void SceneUI2::Render() const
 	// IMGUI STUFF
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame();
+
+	//This is the font stuff if you can find a working one then yeah. But otherwise im gonna keep it default for now.
+	//ImGuiIO& io = ImGui::GetIO();
+	//ImFontConfig config;
+	//config.OversampleH = 2;
+	//io.Fonts->AddFontDefault();
+	//ImFont* font_title = io.Fonts->AddFontFromFileTTF("./fonts/Comic Sans MS.ttf", 23.0f, &config);
+	//IM_ASSERT(font_title != NULL);
+	//io.Fonts->Build();
+
 	ImGui::NewFrame();
 
-	// Get window size and position
-	ImVec2 window_pos = ImGui::GetWindowPos();
-	ImVec2 window_size = ImGui::GetWindowSize();
 	int my_image_width = 0;
 	int my_image_height = 0;
 	GLuint my_image_texture = 0;
 	bool ret = LoadTextureFromFile("./textures/StartPhoto.jpg", &my_image_texture, &my_image_width, &my_image_height);
-	//IM_ASSERT(ret);
+	IM_ASSERT(ret);
 	ImDrawList* drawList = ImGui::GetBackgroundDrawList();
 	ImVec2 image_pos = ImVec2(0, 0); // Set image position
 	drawList->AddImage((ImTextureID)(intptr_t)my_image_texture, image_pos, ImVec2(my_image_width / 1.5, my_image_height / 1.5));
-	
-	ImGui::Begin("A START BUTTON MAYBE?");
-	static int clicked = 0;
-	if (ImGui::Button("START?"))
-		clicked++;
-	if (clicked & 1)
-	{
-		ImGui::SameLine();
-		ImGui::Text("Thanks for clicking me!");
-	}
+
+	bool p_open = false;
+	ImGui::Begin("A START BUTTON MAYBE?", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+	//ImGui::PushFont(font_title);
+	if (ImGui::Button("START GAME", ImVec2(300, 90)))
+		switchButton = true;
+	//ImGui::PopFont();
 	ImGui::End();
 
-	ImGui::ShowDemoWindow();
+	//ImGui::ShowDemoWindow();
 	ImGui::Render(); // Calling This before CurrentScene render wont work
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 

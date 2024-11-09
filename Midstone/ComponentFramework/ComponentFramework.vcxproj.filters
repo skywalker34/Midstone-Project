@@ -153,6 +153,11 @@
     <ClCompile Include="SceneUI2.cpp">
       <Filter>Source Files\Scenes</Filter>
     </ClCompile>
+    <ClCompile Include="ExhaustTrail.cpp">
+      <Filter>Source Files</Filter>
+    <ClCompile Include="SceneGameOver.cpp">
+      <Filter>Source Files\Scenes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Debug.h">
@@ -290,6 +295,11 @@
     <ClInclude Include="SceneUI2.h">
       <Filter>Header Files\Scenes</Filter>
     </ClInclude>
+    <ClInclude Include="ExhaustTrail.h">
+      <Filter>Header Files</Filter>
+    <ClInclude Include="SceneGameOver.h">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="GameEngineLog.txt">
@@ -340,6 +350,12 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="shaders\friendlyShipVert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\clickGridFrag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\clickGridVert.glsl">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

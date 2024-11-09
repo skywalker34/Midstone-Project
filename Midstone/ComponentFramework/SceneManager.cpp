@@ -10,6 +10,7 @@
 #include "Scene2g.h"
 #include "Scene3g.h"
 #include "Scene5g.h"
+#include "SceneGameOver.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -88,13 +89,31 @@ void SceneManager::Run() {
 		timer->UpdateFrameTicks();
 		currentScene->Update(timer->GetDeltaTime());
 		currentScene->Render();
-		
-		if (!mainMenu) {
-			SDL_GL_SwapWindow(window->getWindow());
-		}
-		else if(currentScene->switchButton) {
+		SDL_GL_SwapWindow(window->getWindow());
+		//if (!mainMenu) {
+		//	SDL_GL_SwapWindow(window->getWindow());
+		//}
+		//else if(currentScene->switchButton) {
+		//	currentScene->switchButton = false;
+		//	BuildNewScene(SCENE_NUMBER::SCENE3g);
+		//	mainMenu = false;
+		//}
+		if (mainMenu && currentScene->switchButton)
+		{
 			currentScene->switchButton = false;
 			BuildNewScene(SCENE_NUMBER::SCENE3g);
+			mainMenu = false;
+		}
+		if (!mainMenu && currentScene->switchButton)
+		{
+			currentScene->switchButton = false;
+			BuildNewScene(SCENE_NUMBER::SCENEUI2);
+			mainMenu = true;
+		}
+		if (!mainMenu && currentScene->gameOverBool)
+		{
+			currentScene->gameOverBool = false;
+			BuildNewScene(SCENE_NUMBER::SCENEGAMEOVER);
 			mainMenu = false;
 		}
 		
@@ -122,7 +141,7 @@ void SceneManager::HandleEvents() {
 			switch (sdlEvent.key.keysym.scancode) {
 			[[fallthrough]]; /// C17 Prevents switch/case fallthrough warnings
 			case SDL_SCANCODE_ESCAPE:
-			case SDL_SCANCODE_Q:
+			case SDL_SCANCODE_Z:
 				isRunning = false;
 				return;
 				
@@ -193,7 +212,7 @@ bool SceneManager::BuildNewScene(SCENE_NUMBER scene) {
 		break;
 
 	case SCENE_NUMBER::SCENE3g:
-		currentScene = new Scene3g();
+		currentScene = new Scene3g(window);
 		status = currentScene->OnCreate();
 		//if (currentSceneNumber == 2) break;
 		break;
@@ -207,6 +226,7 @@ bool SceneManager::BuildNewScene(SCENE_NUMBER scene) {
 		break;
 	case SCENE_NUMBER::SCENEUI2:
 		currentScene = new SceneUI2(window);
+		mainMenu = true;
 		status = currentScene->OnCreate();
 		//if (currentSceneNumber == 2) break;
 
@@ -214,6 +234,12 @@ bool SceneManager::BuildNewScene(SCENE_NUMBER scene) {
 
 	case SCENE_NUMBER::SCENE5g:
 		currentScene = new Scene5g();
+		status = currentScene->OnCreate();
+		//if (currentSceneNumber == 2) break;
+
+		break;
+	case SCENE_NUMBER::SCENEGAMEOVER:
+		currentScene = new SceneGameOver(window);
 		status = currentScene->OnCreate();
 		//if (currentSceneNumber == 2) break;
 

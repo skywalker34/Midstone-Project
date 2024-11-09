@@ -1,5 +1,6 @@
 #include <glew.h>
 #include <iostream>
+#include <fstream>
 #include <SDL.h>
 #include "Scene3g.h"
 #include <MMath.h>
@@ -11,11 +12,24 @@
 #include "Body.h"
 #include "Model.h"
 
+#include "ComputeShader.h"
+
 #include <chrono>
 
-Scene3g::Scene3g() : shader{ nullptr }, 
-drawInWireMode{ true } {
+Scene3g::Scene3g(Window* window_) : shader{ nullptr }, 
+drawInWireMode{ false } {
 	Debug::Info("Created Scene0: ", __FILE__, __LINE__);
+	window = window_;
+
+	// ImGUI stuff for initialize from Scotties Vid.
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	//Setup Dear ImGui Style
+	ImGui::StyleColorsDark();
+	// Setup Platform/Renderer backends
+	ImGui_ImplSDL2_InitForOpenGL(window->getWindow(), window->getContext());
+	ImGui_ImplOpenGL3_Init("#version 450");
 }
 
 Scene3g::~Scene3g() {
@@ -25,11 +39,42 @@ Scene3g::~Scene3g() {
 bool Scene3g::OnCreate() {
 	Debug::Info("Loading assets Scene0: ", __FILE__, __LINE__);
 
+
+	
+
+
+	computeShader = new ComputeShader("shaders/computer.glsl");	//create the compute shader
+	if (computeShader->OnCreate() == false) {
+		std::cout << "Shader failed ... we have a problem\n";
+	}
+
+	loadVertsToBuffer = new Shader("shaders/loadVerticiesVert.glsl", "shaders/loadVerticiesFrag.glsl");
+	if (loadVertsToBuffer->OnCreate() == false) {
+		std::cout << "Shader failed ... we have a problem\n";
+	}
+
+	particleShader = new Shader("shaders/particleVert.glsl", "shaders/particleFrag.glsl");
+	if (particleShader->OnCreate() == false) {
+		std::cout << "Shader failed ... we have a problem\n";
+	}
+
+	particleMesh = new Mesh("meshes/Mario.obj");
+	particleMesh->OnCreate();
+
+	SoundEngine->play2D("audio/BackGroundMusic.mp3", true); // Audio For Game 
+	SoundEngine->setSoundVolume(0.3f);
+
+
 	createModels();
 	createActors();
 	createShaders();
 	createClickGrid();
 
+	testMesh = new Mesh("meshes/Sphere.obj");
+	testMesh->OnCreate();
+
+	
+	enemyFleetSpawners.push_back(EnemySpawner(200.0f, 5, 5));
 	printf("On Create finished!!!!!");
 	return true;
 
@@ -75,6 +120,20 @@ void Scene3g::OnDestroy() {
 	planet.OnDestroy();
 
 
+	computeShader->OnDestroy();
+	delete computeShader;
+
+	loadVertsToBuffer->OnDestroy();
+	delete loadVertsToBuffer;
+
+
+	// Cleanup
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+	ImGui::DestroyContext();
+
+
+	SoundEngine->drop(); // Removes Sound from scene
 }
 
 void Scene3g::HandleEvents(const SDL_Event& sdlEvent) {
@@ -84,7 +143,7 @@ void Scene3g::HandleEvents(const SDL_Event& sdlEvent) {
 	//basically whats happening here is that the player controller has a boolean flag thats basically saying "I have something to tell you scenemanager"
 	//the scene knows to check for this flag and to recieve the message so the playercontroller does not need to have a reference to the scene
 	//its basically just throwing out this variable and hoping something is listening
-	
+	ImGui_ImplSDL2_ProcessEvent(&sdlEvent); // ImGui HandleEvents
 
 	switch (sdlEvent.type) {
 	case SDL_KEYDOWN:
@@ -145,25 +204,49 @@ void Scene3g::HandleEvents(const SDL_Event& sdlEvent) {
 
 void Scene3g::Update(const float deltaTime) {
 
-	if (!isGameRunning) return;
 	
-	timeElapsed += deltaTime;
+	playerController.Update(deltaTime);
+
+
+	if (!isGameRunning) return;
+
 
 	planet.Update(deltaTime);
-	playerController.Update(deltaTime);
+	
+
+	timeElapsed += deltaTime;
+
 
 	SpawnEnemy(deltaTime);
 	SetActiveShip();
 	UpdatePlayerFleet(deltaTime);
 	UpdateEnemyFleet(deltaTime);
 
-	
+	planet.Update(deltaTime);
+	if (planet.GetHealth() < 0) {
+		//temp for now
+		GameOver();
+	}
 
-	std::cout << std::endl << "Score: " << score << std::endl;
-	std::cout << "Time Elapsed " << timeElapsed << std::endl;
+	testModelMat = MMath::translate(playerController.hoverPos) * MMath::scale(1, 1, 1);
+
+	static float spawnTimer = 0.0f; // Timer for spawning
+	spawnTimer += deltaTime;
+
+	if (spawnTimer >= 60.0f) { //spawn an enemySpawner every minute
+		enemyFleetSpawners.push_back(EnemySpawner(200.0f, 5, 5));
+		enemySpawnerCount++;
+		std::cout << "Enemy Spawners: " << enemySpawnerCount << std::endl;
+		spawnTimer = 0.0f; // Reset the spawn timer
+	}
+
+	//testModelMat = MMath::translate(Vec3(0, 0, 70)) * MMath::scale(5, 5, 5);
+
+	//std::cout << std::endl << "Score: " << score << std::endl;
+	//std::cout << "Time Elapsed " << timeElapsed << std::endl;
 }
 
-void Scene3g::Render() const {
+void Scene3g::Render() {
 	/// Set the background color then clear the screen
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -180,10 +263,7 @@ void Scene3g::Render() const {
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-
-
-
-
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //temporary line
 
 
 	for (FriendlyShip* ship : playerFleet) {
@@ -208,6 +288,11 @@ void Scene3g::Render() const {
 		glUniform3fv(bulletShader->GetUniformID("cameraPos"), 1, playerController.camera.transform.getPos());
 		ship->RenderBullets(bulletShader);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //temporary line
+
+
+		if (ship->isMoving && isGameRunning) {
+			ship->exhaustTrail.Render(particleShader, computeShader);
+		}
 	}
 
 
@@ -226,14 +311,17 @@ void Scene3g::Render() const {
 			glUniform4fv(friendlyShipShader->GetUniformID("tertiaryColour"), 1, RED);
 			ship->Render(friendlyShipShader);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //temporary line
+
+
+			
+			
+			if(isGameRunning) ship->exhaustTrail.Render( particleShader, computeShader);
+
 		}
 	}
 
 
-	glUseProgram(shader->GetProgram());
-	glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
-	glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-	playerController.Render(shader);
+
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //temporary line
 	glUseProgram(planetShader->GetProgram());
@@ -243,28 +331,89 @@ void Scene3g::Render() const {
 	glUniform3fv(planetShader->GetUniformID("cameraPos"), 1, playerController.camera.transform.getPos());
 	planet.Render(planetShader);
 
+	if (isGivingOrders) {
 
+		glUseProgram(shader->GetProgram());
+		glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+		glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, testModelMat);
+		glUniform4fv(shader->GetUniformID("meshColor"), 1, ORANGE);
+		testMesh->Render(GL_TRIANGLES);
+
+
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //temporary line
+		glUseProgram(gridShader->GetProgram());
+		glUniformMatrix4fv(gridShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+		glUniformMatrix4fv(gridShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+		playerController.Render(gridShader);
+	}
+  
+  
+	// IMGUI STUFF
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
+
+	//This is the font stuff if you can find a working one then yeah. But otherwise im gonna keep it default for now.
+	//ImGuiIO& io = ImGui::GetIO();
+	//ImFontConfig config;
+	//config.OversampleH = 2;
+	//io.Fonts->AddFontDefault();
+	//ImFont* textFont = io.Fonts->AddFontFromFileTTF("./fonts/Comic Sans MS.ttf", 23.0f, &config);
+	//IM_ASSERT(textFont != NULL);
+	//io.Fonts->Build();
+
+	ImGui::NewFrame();
+
+	bool p_open = false;
+	ImGui::Begin("Timer and Score", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+	//ImGui::PushFont(textFont);
+	ImGui::Text("Time = %f", timeElapsed);
+	ImGui::Text("Score = %i", score);
+	ImGui::Text("Planet Health: = %i", planet.GetHealth());
+	//ImGui::PopFont();
+	ImGui::End();
+
+	ImGui::Begin("QuitButton", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+	if(ImGui::Button("Quit to Title", ImVec2(150,30)))
+		switchButton = true;
+	ImGui::End();
+
+	//ImGui::ShowDemoWindow();
+	ImGui::Render(); // Calling This before CurrentScene render wont work
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+  
 
 	glUseProgram(0);
 }
 
 void Scene3g::SpawnEnemy(const float deltaTime)
 {
-	enemySpawnPoint.Update(deltaTime);
-	if (enemySpawnPoint.canSpawn == true) {
-		enemyIndex++;
-		enemyFleet.push_back(new EnemyShip(enemySpawnPoint.position, &enemyShipModel));
-		enemyFleet.back()->OnCreate();
-		enemyFleet.back()->setIndex(enemyIndex);
-		enemySpawnPoint.canSpawn = false;
+	for (int i = 0; i < enemySpawnerCount; i++) {
+
+		enemyFleetSpawners[i].Update(deltaTime);
+		if (enemyFleetSpawners[i].canSpawn == true) {
+			enemyIndex++;
+			enemyFleet.push_back(new EnemyShip(enemyFleetSpawners[i].position, &enemyShipModel));
+			enemyFleet.back()->OnCreate();
+			enemyFleet.back()->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
+			enemyFleet.back()->setIndex(enemyIndex);
+			enemyFleetSpawners[i].canSpawn = false;
+
+		}
 	}
+
+	
 }
 
 void Scene3g::SetActiveShip()
 {
 	if (playerController.has3DClick) {
-		shipWaypoint = playerController.getClickPos();
-		playerFleet[activeShip]->moveToDestination(shipWaypoint);
+		if (activeShip >= 0) {
+			shipWaypoint = playerController.getClickPos();
+			playerFleet[activeShip]->moveToDestination(shipWaypoint);
+			isGivingOrders = false;
+			activeShip = -1;
+		}
 	}
 
 	if (playerController.hasDQLine) {
@@ -275,6 +424,7 @@ void Scene3g::SetActiveShip()
 			if (COLLISION::LineSphereCollisionDetected(playerFleet[i]->collisionSphere, line))
 			{
 				activeShip = i;
+				isGivingOrders = true;
 			}
 		}
 	}
@@ -310,7 +460,10 @@ void Scene3g::UpdatePlayerFleet(const float deltaTime)
 		ship->displayRange = false;
 	}
 
-	playerFleet[activeShip]->displayRange = true;
+	if (activeShip >= 0) {
+		isGivingOrders = true;
+		playerFleet[activeShip]->displayRange = true;
+	}
 }
 
 void Scene3g::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip, const float deltaTime)
@@ -339,17 +492,70 @@ void Scene3g::UpdateEnemyFleet(const float deltaTime)
 {
 	for (int i = 0; i < enemyFleet.size(); i++) {
 		enemyFleet[i]->Update(deltaTime);
+		
 		if (enemyFleet[i]->deleteMe) {
-			enemyFleet[i]->OnDestroy();
-			delete enemyFleet[i];
-			enemyFleet[i] = nullptr;
-			enemyFleet.erase(std::remove(enemyFleet.begin(), enemyFleet.end(), nullptr), enemyFleet.end());
+			DestroyEnenmy(i);
 		}
 		else {
 			enemyFleet[i]->Update(deltaTime);
+
+			if (COLLISION::SphereSphereCollisionDetected(enemyFleet[i]->collisionSphere, planet.collisionSphere)) {
+				planet.takeDamage(1);
+
+				DestroyEnenmy(i);
+			}
+
+
 		}
 	}
 }
+
+
+
+void Scene3g::DestroyEnenmy(int index)
+{
+	score++;
+	enemyFleet[index]->OnDestroy();
+	delete enemyFleet[index];
+	enemyFleet[index] = nullptr;
+	enemyFleet.erase(std::remove(enemyFleet.begin(), enemyFleet.end(), nullptr), enemyFleet.end());
+}
+
+void Scene3g::GameOver()
+{
+	//END GAME LOGIC HERE PLEASE
+	std::cout << "\033[32m" << "GAMEOVER!" << "\033[0m" << std::endl;
+	SaveStats();
+	gameOverBool = true;
+}
+
+
+void Scene3g::SaveStats() {
+
+
+	// Open a file in write mode
+	std::ofstream outFile("Leaderboard.txt");
+
+	// Check if the file is open
+	if (outFile.is_open()) {
+		// Write the data to the file
+		outFile << "Score: " << score << "\n";
+		outFile << "Time: " << timeElapsed << "\n";
+		outFile <<  "-" << "\n";
+
+		// Close the file
+		outFile.close();
+
+		std::cout << "Data written to file successfully." << std::endl;
+	}
+	else {
+		std::cerr << "Unable to open file for writing." << std::endl;
+	}
+
+}
+
+
+
 
 void Scene3g::createModels()
 {
@@ -375,7 +581,7 @@ void Scene3g::createModels()
 	}
 
 
-	planeModel = Model("Plane.obj");
+	planeModel = Model("Plane.obj", std::vector<std::string>{"Grid.png"});
 	if (planeModel.OnCreate() == false) {
 		printf("Model failed to load");
 	}
@@ -395,6 +601,7 @@ void Scene3g::createActors()
 	}
 	for (EnemyShip* ship : enemyFleet) {
 		ship->OnCreate();
+		ship->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
 		ship->setIndex(enemyIndex);
 		enemyIndex++;
 	}
@@ -418,6 +625,7 @@ void Scene3g::createActors()
 		playerFleet[i]->transform.setPos(Vec3(x, 0.0f, z));
 		playerFleet[i]->OnCreate();
 		playerFleet[i]->closestEnemy = enemyFleet.back();	// Set initail target
+		playerFleet[i]->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
 	}
 
 	planet = Planet(30.0f, 5, &sphereModel, ORIGIN);
@@ -443,6 +651,12 @@ void Scene3g::createShaders()
 
 	friendlyShipShader = new Shader("shaders/friendlyShipVert.glsl", "shaders/friendlyShipFrag.glsl");
 	if (friendlyShipShader->OnCreate() == false)
+	{
+		std::cout << "Shader failed ... we have a problem\n";
+	}
+
+	gridShader = new Shader("shaders/clickGridVert.glsl", "shaders/clickGridFrag.glsl");
+	if (gridShader->OnCreate() == false) 
 	{
 		std::cout << "Shader failed ... we have a problem\n";
 	}

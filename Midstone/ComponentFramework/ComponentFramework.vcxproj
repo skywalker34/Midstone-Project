@@ -70,7 +70,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\GameDev\OpenGL\include;C:\GameDev\SDL\include;C:\GameDev\MathLibrary\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\GameDev\OpenGL\include;C:\GameDev\SDL\include;C:\GameDev\MathLibrary\include;C:\GameDev\IrrKlang\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -81,8 +81,8 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>C:\GameDev\OpenGL\lib;C:\GameDev\SDL\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2main.lib;glew32.lib;glew32s.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\GameDev\OpenGL\lib;C:\GameDev\SDL\lib;C:\GameDev\IrrKlang\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2main.lib;glew32.lib;glew32s.lib;opengl32.lib;irrKlang.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -132,6 +132,7 @@
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="EnemyShip.cpp" />
     <ClCompile Include="EnemySpawner.cpp" />
+    <ClCompile Include="ExhaustTrail.cpp" />
     <ClCompile Include="FriendlyShip.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="imgui_demo.cpp" />
@@ -149,6 +150,7 @@
     <ClCompile Include="Scene2g.cpp" />
     <ClCompile Include="Scene3g.cpp" />
     <ClCompile Include="Scene5g.cpp" />
+    <ClCompile Include="SceneGameOver.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Scene0g.cpp" />
@@ -175,6 +177,7 @@
     <ClInclude Include="Debug.h" />
     <ClInclude Include="EnemyShip.h" />
     <ClInclude Include="EnemySpawner.h" />
+    <ClInclude Include="ExhaustTrail.h" />
     <ClInclude Include="FriendlyShip.h" />
     <ClInclude Include="imconfig.h" />
     <ClInclude Include="imgui.h" />
@@ -194,6 +197,7 @@
     <ClInclude Include="Scene2g.h" />
     <ClInclude Include="Scene3g.h" />
     <ClInclude Include="Scene5g.h" />
+    <ClInclude Include="SceneGameOver.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Scene0g.h" />
@@ -217,6 +221,8 @@
   <ItemGroup>
     <None Include="shaders\bulletFrag.glsl" />
     <None Include="shaders\bulletVert.glsl" />
+    <None Include="shaders\clickGridFrag.glsl" />
+    <None Include="shaders\clickGridVert.glsl" />
     <None Include="shaders\computer.glsl" />
     <None Include="shaders\defaultFrag.glsl" />
     <None Include="shaders\defaultVert.glsl" />

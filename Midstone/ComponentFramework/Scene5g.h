@@ -38,6 +38,7 @@ private:
 	float prevFrameTime = 0.0f; //time of the previous frame
 	float frameDelta = 0.0f; //time between frames
 
+	Vec3 shipPos = Vec3(0, 0, 0);
 
 	Camera camera;
 
@@ -57,7 +58,7 @@ public:
 	virtual bool OnCreate() override;
 	virtual void OnDestroy() override;
 	virtual void Update(const float deltaTime) override;
-	virtual void Render() const override;
+	virtual void Render() override;
 	virtual void HandleEvents(const SDL_Event& sdlEvent) override;
 };
 

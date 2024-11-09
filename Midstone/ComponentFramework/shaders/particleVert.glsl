@@ -23,11 +23,21 @@ out vec4 color;
 
 
 void main() {
-    vec3 position = (modelMatrix * vVertex).xyz;
+//    vec3 position = (modelMatrix * vVertex).xyz;
+//
+//    //color = vec4(buf.data[gl_VertexID], 0.0);
+//
+//    position += buf.data[gl_VertexID];
 
-    //color = vec4(buf.data[gl_VertexID], 0.0);
+    vec4 localPos =   vec4(buf.data[gl_VertexID], 1.0);
 
-    position += buf.data[gl_VertexID];
+    vec4 nearColor = vec4(1,1,1,1);
+    vec4 farColor = vec4(1.0f, 0.6f, 0.0f, 1.0f);
+
+    color = mix(nearColor, farColor, length(localPos) / 2.4);
+
+    vec3 position = (modelMatrix * localPos).xyz;
+
 
     gl_Position = projectionMatrix * viewMatrix * vec4(position, 1.0);
     
