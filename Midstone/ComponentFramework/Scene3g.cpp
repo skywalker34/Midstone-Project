@@ -323,6 +323,15 @@ void Scene3g::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip, const
 			ship->transform.setOrientation(targetQuad);
 			ship->initialDirection = targetDirection;
 		}
+		if (ship->isSwitchingTarget) {
+			ship->slerpT = ship->slerpT + deltaTime;
+			if (ship->slerpT >= 1) {
+				ship->closestEnemy = ship->potentialTarget;
+				ship->currentTargetIndex = ship->closestEnemy->shipIndex;
+				ship->isSwitchingTarget = false;
+				ship->slerpT = 0;
+			}
+		}
 	}
 }
 
@@ -393,7 +402,6 @@ void Scene3g::createActors()
 	for (int i = 0; i < startingFleetSize; i++) {
 		playerFleet.push_back(new FriendlyShip(&friendlyShipModel, &bulletModel));
 	}
-
 
 	//spawn the ships in a radius around the planet
 

@@ -40,6 +40,7 @@ class FriendlyShip :
 		Vec3 movingDirection;
 		Vec3 initialDirection = FORWARD;
 		EnemyShip* closestEnemy;
+		EnemyShip* potentialTarget;
 
 		Vec4 color = BLUE;
 		bool isMoving = false;
@@ -55,6 +56,10 @@ class FriendlyShip :
 		float range = 50.0f;
 		int currentTargetIndex = 0;
 		bool wouldIntersectPlanet = false;
+		bool isSwitchingTarget = false;
+
+		float currentTargetDistance;
+		float potentialTargetDistance;
 
 		Sphere detectionSphere;
 
