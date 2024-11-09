@@ -471,18 +471,20 @@ void Scene3g::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip, const
 	if (!ship->isMoving) {
 		ship->FindClosestEnemy(targetShip);
 		if (ship->currentTargetIndex == targetShip->shipIndex) {
-			Quaternion targetQuad = QMath::lookAt(ship->closestEnemyPosition, UP);
+			Vec3 targetDirection = targetShip->transform.getPos() - ship->transform.getPos();
+			Quaternion targetQuad = QMath::lookAt(targetDirection, UP);
 			ship->transform.setOrientation(targetQuad);
+			ship->initialDirection = targetDirection;
 		}
-		else {
-			ship->slerpT = ship->slerpT >= 1 ? 0 : ship->slerpT + deltaTime;
-			ship->rotateTowardTarget(ship->closestEnemyPosition);
-			ship->canFire = false;
+		if (ship->isSwitchingTarget) {
+			ship->slerpT = ship->slerpT + deltaTime;
 			if (ship->slerpT >= 1) {
-				ship->currentTargetIndex = targetShip->shipIndex;
+				ship->closestEnemy = ship->potentialTarget;
+				ship->currentTargetIndex = ship->closestEnemy->shipIndex;
+				ship->isSwitchingTarget = false;
+				ship->slerpT = 0;
 			}
 		}
-
 	}
 }
 
@@ -506,19 +508,6 @@ void Scene3g::UpdateEnemyFleet(const float deltaTime)
 
 		}
 	}
-
-	/*for (EnemyShip* enemy : enemyFleet) {
-		enemy->Update(deltaTime);
-		if (enemy->deleteMe) {
-			enemy->OnDestroy();
-			delete enemy;
-			enemy = nullptr;
-			enemyFleet.erase(std::remove(enemyFleet.begin(), enemyFleet.end(), nullptr), enemyFleet.end());
-		}
-		else {
-			enemy->Update(deltaTime);
-		}
-	}*/
 }
 
 
@@ -614,12 +603,12 @@ void Scene3g::createActors()
 		ship->OnCreate();
 		ship->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
 		ship->setIndex(enemyIndex);
+		enemyIndex++;
 	}
 
 	for (int i = 0; i < startingFleetSize; i++) {
 		playerFleet.push_back(new FriendlyShip(&friendlyShipModel, &bulletModel));
 	}
-
 
 	//spawn the ships in a radius around the planet
 
@@ -635,8 +624,7 @@ void Scene3g::createActors()
 
 		playerFleet[i]->transform.setPos(Vec3(x, 0.0f, z));
 		playerFleet[i]->OnCreate();
-		playerFleet[i]->closestEnemyPosition = enemyFleet.back()->transform.getPos();	// Set initail target
-
+		playerFleet[i]->closestEnemy = enemyFleet.back();	// Set initail target
 		playerFleet[i]->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
 	}
 

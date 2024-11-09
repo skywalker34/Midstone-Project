@@ -139,10 +139,15 @@ void FriendlyShip::RenderBullets(Shader* shader) const
 
 void FriendlyShip::FindClosestEnemy(EnemyShip* enemy)
 {	
-	float currentTargetDistance = VMath::mag(transform.getPos() - closestEnemyPosition);
-	float potentialTargetDistance = VMath::mag(transform.getPos() - enemy->transform.getPos());
+	if (!isSwitchingTarget) {
+		currentTargetDistance = VMath::mag(transform.getPos() - closestEnemy->transform.getPos());
+		potentialTargetDistance = VMath::mag(transform.getPos() - enemy->transform.getPos());
+		potentialTarget = enemy;
+	}
+	
 	if (potentialTargetDistance < currentTargetDistance) {
-		closestEnemyPosition = enemy->transform.getPos();
+		isSwitchingTarget = true;
+		rotateTowardTarget(potentialTarget->transform.getPos());
 	}
 }
 
