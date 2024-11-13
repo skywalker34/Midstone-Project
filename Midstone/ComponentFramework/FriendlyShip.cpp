@@ -88,12 +88,12 @@ void FriendlyShip::Update(const float deltaTime)
 	if (hasReachDestination()) {
 		isMoving = false;
 
-		/*bool HappenOnce = true;
+		bool HappenOnce = true;
 		if (HappenOnce == true && isMoving == false)
 		{
-			SoundEngineFlying->drop();
+			SoundEngineFlying->stopAllSounds();
 			HappenOnce = false;
-		}*/
+		}
 	}
 
 	if (isMoving) {
@@ -211,8 +211,9 @@ void FriendlyShip::moveToDestination(Vec3 destination_)
 	slerpT = 0;
 
 	
-	/*irrklang::vec3df BodyPosition(body->pos.x, body->pos.y, body->pos.z);  
-	SoundEngineFlying->play3D("audio/RocketFlying.mp3", BodyPosition, true);*/  // Broken Atm causes crash?
+	irrklang::vec3df BodyPosition(body->pos.x, body->pos.y, body->pos.z);  
+	SoundEngineFlying->setSoundVolume(0.3f);
+	SoundEngineFlying->play3D("audio/RocketFlying.mp3", BodyPosition, true); // Broken Atm causes crash?
 	
 
 	if (wouldIntersectPlanet) {
