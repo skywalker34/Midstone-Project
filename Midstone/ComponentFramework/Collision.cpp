@@ -43,6 +43,13 @@ bool COLLISION::LineSphereCollisionDetected(const Sphere* body, const DualQuat l
 	return false;
 }
 
+bool COLLISION::SpherePointCollisionDetected(const Sphere* body, const Vec3 pos)
+{
+	float distance = VMath::mag(body->center - pos);
+	if (distance < body->r) return true;
+	return false;
+}
+
 
 
 //void COLLISION::SphereSphereCollisionResponse(Sphere* body1, Sphere* body2) {

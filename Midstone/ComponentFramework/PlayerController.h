@@ -25,6 +25,7 @@ class PlayerController
 		Vec3 clickPos;
 
 		Vec3 forwardVector;
+		Vec3 mouseHoverPos;
 
 		
 		float planeDepth = 1;
@@ -49,6 +50,7 @@ class PlayerController
 		void CreateGrid(Model* model_);
 		Vec3 getClickPos();//returns the position of a 3d click
 		Vec3 get3DClickCoords(float sdl_X, float sdl_Y);
+		void calculateLine();
 		DualQuat getLine() { hasDQLine = false;  return line2; };
 
 		void updateModelMatrixToFaceCamera(Transform& transform);

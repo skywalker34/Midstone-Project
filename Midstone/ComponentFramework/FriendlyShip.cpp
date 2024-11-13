@@ -143,7 +143,7 @@ void FriendlyShip::FindClosestEnemy(EnemyShip* enemy)
 		currentTargetDistance = VMath::mag(transform.getPos() - closestEnemy->transform.getPos());
 		potentialTargetDistance = VMath::mag(transform.getPos() - enemy->transform.getPos());
 		potentialTarget = enemy;
-		potentialTarget->transform.getPos().print("potential target");
+		//potentialTarget->transform.getPos().print("potential target");
 	}
 	
 	if (potentialTargetDistance < currentTargetDistance) {

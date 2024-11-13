@@ -34,6 +34,7 @@ private:
 	Shader* planetShader;
 	Shader* friendlyShipShader;
 	Shader* gridShader;
+	Shader* selectionShader;
 
 	ComputeShader* computeShader = nullptr;
 	Shader* loadVertsToBuffer = nullptr;
@@ -50,7 +51,7 @@ private:
 	Mesh* testMesh; //DELETE LATER
 	Matrix4 testModelMat;
 	
-
+	Actor selectionSphere;
 	
 	
 
@@ -70,7 +71,7 @@ private:
 	int enemySpawnerCount = 1;
 
 	int activeShip = -1;
-	int startingFleetSize = 8;
+	int startingFleetSize = 2;
 	int enemyIndex = 0;
 	
 	float timeElapsed;
@@ -81,6 +82,7 @@ private:
 	bool drawInWireMode;
 	bool isGameRunning = true;
 	bool isGivingOrders = false;
+	bool isMouseOverFriendlyShip = false;
 
 	Window* window;
 

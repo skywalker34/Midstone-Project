@@ -62,7 +62,7 @@ bool Scene3g::OnCreate() {
 	particleMesh->OnCreate();
 
 	SoundEngine->play2D("audio/BackGroundMusic.mp3", true); // Audio For Game 
-	SoundEngine->setSoundVolume(0.3f);
+	SoundEngine->setSoundVolume(0.0f);
 
 
 	createModels();
@@ -229,6 +229,23 @@ void Scene3g::Update(const float deltaTime) {
 
 	testModelMat = MMath::translate(playerController.hoverPos) * MMath::scale(1, 1, 1);
 
+	
+	playerController.calculateLine();
+	for (FriendlyShip* ship : playerFleet) {
+		if (COLLISION::LineSphereCollisionDetected(ship->collisionSphere, playerController.getLine())) {
+			//selectionSphere.transform = ship->transform;
+	
+			;
+			selectionSphere.transform.setParent(ship->transform.toModelMatrix());
+			isMouseOverFriendlyShip = true;
+			break;
+		}
+		else {
+			isMouseOverFriendlyShip = false;
+		}
+
+	}
+
 	static float spawnTimer = 0.0f; // Timer for spawning
 	spawnTimer += deltaTime;
 
@@ -252,21 +269,21 @@ void Scene3g::Render() {
 
 	playerController.camera.RenderSkyBox();
 
-	if (drawInWireMode) {
+	/*if (drawInWireMode) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 	else {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
+	}*/
 
-
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //temporary line
+	
 
 
 	for (FriendlyShip* ship : playerFleet) {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //temporary line
+		
 		//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
 		glUseProgram(friendlyShipShader->GetProgram());
 		glUniformMatrix4fv(friendlyShipShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
@@ -280,13 +297,13 @@ void Scene3g::Render() {
 
 
 
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //temporary line
+		
 		glUseProgram(bulletShader->GetProgram());
 		glUniformMatrix4fv(bulletShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 		glUniformMatrix4fv(bulletShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
 		glUniform3fv(bulletShader->GetUniformID("cameraPos"), 1, playerController.camera.transform.getPos());
 		ship->RenderBullets(bulletShader);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //temporary line
+		
 
 
 		if (ship->isMoving && isGameRunning) {
@@ -309,7 +326,7 @@ void Scene3g::Render() {
 			glUniform4fv(friendlyShipShader->GetUniformID("secondaryColour"), 1, GREY);
 			glUniform4fv(friendlyShipShader->GetUniformID("tertiaryColour"), 1, RED);
 			ship->Render(friendlyShipShader);
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //temporary line
+			
 
 
 
@@ -322,7 +339,7 @@ void Scene3g::Render() {
 
 
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //temporary line
+	
 	glUseProgram(planetShader->GetProgram());
 	glUniformMatrix4fv(planetShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 	glUniformMatrix4fv(planetShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
@@ -340,14 +357,24 @@ void Scene3g::Render() {
 		testMesh->Render(GL_TRIANGLES);
 
 
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //temporary line
+	
 		glUseProgram(gridShader->GetProgram());
 		glUniformMatrix4fv(gridShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 		glUniformMatrix4fv(gridShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
 		playerController.Render(gridShader);
 	}
   
-  
+	if (isMouseOverFriendlyShip) {
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glUseProgram(selectionShader->GetProgram());
+		glUniformMatrix4fv(selectionShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+		glUniformMatrix4fv(selectionShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+		glUniform3fv(selectionShader->GetUniformID("cameraPos"), 1, playerController.camera.transform.getPos());
+		selectionSphere.Render(selectionShader);
+		glDisable(GL_BLEND);
+	}
+
 	// IMGUI STUFF
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame();
@@ -463,6 +490,7 @@ void Scene3g::UpdatePlayerFleet(const float deltaTime)
 		isGivingOrders = true;
 		playerFleet[activeShip]->displayRange = true;
 	}
+
 }
 
 void Scene3g::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip, const float deltaTime)
@@ -543,27 +571,24 @@ void Scene3g::GameOver()
 
 
 void Scene3g::SaveStats() {
-
-
-	// Open a file in write mode
-	std::ofstream outFile("Leaderboard.txt");
+	// Open a file in append mode
+	std::ofstream outFile("Leaderboard.txt", std::ios::app);
 
 	// Check if the file is open
 	if (outFile.is_open()) {
 		// Write the data to the file
 		outFile << "Score: " << score << "\n";
 		outFile << "Time: " << timeElapsed << "\n";
-		outFile <<  "-" << "\n";
+		outFile << "-" << "\n";
 
 		// Close the file
 		outFile.close();
 
-		std::cout << "Data written to file successfully." << std::endl;
+		std::cout << "Data appended to file successfully." << std::endl;
 	}
 	else {
 		std::cerr << "Unable to open file for writing." << std::endl;
 	}
-
 }
 
 
@@ -620,10 +645,10 @@ void Scene3g::createActors()
 		std::cout << "index: " << ship->shipIndex << std::endl;
 	}
 
-	/*for (int i = 0; i < startingFleetSize; i++) {
+	for (int i = 0; i < startingFleetSize; i++) {
 		playerFleet.push_back(new FriendlyShip(&friendlyShipModel, &bulletModel));
-	}*/
-	playerFleet.push_back(new FriendlyShip(&friendlyShipModel, &bulletModel));
+	}
+
 	//spawn the ships in a radius around the planet
 
 	int numShips = playerFleet.size();
@@ -644,6 +669,9 @@ void Scene3g::createActors()
 
 	planet = Planet(30.0f, 50, &sphereModel, ORIGIN);
 	planet.OnCreate();
+
+	selectionSphere = Actor(Transform(), &sphereModel);
+	selectionSphere.transform.setPos(0, 0, -1);
 }
 
 void Scene3g::createShaders()
@@ -671,6 +699,12 @@ void Scene3g::createShaders()
 
 	gridShader = new Shader("shaders/clickGridVert.glsl", "shaders/clickGridFrag.glsl");
 	if (gridShader->OnCreate() == false) 
+	{
+		std::cout << "Shader failed ... we have a problem\n";
+	}
+
+	selectionShader = new Shader("shaders/selectionVert.glsl", "shaders/selectionFrag.glsl");
+	if (selectionShader->OnCreate() == false)
 	{
 		std::cout << "Shader failed ... we have a problem\n";
 	}
