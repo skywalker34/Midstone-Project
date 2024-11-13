@@ -61,8 +61,9 @@ bool Scene3g::OnCreate() {
 	particleMesh = new Mesh("meshes/Mario.obj");
 	particleMesh->OnCreate();
 
-	//SoundEngine->play2D("audio/BackGroundMusic.mp3", true); // Audio For Game 
-	//SoundEngine->setSoundVolume(0.5f);
+	SoundEngine->setSoundVolume(0.4f);
+	SoundEngine->play2D("audio/BackGroundMusic.mp3", true); // Audio For Game 
+	
 
 
 	createModels();

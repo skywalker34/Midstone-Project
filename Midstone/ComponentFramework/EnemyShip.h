@@ -25,7 +25,7 @@ class EnemyShip :
 		//Matrix4 shipModelMatrix;
 	Vec3 target; 
 	ISoundEngine* SoundEngine = createIrrKlangDevice(); //Sound Device For Shooting Sounds
-
+	ISoundEngine* SoundEngineFlying = createIrrKlangDevice(); //Sound Device For Shooting Sounds
 	public:
 		bool deleteMe = false;//flag to tell the scene when to delete this ship
 		int shipIndex;

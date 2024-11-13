@@ -35,7 +35,10 @@ bool EnemyShip::OnCreate()
 	
 	collisionSphere = new Sphere(transform.getPos(), 5.0f);
 
-	
+	irrklang::vec3df BodyPosition(body->pos.x, body->pos.y, body->pos.z);
+	SoundEngineFlying->setSoundVolume(0.1f);
+	SoundEngineFlying->play3D("audio/RocketFlying.mp3", BodyPosition, true);
+
 	printf("Ship Created! \n");
 
 	speed = 0.1;
@@ -55,6 +58,8 @@ void EnemyShip::OnDestroy()
 
 	exhaustTrail.OnDestroy();
 
+	SoundEngineFlying->drop();
+
 }
 
 void EnemyShip::setIndex(int index)
@@ -64,6 +69,10 @@ void EnemyShip::setIndex(int index)
 
 void EnemyShip::Update(const float deltaTime)
 {
+	irrklang::vec3df bodypos(body->pos.x, body->pos.y, body->pos.z);
+	bool happenonce = true;
+	
+
 	body->ApplyForce(getTargetDirection() * speed);	//shouldn't have to do this every frame we nay want to move it
 	body->Update(deltaTime);
 	aimingPoint = transform.getPos() + body->vel * deltaTime;

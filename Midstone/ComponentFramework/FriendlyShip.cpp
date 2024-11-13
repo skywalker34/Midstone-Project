@@ -65,6 +65,9 @@ void FriendlyShip::OnDestroy()
 
 	delete model;
 
+	SoundEngine->drop();
+	SoundEngineFlying->drop();
+
 }
 
 void FriendlyShip::Update(const float deltaTime)
@@ -213,8 +216,7 @@ void FriendlyShip::moveToDestination(Vec3 destination_)
 	
 	irrklang::vec3df BodyPosition(body->pos.x, body->pos.y, body->pos.z);  
 	SoundEngineFlying->setSoundVolume(0.3f);
-	SoundEngineFlying->play3D("audio/RocketFlying.mp3", BodyPosition, true); // Broken Atm causes crash?
-	
+	SoundEngineFlying->play3D("audio/RocketFlying.mp3", BodyPosition, true); 
 
 	if (wouldIntersectPlanet) {
 		Vec3 axis = VMath::cross(destination, transform.getPos());
