@@ -27,7 +27,11 @@ private:
 
 	Shader* shader = nullptr;
 
+	float vertices[3] = {
+	0.0f, 0.0f, -1.0f,
 
+
+	};
 
 	Shader* loadVertsToBuffer = nullptr;
 
@@ -60,6 +64,8 @@ private:
 	GLuint posBuffer;
 	GLuint velBuffer;
 
+	unsigned int VAO;
+
 public:
 	int frameCounter = 0;
 	explicit Scene5g();
@@ -70,8 +76,7 @@ public:
 	virtual void Update(const float deltaTime) override;
 	virtual void Render() override;
 	virtual void HandleEvents(const SDL_Event& sdlEvent) override;
-	void draw_line(const Vec3& p1, const Vec3& p2, const Vec3& color);
-	void draw_lines_flush();
+
 };
 
 
