@@ -230,6 +230,8 @@
     <None Include="shaders\defaultVert.glsl" />
     <None Include="shaders\friendlyShipFrag.glsl" />
     <None Include="shaders\friendlyShipVert.glsl" />
+    <None Include="shaders\lineFrag.glsl" />
+    <None Include="shaders\lineVert.glsl" />
     <None Include="shaders\loadVerticiesFrag.glsl" />
     <None Include="shaders\loadVerticiesVert.glsl" />
     <None Include="shaders\planetFrag.glsl" />

@@ -30,6 +30,11 @@ drawInWireMode{ false } {
 	// Setup Platform/Renderer backends
 	ImGui_ImplSDL2_InitForOpenGL(window->getWindow(), window->getContext());
 	ImGui_ImplOpenGL3_Init("#version 450");
+
+	// Load the font 
+	io.Fonts->AddFontFromFileTTF("./fonts/Comic Sans MS.ttf", 23.0f);
+	// Adjust path and size as needed
+	io.FontDefault = io.Fonts->Fonts.back(); // Set as default font (optional)
 }
 
 Scene3g::~Scene3g() {
@@ -313,8 +318,8 @@ void Scene3g::Render() {
 
 
 
-			
-			if(isGameRunning) ship->exhaustTrail.Render( particleShader, computeShader);
+
+			if (isGameRunning) ship->exhaustTrail.Render(particleShader, computeShader);
 
 		}
 	}
@@ -346,45 +351,29 @@ void Scene3g::Render() {
 		glUniformMatrix4fv(gridShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
 		playerController.Render(gridShader);
 	}
-  
-  
-	// IMGUI STUFF
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplSDL2_NewFrame();
 
-	//This is the font stuff if you can find a working one then yeah. But otherwise im gonna keep it default for now.
-	//ImGuiIO& io = ImGui::GetIO();
-	//ImFontConfig config;
-	//config.OversampleH = 2;
-	//io.Fonts->AddFontDefault();
-	//ImFont* textFont = io.Fonts->AddFontFromFileTTF("./fonts/Comic Sans MS.ttf", 23.0f, &config);
-	//IM_ASSERT(textFont != NULL);
-	//io.Fonts->Build();
 
-	ImGui::NewFrame();
-
-	bool p_open = false;
+	// IMGUI STUFF 
+	ImGui_ImplOpenGL3_NewFrame(); 
+	ImGui_ImplSDL2_NewFrame(); 
+	ImGui::NewFrame(); 
+	bool p_open = false; 
+	// Apply the font 
+	ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
+	// Use the loaded font
 	ImGui::Begin("Timer and Score", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-	//ImGui::PushFont(textFont);
 	ImGui::Text("Time = %f", timeElapsed);
-	ImGui::Text("Score = %i", score);
+	ImGui::Text("Score = %i", score); 
 	ImGui::Text("Planet Health: = %i", planet.GetHealth());
-	//ImGui::PopFont();
-	ImGui::End();
-
+	ImGui::End(); 
 	ImGui::Begin("QuitButton", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-	if(ImGui::Button("Quit to Title", ImVec2(150,30)))
-		switchButton = true;
+	if (ImGui::Button("Quit to Title", ImVec2(150,30))) switchButton = true; 
 	ImGui::End();
-
-	//ImGui::ShowDemoWindow();
-	ImGui::Render(); // Calling This before CurrentScene render wont work
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-  
-
+	ImGui::PopFont(); // Pop the font after usage 
+	ImGui::Render(); 
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); 
 	glUseProgram(0);
 }
-
 void Scene3g::SpawnEnemy(const float deltaTime)
 {
 	for (int i = 0; i < enemySpawnerCount; i++) {

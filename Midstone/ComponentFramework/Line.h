@@ -12,7 +12,7 @@ class Line
 {
 public:
     int shaderProgram;
-    unsigned int VBO, VAO;
+    GLuint vao, vbo;
     std::vector<float> vertices;
     Vec3 startPoint;
     Vec3 endPoint;
@@ -23,6 +23,6 @@ public:
     Line(Vec3 start, Vec3 end);
     int setMVP(Matrix4 mvp);
     int setColor(Vec3 color);
-    int draw();
+    void draw();
     ~Line();
 };

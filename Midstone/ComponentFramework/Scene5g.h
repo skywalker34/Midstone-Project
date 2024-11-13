@@ -7,6 +7,7 @@
 #include "Trackball.h"
 #include "Camera.h"
 #include "PlayerController.h"
+#include "Line.h"
 using namespace MATH;
 
 /// Forward declarations 
@@ -26,7 +27,13 @@ private:
 
 	Shader* shader = nullptr;
 
+
+
 	Shader* loadVertsToBuffer = nullptr;
+
+	Shader* lineShader = nullptr;
+
+
 
 	ComputeShader* computeShader = nullptr;
 
@@ -42,11 +49,14 @@ private:
 
 	Camera camera;
 
+	Line testLine;
+
 	Matrix4 sphereModelMatrix;
 	Matrix4 shipModelMatrix;
 
 	PlayerController playerController;
 
+	std::vector<float> lineData{};
 	GLuint posBuffer;
 	GLuint velBuffer;
 
@@ -60,6 +70,8 @@ public:
 	virtual void Update(const float deltaTime) override;
 	virtual void Render() override;
 	virtual void HandleEvents(const SDL_Event& sdlEvent) override;
+	void draw_line(const Vec3& p1, const Vec3& p2, const Vec3& color);
+	void draw_lines_flush();
 };
 
 
