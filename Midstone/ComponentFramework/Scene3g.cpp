@@ -61,8 +61,8 @@ bool Scene3g::OnCreate() {
 	particleMesh = new Mesh("meshes/Mario.obj");
 	particleMesh->OnCreate();
 
-	SoundEngine->play2D("audio/BackGroundMusic.mp3", true); // Audio For Game 
-	SoundEngine->setSoundVolume(0.3f);
+	//SoundEngine->play2D("audio/BackGroundMusic.mp3", true); // Audio For Game 
+	//SoundEngine->setSoundVolume(0.5f);
 
 
 	createModels();
@@ -406,9 +406,12 @@ void Scene3g::SpawnEnemy(const float deltaTime)
 
 void Scene3g::SetActiveShip()
 {
+
 	if (playerController.has3DClick) {
+		
 		if (activeShip >= 0) {
 			shipWaypoint = playerController.getClickPos();
+			
 			playerFleet[activeShip]->moveToDestination(shipWaypoint);
 			isGivingOrders = false;
 			activeShip = -1;
@@ -424,6 +427,8 @@ void Scene3g::SetActiveShip()
 			{
 				activeShip = i;
 				isGivingOrders = true;
+
+				SoundEngine->play2D("audio/SelectionSound.mp3", false); // Audio For Selection Ship
 			}
 		}
 	}
@@ -514,6 +519,11 @@ void Scene3g::UpdateEnemyFleet(const float deltaTime)
 			if (COLLISION::SphereSphereCollisionDetected(enemyFleet[i]->collisionSphere, planet.collisionSphere)) {
 				planet.takeDamage(1);
 
+				
+				SoundEngine->setSoundVolume(0.2f);
+				SoundEngine->play2D("audio/PlanetGotHit.mp3", false); // Planet Got Hit Sound
+
+				
 				DestroyEnenmy(i);
 			}
 

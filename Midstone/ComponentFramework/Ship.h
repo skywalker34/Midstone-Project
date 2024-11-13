@@ -2,7 +2,9 @@
 #include "Actor.h"
 #include "Body.h"
 #include "ExhaustTrail.h"
+#include "irrKlang.h"
 
+using namespace irrklang;
 class Body;
 
 class Ship :

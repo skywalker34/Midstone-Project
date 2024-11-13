@@ -48,6 +48,7 @@ void EnemyShip::OnDestroy()
 {
 	model = nullptr;
 
+	
 
 	body->OnDestroy();
 	delete body;
@@ -87,8 +88,14 @@ void EnemyShip::Render(Shader* shader) const
 void EnemyShip::Hit()
 {
 	health -= 1; //reduce health
+	irrklang::vec3df bodypos(body->pos.x, body->pos.y, body->pos.z);
+	SoundEngine->setSoundVolume(0.5f);
+	SoundEngine->play3D("audio/Gothit.mp3.", bodypos, false); // Audio For Gothit Ships Noise
+	
+
 	if (health < 0) { //if dead set flag so scene knows to delete the ship
 		deleteMe = true;
+		SoundEngine->play3D("audio/DeadExplosion.mp3", bodypos, false); // Audio For Dying Ships Noise
 	}
 
 }
