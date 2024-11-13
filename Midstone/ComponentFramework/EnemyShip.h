@@ -28,6 +28,7 @@ class EnemyShip :
 	public:
 		bool deleteMe = false;//flag to tell the scene when to delete this ship
 		int shipIndex;
+		Vec3 aimingPoint;
 
 		EnemyShip();
 		EnemyShip(Vec3 pos, Model* model_);
