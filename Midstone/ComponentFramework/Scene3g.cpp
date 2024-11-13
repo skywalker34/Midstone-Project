@@ -74,7 +74,7 @@ bool Scene3g::OnCreate() {
 	testMesh->OnCreate();
 
 	
-	enemyFleetSpawners.push_back(EnemySpawner(200.0f, 5, 5));
+	enemyFleetSpawners.push_back(EnemySpawner(100.0f, 15, 5));
 	printf("On Create finished!!!!!");
 	return true;
 
@@ -115,7 +115,6 @@ void Scene3g::OnDestroy() {
 
 	friendlyShipShader->OnDestroy();
 	delete friendlyShipShader;
-
 
 	planet.OnDestroy();
 
@@ -313,7 +312,7 @@ void Scene3g::Render() {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //temporary line
 
 
-			
+
 			
 			if(isGameRunning) ship->exhaustTrail.Render( particleShader, computeShader);
 
@@ -469,7 +468,15 @@ void Scene3g::UpdatePlayerFleet(const float deltaTime)
 void Scene3g::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip, const float deltaTime)
 {
 	if (!ship->isMoving) {
-		ship->FindClosestEnemy(targetShip);
+		if (rotationTimer <= 1) {
+			ship->FindClosestEnemy(targetShip);
+			rotationTimer += deltaTime;
+		}
+		else {
+			rotationTimer = 0;
+		}
+		//ship->FindClosestEnemy(targetShip);
+		
 		if (ship->currentTargetIndex == targetShip->shipIndex) {
 			Vec3 targetDirection = targetShip->transform.getPos() - ship->transform.getPos();
 			Quaternion targetQuad = QMath::lookAt(targetDirection, UP);
@@ -477,14 +484,19 @@ void Scene3g::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip, const
 			ship->initialDirection = targetDirection;
 		}
 		if (ship->isSwitchingTarget) {
+			
 			ship->slerpT = ship->slerpT + deltaTime;
 			if (ship->slerpT >= 1) {
 				ship->closestEnemy = ship->potentialTarget;
 				ship->currentTargetIndex = ship->closestEnemy->shipIndex;
 				ship->isSwitchingTarget = false;
 				ship->slerpT = 0;
+				std::cout << "Switch index: " << ship->currentTargetIndex << std::endl;
 			}
 		}
+
+		Line line = Line(targetShip->transform.getPos(), ship->transform.getPos());
+		line.draw();
 	}
 }
 
@@ -597,19 +609,21 @@ void Scene3g::createActors()
 		float z = radius * sin(angle);													// Calculate z position
 
 		enemyFleet.push_back(new EnemyShip(Vec3(x, 0, z), &enemyShipModel));
-
 	}
+
+
 	for (EnemyShip* ship : enemyFleet) {
 		ship->OnCreate();
 		ship->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
 		ship->setIndex(enemyIndex);
 		enemyIndex++;
+		std::cout << "index: " << ship->shipIndex << std::endl;
 	}
 
-	for (int i = 0; i < startingFleetSize; i++) {
+	/*for (int i = 0; i < startingFleetSize; i++) {
 		playerFleet.push_back(new FriendlyShip(&friendlyShipModel, &bulletModel));
-	}
-
+	}*/
+	playerFleet.push_back(new FriendlyShip(&friendlyShipModel, &bulletModel));
 	//spawn the ships in a radius around the planet
 
 	int numShips = playerFleet.size();
@@ -628,7 +642,7 @@ void Scene3g::createActors()
 		playerFleet[i]->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
 	}
 
-	planet = Planet(30.0f, 5, &sphereModel, ORIGIN);
+	planet = Planet(30.0f, 50, &sphereModel, ORIGIN);
 	planet.OnCreate();
 }
 
