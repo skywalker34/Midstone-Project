@@ -153,16 +153,7 @@ bool Scene5g::OnCreate() {
 		//SCREEN_HEIGHT = viewport[3];
 
 
-		unsigned int VBO;
-		// 1. bind Vertex Array Object
-		glBindVertexArray(VAO);
-		glGenBuffers(1, &VBO);
-		// 2. copy our vertices array in a buffer for OpenGL to use
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-		// 3. then set our vertex attributes pointers
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
+		
 	}
 
 
@@ -179,11 +170,10 @@ bool Scene5g::OnCreate() {
 	shipModelMatrix =   MMath::translate(0.0f,0.0f,0.0f) * MMath::rotate(90.0f, Vec3(0.0f, 1.0f, 0.0f)) ;
 
 	sphereModelMatrix = MMath::rotate(90.0f, Vec3(0.0f, 1.0f, 0.0f)) ;
-	
 
 
 
-	testLine = Line(Vec3(0, 0, 0), Vec3(0, 100, 0));
+	//testLine = Line(Vec3(0, 0, 0), Vec3(0, 100, 0));
 	
 	lineShader = new Shader("shaders/lineVert.glsl", "shaders/lineFrag.glsl");
 	if (lineShader->OnCreate() == false) {
@@ -275,12 +265,7 @@ void Scene5g::Render() {
 	//glDrawArrays(GL_LINES, 0, 2);
 	//glDisableClientState(GL_VERTEX_ARRAY);
 
-	glUseProgram(lineShader->GetProgram());
-	glUniformMatrix4fv(lineShader->GetUniformID("projection"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
-	glUniformMatrix4fv(lineShader->GetUniformID("view"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-	glUniformMatrix4fv(lineShader->GetUniformID("model"), 1, GL_FALSE, sphereModelMatrix * MMath::scale(2,2,2));
-	glBindVertexArray(VAO);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	
 
 	/*glDrawArrays(GL_LINES, 0, 2);
 	glDisableClientState(GL_VERTEX_ARRAY);*/
@@ -289,7 +274,7 @@ void Scene5g::Render() {
 	glUniformMatrix4fv(lineShader->GetUniformID("MVP"), 1, GL_FALSE, testLine.MVP);
 	glUniform4fv(lineShader->GetUniformID("color"), 1,  Vec4(0,1,0,1));
 	testLine.draw();*/
-	glUseProgram(0);
+	//glUseProgram(0);
 
 
 
@@ -328,7 +313,11 @@ void Scene5g::Render() {
 	glUniform4fv(normalShader->GetUniformID("meshColor"), 1, BLUE);
 	ship->Render(GL_TRIANGLES);
 
-	
+	glUseProgram(lineShader->GetProgram());
+	glUniformMatrix4fv(lineShader->GetUniformID("projection"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+	glUniformMatrix4fv(lineShader->GetUniformID("view"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+	glUniformMatrix4fv(lineShader->GetUniformID("model"), 1, GL_FALSE, testLine.transform.toModelMatrix());
+	testLine.draw();
 
 	glUseProgram(0);
 	

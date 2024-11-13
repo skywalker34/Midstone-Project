@@ -27,11 +27,7 @@ private:
 
 	Shader* shader = nullptr;
 
-	float vertices[3] = {
-	0.0f, 0.0f, -1.0f,
-
-
-	};
+	
 
 	Shader* loadVertsToBuffer = nullptr;
 
@@ -53,7 +49,7 @@ private:
 
 	Camera camera;
 
-	Line testLine;
+	Line testLine  = Line(Vec3(0, 0, -1), Vec3(1, 2, 3));;
 
 	Matrix4 sphereModelMatrix;
 	Matrix4 shipModelMatrix;
