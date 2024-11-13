@@ -155,6 +155,7 @@
     </ClCompile>
     <ClCompile Include="ExhaustTrail.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="SceneGameOver.cpp">
       <Filter>Source Files\Scenes</Filter>
     </ClCompile>
@@ -297,6 +298,7 @@
     </ClInclude>
     <ClInclude Include="ExhaustTrail.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="SceneGameOver.h">
       <Filter>Header Files\Scenes</Filter>
     </ClInclude>
