@@ -150,7 +150,7 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 
 			
 
-			hasDQLine = true;
+			hasCanceledOrder = true;
 
 	
 			break;

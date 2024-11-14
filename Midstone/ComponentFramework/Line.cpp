@@ -60,9 +60,9 @@ void Line::RecalculateLine(Vec3 start, Vec3 end)
 
 void Line::draw() {
 
-
+	glLineWidth(5.0f); // Set the line width to 5 pixels (adjust as needed)
 	glBindVertexArray(vao);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawArrays(GL_LINES, 0, 3);
 	glBindVertexArray(0);
 
 

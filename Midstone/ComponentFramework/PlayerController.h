@@ -43,6 +43,7 @@ class PlayerController
 		Camera camera;
 		bool has3DClick = false;
 		bool hasDQLine = false;
+		bool hasCanceledOrder = false;
 		bool OnCreate();
 		void OnDestroy();
 		void handleEvents(const SDL_Event& sdlEvent);

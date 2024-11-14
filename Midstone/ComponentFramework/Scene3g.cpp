@@ -259,14 +259,16 @@ void Scene3g::Render() {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}*/
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glUseProgram(lineShader->GetProgram());
-	glUniformMatrix4fv(lineShader->GetUniformID("projection"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
-	glUniformMatrix4fv(lineShader->GetUniformID("view"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-	glUniformMatrix4fv(lineShader->GetUniformID("model"), 1, GL_FALSE, testLine.transform.toModelMatrix());
-	testLine.draw();
+
+	if (activeShip >= 0) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glUseProgram(lineShader->GetProgram());
+		glUniformMatrix4fv(lineShader->GetUniformID("projection"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+		glUniformMatrix4fv(lineShader->GetUniformID("view"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+		glUniformMatrix4fv(lineShader->GetUniformID("model"), 1, GL_FALSE, pathLine.transform.toModelMatrix());
+		pathLine.draw();
+	}
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_DEPTH_TEST);
@@ -429,13 +431,6 @@ void Scene3g::SetActiveShip()
 
 	playerController.calculateLine(); //get the raycast into the screen
 
-
-	
-
-	
-
-
-	
 	int i = 0;
 	for (FriendlyShip* ship : playerFleet) {
 		if (COLLISION::LineSphereCollisionDetected(ship->collisionSphere, playerController.getLine())) {
@@ -495,6 +490,13 @@ void Scene3g::SetActiveShip()
 		}
 	}
 
+
+	if (playerController.hasCanceledOrder) {
+		isGivingOrders = false;
+		activeShip = -1;
+
+		playerController.hasCanceledOrder = false;
+	}
 	
 }
 
@@ -531,7 +533,12 @@ void Scene3g::UpdatePlayerFleet(const float deltaTime)
 	if (activeShip >= 0) {
 		isGivingOrders = true;
 		playerFleet[activeShip]->displayRange = true;
+		if (playerFleet[activeShip]->isMoving) {
+			pathLine.RecalculateLine(playerFleet[activeShip]->transform.getPos(), playerFleet[activeShip]->destination);
+		}
 	}
+
+	
 
 }
 
