@@ -264,6 +264,13 @@ void Scene3g::Render() {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glUseProgram(lineShader->GetProgram());
+	glUniformMatrix4fv(lineShader->GetUniformID("projection"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+	glUniformMatrix4fv(lineShader->GetUniformID("view"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+	glUniformMatrix4fv(lineShader->GetUniformID("model"), 1, GL_FALSE, testLine.transform.toModelMatrix());
+	testLine.draw();
+
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -324,8 +331,7 @@ void Scene3g::Render() {
 		}
 	}
 
-
-
+	
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //temporary line
 	glUseProgram(planetShader->GetProgram());
@@ -334,6 +340,7 @@ void Scene3g::Render() {
 	glUniform3fv(planetShader->GetUniformID("lightPos"), 1, lightPos);
 	glUniform3fv(planetShader->GetUniformID("cameraPos"), 1, playerController.camera.transform.getPos());
 	planet.Render(planetShader);
+
 
 	if (isGivingOrders) {
 
@@ -484,8 +491,8 @@ void Scene3g::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip, const
 			}
 		}
 
-		Line line = Line(targetShip->transform.getPos(), ship->transform.getPos());
-		line.draw();
+		testLine.RecalculateLine(targetShip->transform.getPos(), ship->transform.getPos());
+	
 	}
 }
 
@@ -663,6 +670,12 @@ void Scene3g::createShaders()
 	{
 		std::cout << "Shader failed ... we have a problem\n";
 	}
+
+	lineShader = new Shader("shaders/lineVert.glsl", "shaders/lineFrag.glsl");
+	if (lineShader->OnCreate() == false) {
+		std::cout << "Shader failed ... we have a problem\n";
+	}
+
 }
 
 void Scene3g::createClickGrid()

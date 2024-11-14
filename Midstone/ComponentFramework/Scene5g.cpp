@@ -213,7 +213,7 @@ void Scene5g::HandleEvents(const SDL_Event& sdlEvent) {
 
 void Scene5g::Update(const float deltaTime) {
 	playerController.Update(deltaTime);
-	drawInWireMode = true;
+	drawInWireMode = false;
 
 
 	time += deltaTime;

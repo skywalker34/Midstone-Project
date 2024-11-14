@@ -23,7 +23,7 @@ public:
 
     Line();
     Line(Vec3 start, Vec3 end);
-   
+    void RecalculateLine(Vec3 start, Vec3 end);
     void draw();
     ~Line();
 };

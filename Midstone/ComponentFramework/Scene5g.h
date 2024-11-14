@@ -49,7 +49,7 @@ private:
 
 	Camera camera;
 
-	Line testLine  = Line(Vec3(0, 0, -1), Vec3(1, 2, 3));;
+	Line testLine  = Line(Vec3(0, 0, 0), Vec3(100, 100, 100));
 
 	Matrix4 sphereModelMatrix;
 	Matrix4 shipModelMatrix;
