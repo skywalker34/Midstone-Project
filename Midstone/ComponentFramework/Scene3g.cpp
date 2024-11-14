@@ -227,24 +227,7 @@ void Scene3g::Update(const float deltaTime) {
 		GameOver();
 	}
 
-	testModelMat = MMath::translate(playerController.hoverPos) * MMath::scale(1, 1, 1);
-
 	
-	playerController.calculateLine();
-	for (FriendlyShip* ship : playerFleet) {
-		if (COLLISION::LineSphereCollisionDetected(ship->collisionSphere, playerController.getLine())) {
-			//selectionSphere.transform = ship->transform;
-	
-			;
-			selectionSphere.transform.setParent(ship->transform.toModelMatrix());
-			isMouseOverFriendlyShip = true;
-			break;
-		}
-		else {
-			isMouseOverFriendlyShip = false;
-		}
-
-	}
 
 	static float spawnTimer = 0.0f; // Timer for spawning
 	spawnTimer += deltaTime;
@@ -275,6 +258,15 @@ void Scene3g::Render() {
 	else {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}*/
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glUseProgram(lineShader->GetProgram());
+	glUniformMatrix4fv(lineShader->GetUniformID("projection"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+	glUniformMatrix4fv(lineShader->GetUniformID("view"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+	glUniformMatrix4fv(lineShader->GetUniformID("model"), 1, GL_FALSE, testLine.transform.toModelMatrix());
+	testLine.draw();
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_DEPTH_TEST);
@@ -364,7 +356,7 @@ void Scene3g::Render() {
 		playerController.Render(gridShader);
 	}
   
-	if (isMouseOverFriendlyShip) {
+	if (isMouseOverShip) {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glUseProgram(selectionShader->GetProgram());
@@ -433,7 +425,68 @@ void Scene3g::SpawnEnemy(const float deltaTime)
 
 void Scene3g::SetActiveShip()
 {
-	if (playerController.has3DClick) {
+
+
+	playerController.calculateLine(); //get the raycast into the screen
+
+
+	
+
+	
+
+
+	
+	int i = 0;
+	for (FriendlyShip* ship : playerFleet) {
+		if (COLLISION::LineSphereCollisionDetected(ship->collisionSphere, playerController.getLine())) {
+			//selectionSphere.transform = ship->transform;
+
+			selectionSphere.meshColour = GREEN;
+			selectionSphere.transform.setParent(ship->transform.toModelMatrix());
+			isMouseOverShip = true;
+			if (playerController.has3DClick) {
+				activeShip = i;
+				isGivingOrders = true;
+				
+				playerController.has3DClick = false;
+			}
+			break;
+		}
+		else {
+			isMouseOverShip = false;
+		}
+		i++;
+
+	}
+
+	
+	if (isGivingOrders) { //if player has a ship selected and clicks on an enemy we want to attack that enenmy
+		for (EnemyShip* ship : enemyFleet) {
+			if (COLLISION::LineSphereCollisionDetected(ship->collisionSphere, playerController.getLine())) { //check for collision between player raycast and the enemy ships
+
+
+
+				selectionSphere.transform.setParent(ship->transform.toModelMatrix()); //reparent the model matrix to the ship
+				isMouseOverShip = true;
+				selectionSphere.meshColour = RED;
+
+				if (playerController.has3DClick) {
+					playerController.has3DClick = false;
+					shipWaypoint = ship->transform.getPos();
+					isGivingOrders = false;
+					playerFleet[activeShip]->moveToDestination(shipWaypoint);
+					activeShip = -1;
+				}
+				break;
+			}
+			else {
+				isMouseOverShip = false;
+			}
+		}
+	}
+
+	testModelMat = MMath::translate(playerController.hoverPos) * MMath::scale(1, 1, 1);
+	if (playerController.has3DClick && isGivingOrders) {
 		if (activeShip >= 0) {
 			shipWaypoint = playerController.getClickPos();
 			playerFleet[activeShip]->moveToDestination(shipWaypoint);
@@ -442,18 +495,7 @@ void Scene3g::SetActiveShip()
 		}
 	}
 
-	if (playerController.hasDQLine) {
-		DualQuat line = playerController.getLine();
-
-		//loop through the spheres
-		for (int i = 0; i < playerFleet.size(); i++) {
-			if (COLLISION::LineSphereCollisionDetected(playerFleet[i]->collisionSphere, line))
-			{
-				activeShip = i;
-				isGivingOrders = true;
-			}
-		}
-	}
+	
 }
 
 void Scene3g::UpdatePlayerFleet(const float deltaTime)
@@ -523,8 +565,8 @@ void Scene3g::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip, const
 			}
 		}
 
-		Line line = Line(targetShip->transform.getPos(), ship->transform.getPos());
-		line.draw();
+		/*Line line = Line(targetShip->transform.getPos(), ship->transform.getPos());
+		line.draw();*/
 	}
 }
 
@@ -671,7 +713,8 @@ void Scene3g::createActors()
 	planet.OnCreate();
 
 	selectionSphere = Actor(Transform(), &sphereModel);
-	selectionSphere.transform.setPos(0, 0, -1);
+	enemySelectionSphere = Actor(Transform(), &sphereModel);
+	selectionSphere.transform.setPos(0, 0, -0.5);
 }
 
 void Scene3g::createShaders()
@@ -708,11 +751,17 @@ void Scene3g::createShaders()
 	{
 		std::cout << "Shader failed ... we have a problem\n";
 	}
+	lineShader = new Shader("shaders/lineVert.glsl", "shaders/lineFrag.glsl");
+	if (lineShader->OnCreate() == false) {
+		std::cout << "Shader failed ... we have a problem\n";
+	}
+
 }
 
 void Scene3g::createClickGrid()
 {
 	playerController.CreateGrid(&planeModel);
+	playerController.setPlayerBounds(planet.collisionSphere->r + 10, 150);
 	if (playerController.OnCreate() == false) {
 		std::cout << "Controller failed ... we have a problem\n";
 	}

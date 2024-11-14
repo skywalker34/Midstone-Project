@@ -26,7 +26,7 @@ void Actor::Render(Shader* shader) const
 {
 
 	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, transform.toModelMatrix());
-	glUniform4fv(shader->GetUniformID("meshColor"), 1, GREEN);
+	glUniform4fv(shader->GetUniformID("meshColor"), 1, meshColour);
 	model->mesh->Render(GL_TRIANGLES);
 }
 

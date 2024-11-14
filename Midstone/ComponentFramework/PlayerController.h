@@ -36,6 +36,8 @@ class PlayerController
 
 		Vec3 hoverPos;
 
+		Sphere innerBounds;
+		Sphere outerBounds;
 
 		Transform transform; //temporary public
 		Camera camera;
@@ -52,6 +54,8 @@ class PlayerController
 		Vec3 get3DClickCoords(float sdl_X, float sdl_Y);
 		void calculateLine();
 		DualQuat getLine() { hasDQLine = false;  return line2; };
+
+		void setPlayerBounds(float innerDis, float outerDis);
 
 		void updateModelMatrixToFaceCamera(Transform& transform);
 		

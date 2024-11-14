@@ -4,3 +4,9 @@ Time: 96.7873
 Score: 62
 Time: 215.389
 -
+Score: 74
+Time: 229.016
+-
+Score: 66
+Time: 219.154
+-

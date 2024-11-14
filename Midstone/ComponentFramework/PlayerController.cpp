@@ -3,7 +3,7 @@
 #include <SDL.h>
 #include <DQMath.h>
 #include <Plane.h>
-
+#include "Collision.h"
 
 
 PlayerController::PlayerController()
@@ -70,7 +70,8 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 			//	below works *marginally* better (still jank af)
 			v = transform.getPos();
 			v += (VMath::normalize(-forwardVector) * CAMERA_SPEED);
-			transform.setPos(v);
+			
+			
 			break;
 
 		case SDL_SCANCODE_S:
@@ -79,7 +80,7 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 
 			v = transform.getPos();
 			v += (VMath::normalize(forwardVector) * CAMERA_SPEED);
-			transform.setPos(v);
+
 			break;
 
 			//future for strafing movement
@@ -87,7 +88,7 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 
 			v = transform.getPos();
 			v += (VMath::normalize(-rightVector) * CAMERA_SPEED);
-			transform.setPos(v);
+
 			//move the camera right
 			break;
 
@@ -95,21 +96,21 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 
 			v = transform.getPos();
 			v += (VMath::normalize(rightVector) * CAMERA_SPEED);
-			transform.setPos(v);
+	
 			//move the camera left
 			break;
 		case SDL_SCANCODE_Q:
 
 			v = transform.getPos();
 			v += (VMath::normalize(upVector) * CAMERA_SPEED);
-			transform.setPos(v);
+
 			//move the camera UP
 			break;
 		case SDL_SCANCODE_E:
 
 			v = transform.getPos();
 			v += (VMath::normalize(-upVector) * CAMERA_SPEED);
-			transform.setPos(v);
+
 			//move the camera down
 			break;
 
@@ -130,7 +131,13 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 
 
 		}
+
+
+		if (!COLLISION::SpherePointCollisionDetected(&innerBounds, v) && COLLISION::SpherePointCollisionDetected(&outerBounds, v)) transform.setPos(v);
+
 		break;
+
+		
 
 	case SDL_MOUSEBUTTONDOWN:
 	{
@@ -138,8 +145,6 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 		switch (sdlEvent.button.button){
 		case SDL_BUTTON_LEFT:
 			has3DClick = true;
-			
-
 			break;
 		case SDL_BUTTON_RIGHT:
 
@@ -263,4 +268,10 @@ void PlayerController::calculateLine()
 	// Using the join of two points
 	line2 = transform.getPos() & sdlPosWorldSpace;
 
+}
+
+void PlayerController::setPlayerBounds(float innerDis, float outerDis)
+{
+	innerBounds = Sphere(ORIGIN, innerDis);
+	outerBounds = Sphere(ORIGIN, outerDis);
 }
