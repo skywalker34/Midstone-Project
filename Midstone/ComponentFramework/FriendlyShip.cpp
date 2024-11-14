@@ -143,7 +143,7 @@ void FriendlyShip::FindClosestEnemy(EnemyShip* enemy)
 		currentTargetDistance = VMath::mag(transform.getPos() - closestEnemy->transform.getPos());
 		potentialTargetDistance = VMath::mag(transform.getPos() - enemy->transform.getPos());
 		potentialTarget = enemy;
-		potentialTarget->transform.getPos().print("potential target");
+		//potentialTarget->transform.getPos().print("potential target");
 	}
 	
 	if (potentialTargetDistance < currentTargetDistance) {
@@ -201,11 +201,13 @@ void FriendlyShip::moveToDestination(Vec3 destination_)
 
 void FriendlyShip::rotateTowardTarget(Vec3 target)
 {
+	if (abs(target.x) < 0.00000000000000001) return;
+	target.print();
 	//keeps the ship pointing toward where its going
 	if (slerpT < 1) {
 		Quaternion startQuad = QMath::lookAt(initialDirection, UP);
 		Quaternion targetQuad = QMath::lookAt(target, UP);
-		Quaternion currentQuat = QMath::slerp(startQuad, targetQuad, slerpT);
+		Quaternion currentQuat = QMath::normalize(QMath::slerp(startQuad, targetQuad, slerpT));
 		transform.setOrientation(currentQuat);
 	}
 	else {

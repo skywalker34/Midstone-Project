@@ -32,7 +32,7 @@ drawInWireMode{ false } {
 	ImGui_ImplOpenGL3_Init("#version 450");
 
 	// Load the font 
-	io.Fonts->AddFontFromFileTTF("./fonts/Comic Sans MS.ttf", 23.0f);
+	io.Fonts->AddFontFromFileTTF("./fonts/Comic Sans MS.ttf", 16.0f);
 	// Adjust path and size as needed
 	io.FontDefault = io.Fonts->Fonts.back(); // Set as default font (optional)
 }
@@ -240,7 +240,7 @@ void Scene3g::Update(const float deltaTime) {
 	if (spawnTimer >= 60.0f) { //spawn an enemySpawner every minute
 		enemyFleetSpawners.push_back(EnemySpawner(200.0f, 5, 5));
 		enemySpawnerCount++;
-		std::cout << "Enemy Spawners: " << enemySpawnerCount << std::endl;
+		//std::cout << "Enemy Spawners: " << enemySpawnerCount << std::endl;
 		spawnTimer = 0.0f; // Reset the spawn timer
 	}
 
@@ -393,7 +393,6 @@ void Scene3g::SpawnEnemy(const float deltaTime)
 			enemyFleet.back()->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
 			enemyFleet.back()->setIndex(enemyIndex);
 			enemyFleetSpawners[i].canSpawn = false;
-
 		}
 	}
 
@@ -478,9 +477,10 @@ void Scene3g::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip, const
 			Quaternion targetQuad = QMath::lookAt(targetDirection, UP);
 			ship->transform.setOrientation(targetQuad);
 			ship->initialDirection = targetDirection;
+			testLine.RecalculateLine(targetShip->transform.getPos(), ship->transform.getPos());
 		}
+		std::cout << "potentialTarget: " << ship->potentialTarget->shipIndex << std::endl;
 		if (ship->isSwitchingTarget) {
-			
 			ship->slerpT = ship->slerpT + deltaTime;
 			if (ship->slerpT >= 1) {
 				ship->closestEnemy = ship->potentialTarget;
@@ -489,9 +489,10 @@ void Scene3g::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip, const
 				ship->slerpT = 0;
 				std::cout << "Switch index: " << ship->currentTargetIndex << std::endl;
 			}
+			testLine.RecalculateLine(ship->potentialTarget->transform.getPos(), ship->transform.getPos());
 		}
 
-		testLine.RecalculateLine(targetShip->transform.getPos(), ship->transform.getPos());
+		//testLine.RecalculateLine(ship->closestEnemy->transform.getPos(), ship->transform.getPos());
 	
 	}
 }
@@ -616,10 +617,10 @@ void Scene3g::createActors()
 		std::cout << "index: " << ship->shipIndex << std::endl;
 	}
 
-	/*for (int i = 0; i < startingFleetSize; i++) {
+	for (int i = 0; i < startingFleetSize; i++) {
 		playerFleet.push_back(new FriendlyShip(&friendlyShipModel, &bulletModel));
-	}*/
-	playerFleet.push_back(new FriendlyShip(&friendlyShipModel, &bulletModel));
+	}
+	//playerFleet.push_back(new FriendlyShip(&friendlyShipModel, &bulletModel));
 	//spawn the ships in a radius around the planet
 
 	int numShips = playerFleet.size();
