@@ -31,8 +31,7 @@ Vec3 EnemyShip::getTargetDirection()
 bool EnemyShip::OnCreate()
 {
 	health = 5; //may want to put this in constructor
-	aimingPoint = transform.getPos() + getTargetDirection() * speed;
-	
+	//aimingPoint = transform.getPos() + body->vel;
 	collisionSphere = new Sphere(transform.getPos(), 5.0f);
 
 	
@@ -65,7 +64,7 @@ void EnemyShip::Update(const float deltaTime)
 {
 	body->ApplyForce(getTargetDirection() * speed);	//shouldn't have to do this every frame we nay want to move it
 	body->Update(deltaTime);
-	aimingPoint = transform.getPos() + body->vel * deltaTime;
+	//aimingPoint = transform.getPos() + body->vel;
 	transform.setOrientation(QMath::lookAt(getTargetDirection(), UP));
 	collisionSphere->center = transform.getPos();
 

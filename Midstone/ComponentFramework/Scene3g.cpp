@@ -30,6 +30,11 @@ drawInWireMode{ false } {
 	// Setup Platform/Renderer backends
 	ImGui_ImplSDL2_InitForOpenGL(window->getWindow(), window->getContext());
 	ImGui_ImplOpenGL3_Init("#version 450");
+
+	// Load the font 
+	io.Fonts->AddFontFromFileTTF("./fonts/Comic Sans MS.ttf", 16.0f);
+	// Adjust path and size as needed
+	io.FontDefault = io.Fonts->Fonts.back(); // Set as default font (optional)
 }
 
 Scene3g::~Scene3g() {
@@ -235,7 +240,7 @@ void Scene3g::Update(const float deltaTime) {
 	if (spawnTimer >= 60.0f) { //spawn an enemySpawner every minute
 		enemyFleetSpawners.push_back(EnemySpawner(200.0f, 5, 5));
 		enemySpawnerCount++;
-		std::cout << "Enemy Spawners: " << enemySpawnerCount << std::endl;
+		//std::cout << "Enemy Spawners: " << enemySpawnerCount << std::endl;
 		spawnTimer = 0.0f; // Reset the spawn timer
 	}
 
@@ -258,6 +263,13 @@ void Scene3g::Render() {
 	else {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glUseProgram(lineShader->GetProgram());
+	glUniformMatrix4fv(lineShader->GetUniformID("projection"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+	glUniformMatrix4fv(lineShader->GetUniformID("view"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+	glUniformMatrix4fv(lineShader->GetUniformID("model"), 1, GL_FALSE, testLine.transform.toModelMatrix());
+	testLine.draw();
 
 
 	glEnable(GL_DEPTH_TEST);
@@ -313,14 +325,13 @@ void Scene3g::Render() {
 
 
 
-			
-			if(isGameRunning) ship->exhaustTrail.Render( particleShader, computeShader);
+
+			if (isGameRunning) ship->exhaustTrail.Render(particleShader, computeShader);
 
 		}
 	}
 
-
-
+	
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //temporary line
 	glUseProgram(planetShader->GetProgram());
@@ -329,6 +340,7 @@ void Scene3g::Render() {
 	glUniform3fv(planetShader->GetUniformID("lightPos"), 1, lightPos);
 	glUniform3fv(planetShader->GetUniformID("cameraPos"), 1, playerController.camera.transform.getPos());
 	planet.Render(planetShader);
+
 
 	if (isGivingOrders) {
 
@@ -346,45 +358,29 @@ void Scene3g::Render() {
 		glUniformMatrix4fv(gridShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
 		playerController.Render(gridShader);
 	}
-  
-  
-	// IMGUI STUFF
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplSDL2_NewFrame();
 
-	//This is the font stuff if you can find a working one then yeah. But otherwise im gonna keep it default for now.
-	//ImGuiIO& io = ImGui::GetIO();
-	//ImFontConfig config;
-	//config.OversampleH = 2;
-	//io.Fonts->AddFontDefault();
-	//ImFont* textFont = io.Fonts->AddFontFromFileTTF("./fonts/Comic Sans MS.ttf", 23.0f, &config);
-	//IM_ASSERT(textFont != NULL);
-	//io.Fonts->Build();
 
-	ImGui::NewFrame();
-
-	bool p_open = false;
+	// IMGUI STUFF 
+	ImGui_ImplOpenGL3_NewFrame(); 
+	ImGui_ImplSDL2_NewFrame(); 
+	ImGui::NewFrame(); 
+	bool p_open = false; 
+	// Apply the font 
+	ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
+	// Use the loaded font
 	ImGui::Begin("Timer and Score", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-	//ImGui::PushFont(textFont);
 	ImGui::Text("Time = %f", timeElapsed);
-	ImGui::Text("Score = %i", score);
+	ImGui::Text("Score = %i", score); 
 	ImGui::Text("Planet Health: = %i", planet.GetHealth());
-	//ImGui::PopFont();
-	ImGui::End();
-
+	ImGui::End(); 
 	ImGui::Begin("QuitButton", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-	if(ImGui::Button("Quit to Title", ImVec2(150,30)))
-		switchButton = true;
+	if (ImGui::Button("Quit to Title", ImVec2(150,30))) switchButton = true; 
 	ImGui::End();
-
-	//ImGui::ShowDemoWindow();
-	ImGui::Render(); // Calling This before CurrentScene render wont work
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-  
-
+	ImGui::PopFont(); // Pop the font after usage 
+	ImGui::Render(); 
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); 
 	glUseProgram(0);
 }
-
 void Scene3g::SpawnEnemy(const float deltaTime)
 {
 	for (int i = 0; i < enemySpawnerCount; i++) {
@@ -397,7 +393,6 @@ void Scene3g::SpawnEnemy(const float deltaTime)
 			enemyFleet.back()->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
 			enemyFleet.back()->setIndex(enemyIndex);
 			enemyFleetSpawners[i].canSpawn = false;
-
 		}
 	}
 
@@ -475,28 +470,25 @@ void Scene3g::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip, const
 		else {
 			rotationTimer = 0;
 		}
-		//ship->FindClosestEnemy(targetShip);
 		
 		if (ship->currentTargetIndex == targetShip->shipIndex) {
 			Vec3 targetDirection = targetShip->transform.getPos() - ship->transform.getPos();
 			Quaternion targetQuad = QMath::lookAt(targetDirection, UP);
 			ship->transform.setOrientation(targetQuad);
 			ship->initialDirection = targetDirection;
+			testLine.RecalculateLine(targetShip->aimingPoint, ship->transform.getPos());
 		}
+		
 		if (ship->isSwitchingTarget) {
-			
 			ship->slerpT = ship->slerpT + deltaTime;
 			if (ship->slerpT >= 1) {
 				ship->closestEnemy = ship->potentialTarget;
 				ship->currentTargetIndex = ship->closestEnemy->shipIndex;
 				ship->isSwitchingTarget = false;
 				ship->slerpT = 0;
-				std::cout << "Switch index: " << ship->currentTargetIndex << std::endl;
 			}
+			testLine.RecalculateLine(ship->potentialTarget->aimingPoint, ship->transform.getPos());
 		}
-
-		Line line = Line(targetShip->transform.getPos(), ship->transform.getPos());
-		line.draw();
 	}
 }
 
@@ -617,13 +609,12 @@ void Scene3g::createActors()
 		ship->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
 		ship->setIndex(enemyIndex);
 		enemyIndex++;
-		std::cout << "index: " << ship->shipIndex << std::endl;
 	}
 
-	/*for (int i = 0; i < startingFleetSize; i++) {
+	for (int i = 0; i < startingFleetSize; i++) {
 		playerFleet.push_back(new FriendlyShip(&friendlyShipModel, &bulletModel));
-	}*/
-	playerFleet.push_back(new FriendlyShip(&friendlyShipModel, &bulletModel));
+	}
+	//playerFleet.push_back(new FriendlyShip(&friendlyShipModel, &bulletModel));
 	//spawn the ships in a radius around the planet
 
 	int numShips = playerFleet.size();
@@ -674,6 +665,12 @@ void Scene3g::createShaders()
 	{
 		std::cout << "Shader failed ... we have a problem\n";
 	}
+
+	lineShader = new Shader("shaders/lineVert.glsl", "shaders/lineFrag.glsl");
+	if (lineShader->OnCreate() == false) {
+		std::cout << "Shader failed ... we have a problem\n";
+	}
+
 }
 
 void Scene3g::createClickGrid()
