@@ -72,6 +72,7 @@ private:
 
 	Shader* lineShader = nullptr;
 	Line pathLine = Line(Vec3(0, 0, 0), Vec3(1, 1, 1));
+	Line testLine = Line(Vec3(0, 0, 0), Vec3(100, 100, 100));
 
 	std::vector<FriendlyShip*> playerFleet;
 	std::vector<EnemyShip*> enemyFleet;

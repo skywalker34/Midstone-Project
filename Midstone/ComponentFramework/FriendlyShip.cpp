@@ -239,7 +239,8 @@ void FriendlyShip::rotateTowardTarget(Vec3 target)
 			Quaternion startQuad = QMath::lookAt(initialDirection, UP);
 			initialDirection.print("target: ");
 			Quaternion targetQuad = QMath::lookAt(target, UP);
-			Quaternion currentQuat = QMath::slerp(startQuad, targetQuad, slerpT);
+			Quaternion currentQuat = QMath::normalize(QMath::slerp(startQuad, targetQuad, slerpT));
+			
 			transform.setOrientation(currentQuat);
 		}
 
