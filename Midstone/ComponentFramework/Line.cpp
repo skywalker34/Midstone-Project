@@ -4,7 +4,7 @@
 Line::Line() {}
 
 Line::Line(Vec3 start, Vec3 end) {
-
+ 
 
 	transform.setPos(start);
 
@@ -14,8 +14,8 @@ Line::Line(Vec3 start, Vec3 end) {
 
 	Vec3 foward = Vec3(0, 0, -1);
 
-	start.print("Starting line point: ");
-	end.print("Ending line point: ");
+	/*start.print("Starting line point: ");
+	end.print("Ending line point: ");*/
 	Vec3 direction = VMath::normalize(end - start);
 
 	Quaternion q = QMath::lookAt(direction, UP);
@@ -23,7 +23,7 @@ Line::Line(Vec3 start, Vec3 end) {
 
 	transform.setOrientation(q);
 
-
+	
 
 
 
@@ -48,15 +48,23 @@ void Line::RecalculateLine(Vec3 start, Vec3 end)
 
 	Vec3 foward = Vec3(0, 0, -1);
 
-	start.print("Starting line point: ");
-	end.print("Ending line point: ");
-	Vec3 direction = VMath::normalize(end - start);
 
-	Quaternion q = QMath::lookAt(direction, UP);
+	/*start.print("Starting line point: ");
+	end.print("Ending line point: ");*/
+	Quaternion q = Quaternion();
+	Vec3 direction = VMath::normalize(end - start);
+	if (direction.x < VERY_SMALL && direction.y < VERY_SMALL && direction.z < VERY_SMALL) {
+		q = Quaternion();
+	}
+	else {
+		q = QMath::lookAt(direction, UP);
+	}
+
 
 
 	transform.setOrientation(q);
 }
+
 
 void Line::draw() {
 
@@ -72,3 +80,4 @@ Line::~Line() {
 	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1, &vbo);
 }
+

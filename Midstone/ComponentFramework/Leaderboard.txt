@@ -1,5 +1,5 @@
-Score: 23
-Time: 96.7873
+Score: 60
+Time: 168.11
 -
 Score: 62
 Time: 215.389

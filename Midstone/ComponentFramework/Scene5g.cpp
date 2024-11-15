@@ -151,6 +151,9 @@ bool Scene5g::OnCreate() {
 		//glGetIntegerv(GL_VIEWPORT, viewport);
 		//SCREEN_WIDTH = viewport[2];
 		//SCREEN_HEIGHT = viewport[3];
+
+
+		
 	}
 
 
@@ -167,8 +170,18 @@ bool Scene5g::OnCreate() {
 	shipModelMatrix =   MMath::translate(0.0f,0.0f,0.0f) * MMath::rotate(90.0f, Vec3(0.0f, 1.0f, 0.0f)) ;
 
 	sphereModelMatrix = MMath::rotate(90.0f, Vec3(0.0f, 1.0f, 0.0f)) ;
-		
+
+
+
+	//testLine = Line(Vec3(0, 0, 0), Vec3(0, 100, 0));
 	
+	lineShader = new Shader("shaders/lineVert.glsl", "shaders/lineFrag.glsl");
+	if (lineShader->OnCreate() == false) {
+		std::cout << "Shader failed ... we have a problem\n";
+	}
+
+
+
 	return true;
 }
 
@@ -200,7 +213,7 @@ void Scene5g::HandleEvents(const SDL_Event& sdlEvent) {
 
 void Scene5g::Update(const float deltaTime) {
 	playerController.Update(deltaTime);
-	drawInWireMode = true;
+	drawInWireMode = false;
 
 
 	time += deltaTime;
@@ -224,11 +237,13 @@ void Scene5g::Update(const float deltaTime) {
 	sphereModelMatrix = shipModelMatrix;
 
 
-
-
 }
 
 void Scene5g::Render() {
+
+
+
+
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -238,6 +253,28 @@ void Scene5g::Render() {
 	else {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
+
+	//GLfloat lineVerticices[] =
+	//{
+	//	0,0,0,
+	//	0,300,0
+	//};
+	//glEnableClientState(GL_VERTEX_ARRAY);
+	//glVertexPointer(3, GL_FLOAT, 0, lineVerticices);
+	//glUseProgram(lineShader->GetProgram());
+	//glDrawArrays(GL_LINES, 0, 2);
+	//glDisableClientState(GL_VERTEX_ARRAY);
+
+	
+
+	/*glDrawArrays(GL_LINES, 0, 2);
+	glDisableClientState(GL_VERTEX_ARRAY);*/
+
+	/*glUseProgram(lineShader->GetProgram());
+	glUniformMatrix4fv(lineShader->GetUniformID("MVP"), 1, GL_FALSE, testLine.MVP);
+	glUniform4fv(lineShader->GetUniformID("color"), 1,  Vec4(0,1,0,1));
+	testLine.draw();*/
+	//glUseProgram(0);
 
 
 
@@ -276,10 +313,83 @@ void Scene5g::Render() {
 	glUniform4fv(normalShader->GetUniformID("meshColor"), 1, BLUE);
 	ship->Render(GL_TRIANGLES);
 
+	glUseProgram(lineShader->GetProgram());
+	glUniformMatrix4fv(lineShader->GetUniformID("projection"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+	glUniformMatrix4fv(lineShader->GetUniformID("view"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+	glUniformMatrix4fv(lineShader->GetUniformID("model"), 1, GL_FALSE, testLine.transform.toModelMatrix());
+	testLine.draw();
+
 	glUseProgram(0);
 	
 }
 
 
-
-
+//void Scene5g::draw_line(const Vec3& p1, const Vec3& p2, const Vec3& color)
+//{
+//	// point 1
+//	lineData.push_back(p1.x);
+//	lineData.push_back(p1.y);
+//	lineData.push_back(p1.z);
+//
+//	// color
+//	lineData.push_back(color.x);
+//	lineData.push_back(color.y);
+//	lineData.push_back(color.z);
+//
+//	// point 2
+//	lineData.push_back(p2.x);
+//	lineData.push_back(p2.y);
+//	lineData.push_back(p2.z);
+//
+//	// color
+//	lineData.push_back(color.x);
+//	lineData.push_back(color.y);
+//	lineData.push_back(color.z);
+//
+//}
+//
+//
+//void Scene5g::draw_lines_flush()
+//{
+//	static unsigned int vao, vbo;
+//
+//	static bool created = false;
+//	if (!created)
+//	{
+//		created = true;
+//
+//		glGenVertexArrays(1, &vao);
+//		glBindVertexArray(vao);
+//
+//		glGenBuffers(1, &vbo);
+//		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+//		glBufferData(GL_ARRAY_BUFFER, lineData.size() * sizeof(float),
+//			lineData.data(), GL_DYNAMIC_DRAW);
+//
+//		glEnableVertexAttribArray(0);
+//		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+//			(void*)0);
+//
+//		glEnableVertexAttribArray(1);
+//		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+//			(void*)(3 * sizeof(float)));
+//	}
+//	else
+//	{
+//		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+//		glBufferData(GL_ARRAY_BUFFER, lineData.size() * sizeof(float),
+//			lineData.data(), GL_DYNAMIC_DRAW);
+//	}
+//
+//	// 6 floats make up a vertex (3 position 3 color)
+//	// divide by that to get number of vertices to draw
+//	int count = lineData.size() / 6;
+//
+//	glBindVertexArray(vao);
+//	glDrawArrays(GL_LINES, 0, count);
+//
+//	lineData.clear();
+//}
+//
+//
+//

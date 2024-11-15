@@ -173,12 +173,14 @@ void FriendlyShip::FindClosestEnemy(EnemyShip* enemy)
 		currentTargetDistance = VMath::mag(transform.getPos() - closestEnemy->transform.getPos());
 		potentialTargetDistance = VMath::mag(transform.getPos() - enemy->transform.getPos());
 		potentialTarget = enemy;
-		//potentialTarget->transform.getPos().print("potential target");
+
+		potentialTarget->aimingPoint = potentialTarget->transform.getPos() + potentialTarget->body->vel;
+
 	}
 	
 	if (potentialTargetDistance < currentTargetDistance) {
 		isSwitchingTarget = true;
-		rotateTowardTarget(potentialTarget->aimingPoint);
+		rotateTowardTarget(potentialTarget->aimingPoint - transform.getPos());
 	}
 }
 
@@ -221,8 +223,6 @@ void FriendlyShip::moveToDestination(Vec3 destination_)
 		body->vel = speed * VMath::normalize(movingDirection);
 	}
 	else {
-
-		
 		Vec3 diff =  destination - transform.getPos(); //"draw" a vector between the 2 points
 		movingDirection = VMath::normalize(diff);//"convert" thevector into just a direction (normalize)
 		body->vel = movingDirection * speed; //tell the ship to move along that vector
@@ -231,8 +231,10 @@ void FriendlyShip::moveToDestination(Vec3 destination_)
 
 void FriendlyShip::rotateTowardTarget(Vec3 target)
 {
+	if (VMath::mag(target) < 0.0001) return;
 	//keeps the ship pointing toward where its going
 	if (slerpT < 1) {
+
 		if (VMath::mag(target) != 0) {
 			Quaternion startQuad = QMath::lookAt(initialDirection, UP);
 			initialDirection.print("target: ");
@@ -240,6 +242,7 @@ void FriendlyShip::rotateTowardTarget(Vec3 target)
 			Quaternion currentQuat = QMath::slerp(startQuad, targetQuad, slerpT);
 			transform.setOrientation(currentQuat);
 		}
+
 	}
 	else {
 		initialDirection = target;
