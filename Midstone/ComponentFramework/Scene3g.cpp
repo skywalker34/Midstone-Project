@@ -268,7 +268,7 @@ void Scene3g::Render() {
 
 	}*/
 
-	
+
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glUseProgram(lineShader->GetProgram());
@@ -297,7 +297,7 @@ void Scene3g::Render() {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	
+
 
 
 
@@ -317,7 +317,7 @@ void Scene3g::Render() {
 			glUniform4fv(friendlyShipShader->GetUniformID("secondaryColour"), 1, GREY);
 			glUniform4fv(friendlyShipShader->GetUniformID("tertiaryColour"), 1, RED);
 			ship->Render(friendlyShipShader);
-			
+
 
 
 
@@ -327,9 +327,9 @@ void Scene3g::Render() {
 		}
 	}
 
-	
 
-	
+
+
 	glUseProgram(planetShader->GetProgram());
 	glUniformMatrix4fv(planetShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 	glUniformMatrix4fv(planetShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
@@ -362,7 +362,7 @@ void Scene3g::Render() {
 		glUniform3fv(bulletShader->GetUniformID("cameraPos"), 1, playerController.camera.transform.getPos());
 		ship->RenderBullets(bulletShader);
 
-		
+
 
 
 		if (ship->isMoving && isGameRunning) {
@@ -371,17 +371,22 @@ void Scene3g::Render() {
 
 
 
-	if (isGivingOrders) {
+		if (isGivingOrders) 
+		{
 
 
-		glUseProgram(shader->GetProgram());
-		glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
-		glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-		ship->RenderRange(shader);
+			glUseProgram(shader->GetProgram());
+			glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+			glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+			ship->RenderRange(shader);
+		}
+
+
+		
 	}
 
-
-	if (isMouseOverShip) {
+	if (isMouseOverShip)
+	{
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glUseProgram(selectionShader->GetProgram());
@@ -392,9 +397,11 @@ void Scene3g::Render() {
 		glDisable(GL_BLEND);
 	}
 
-	if (isGivingOrders) {
+	if (isGivingOrders) 
+	{
 
-		if (!isMouseOverShip) {
+		if (!isMouseOverShip) 
+		{
 			glUseProgram(shader->GetProgram());
 			glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 			glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
@@ -404,55 +411,54 @@ void Scene3g::Render() {
 		}
 
 
-	
+
 		glUseProgram(gridShader->GetProgram());
 		glUniformMatrix4fv(gridShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 		glUniformMatrix4fv(gridShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
 		playerController.Render(gridShader);
 	}
 
-     
-
-	
-
-	
-
-	// IMGUI STUFF
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplSDL2_NewFrame();
-
-	//This is the font stuff if you can find a working one then yeah. But otherwise im gonna keep it default for now.
-	//ImGuiIO& io = ImGui::GetIO();
-	//ImFontConfig config;
-	//config.OversampleH = 2;
-	//io.Fonts->AddFontDefault();
-	//ImFont* textFont = io.Fonts->AddFontFromFileTTF("./fonts/Comic Sans MS.ttf", 23.0f, &config);
-	//IM_ASSERT(textFont != NULL);
-	//io.Fonts->Build();
 
 
 
-	// IMGUI STUFF 
-	ImGui_ImplOpenGL3_NewFrame(); 
-	ImGui_ImplSDL2_NewFrame(); 
-	ImGui::NewFrame(); 
-	bool p_open = false; 
-	// Apply the font 
-	ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
-	// Use the loaded font
-	ImGui::Begin("Timer and Score", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-	ImGui::Text("Time = %f", timeElapsed);
-	ImGui::Text("Score = %i", score); 
-	ImGui::Text("Planet Health: = %i", planet.GetHealth());
-	ImGui::End(); 
-	ImGui::Begin("QuitButton", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-	if (ImGui::Button("Quit to Title", ImVec2(150,30))) switchButton = true; 
-	ImGui::End();
-	ImGui::PopFont(); // Pop the font after usage 
-	ImGui::Render(); 
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); 
-	glUseProgram(0);
+
+		// IMGUI STUFF
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplSDL2_NewFrame();
+
+		//This is the font stuff if you can find a working one then yeah. But otherwise im gonna keep it default for now.
+		//ImGuiIO& io = ImGui::GetIO();
+		//ImFontConfig config;
+		//config.OversampleH = 2;
+		//io.Fonts->AddFontDefault();
+		//ImFont* textFont = io.Fonts->AddFontFromFileTTF("./fonts/Comic Sans MS.ttf", 23.0f, &config);
+		//IM_ASSERT(textFont != NULL);
+		//io.Fonts->Build();
+
+
+
+		// IMGUI STUFF 
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplSDL2_NewFrame();
+		ImGui::NewFrame();
+		bool p_open = false;
+		// Apply the font 
+		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
+		// Use the loaded font
+		ImGui::Begin("Timer and Score", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+		ImGui::Text("Time = %f", timeElapsed);
+		ImGui::Text("Score = %i", score);
+		ImGui::Text("Planet Health: = %i", planet.GetHealth());
+		ImGui::End();
+		ImGui::Begin("QuitButton", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+		if (ImGui::Button("Quit to Title", ImVec2(150, 30))) switchButton = true;
+		ImGui::End();
+		ImGui::PopFont(); // Pop the font after usage 
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		glUseProgram(0);
 }
+
 void Scene3g::SpawnEnemy(const float deltaTime)
 {
 	for (int i = 0; i < enemySpawnerCount; i++) {
