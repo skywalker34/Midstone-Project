@@ -1,50 +1,36 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Actor.cpp" />
-    <ClCompile Include="Body.cpp" />
-    <ClCompile Include="Bullet.cpp" />
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Collision.cpp" />
-    <ClCompile Include="ComputeShader.cpp" />
-    <ClCompile Include="Debug.cpp" />
-    <ClCompile Include="EnemyShip.cpp" />
-    <ClCompile Include="EnemySpawner.cpp" />
-    <ClCompile Include="ExhaustTrail.cpp" />
-    <ClCompile Include="FriendlyShip.cpp" />
-    <ClCompile Include="imgui.cpp" />
-    <ClCompile Include="imgui_demo.cpp" />
-    <ClCompile Include="imgui_draw.cpp" />
-    <ClCompile Include="imgui_impl_opengl3.cpp" />
-    <ClCompile Include="imgui_impl_sdl2.cpp" />
-    <ClCompile Include="imgui_tables.cpp" />
-    <ClCompile Include="imgui_widgets.cpp" />
-    <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="Model.cpp" />
-    <ClCompile Include="Planet.cpp" />
-    <ClCompile Include="PlayerController.cpp" />
-    <ClCompile Include="Scene0p.cpp" />
-    <ClCompile Include="Scene1g.cpp" />
-    <ClCompile Include="Scene2g.cpp" />
-    <ClCompile Include="Scene3g.cpp" />
-    <ClCompile Include="Scene5g.cpp" />
-    <ClCompile Include="SceneGameOver.cpp" />
-    <ClCompile Include="SceneManager.cpp" />
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Scene0g.cpp" />
-    <ClCompile Include="SceneUI.cpp" />
-    <ClCompile Include="SceneUI2.cpp" />
-    <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="Ship.cpp" />
-    <ClCompile Include="ShipController.cpp" />
-    <ClCompile Include="SkyBox.cpp" />
-    <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="Timer.cpp" />
-    <ClCompile Include="Trackball.cpp" />
-    <ClCompile Include="Transform.cpp" />
-    <ClCompile Include="Window.cpp" />
-    <ClCompile Include="Line.cpp" />
-    <ClCompile Include="LeaderBoard.cpp" />
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Scenes">
+      <UniqueIdentifier>{252de02d-6b89-41ec-b372-ddfef9870bbe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scenes">
+      <UniqueIdentifier>{e8c82a08-d757-47ee-b6fe-eee59a99570f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Actors">
+      <UniqueIdentifier>{4b77be70-1dc3-4fd6-bea0-d13c986e8bcf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Actors">
+      <UniqueIdentifier>{b7a90c99-a5c4-43d6-9ba9-eab31fb07efb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\IMGUI">
+      <UniqueIdentifier>{edd92cbc-c033-44aa-a7ff-73d0ae0703b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\IMGUI">
+      <UniqueIdentifier>{b8005b75-25ca-47c7-b0ea-3fd6853ce779}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -176,78 +162,221 @@
     <ClCompile Include="Line.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LeaderBoard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Actor.h" />
-    <ClInclude Include="Body.h" />
-    <ClInclude Include="Bullet.h" />
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="Collision.h" />
-    <ClInclude Include="ComputeShader.h" />
-    <ClInclude Include="Constants.h" />
-    <ClInclude Include="Debug.h" />
-    <ClInclude Include="EnemyShip.h" />
-    <ClInclude Include="EnemySpawner.h" />
-    <ClInclude Include="ExhaustTrail.h" />
-    <ClInclude Include="FriendlyShip.h" />
-    <ClInclude Include="imconfig.h" />
-    <ClInclude Include="imgui.h" />
-    <ClInclude Include="imgui_impl_opengl3.h" />
-    <ClInclude Include="imgui_impl_opengl3_loader.h" />
-    <ClInclude Include="imgui_impl_sdl2.h" />
-    <ClInclude Include="imgui_internal.h" />
-    <ClInclude Include="imstb_rectpack.h" />
-    <ClInclude Include="imstb_textedit.h" />
-    <ClInclude Include="imstb_truetype.h" />
-    <ClInclude Include="Line.h" />
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="Model.h" />
-    <ClInclude Include="Planet.h" />
-    <ClInclude Include="PlayerController.h" />
-    <ClInclude Include="Scene0p.h" />
-    <ClInclude Include="Scene1g.h" />
-    <ClInclude Include="Scene2g.h" />
-    <ClInclude Include="Scene3g.h" />
-    <ClInclude Include="Scene5g.h" />
-    <ClInclude Include="SceneGameOver.h" />
-    <ClInclude Include="SceneManager.h" />
-    <ClInclude Include="Scene.h" />
-    <ClInclude Include="Scene0g.h" />
-    <ClInclude Include="SceneUI.h" />
-    <ClInclude Include="SceneUI2.h" />
-    <ClInclude Include="Shader.h" />
-    <ClInclude Include="Ship.h" />
-    <ClInclude Include="ShipController.h" />
-    <ClInclude Include="SkyBox.h" />
-    <ClInclude Include="stb_image.h" />
-    <ClInclude Include="Texture.h" />
-    <ClInclude Include="Timer.h" />
-    <ClInclude Include="tiny_obj_loader.h" />
-    <ClInclude Include="Trackball.h" />
-    <ClInclude Include="Transform.h" />
-    <ClInclude Include="Window.h" />
-    <ClInclude Include="LeaderBoard.h" />
+    <ClInclude Include="Debug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene0g.h">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tiny_obj_loader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Body.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene0p.h">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Trackball.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ShipController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene1g.h">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Constants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Bullet.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyShip.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="FriendlyShip.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Ship.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Planet.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene2g.h">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneUI.h">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene3g.h">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemySpawner.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene5g.h">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="ComputeShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="imconfig.h">
+      <Filter>Header Files\IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui.h">
+      <Filter>Header Files\IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_impl_opengl3.h">
+      <Filter>Header Files\IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_impl_opengl3_loader.h">
+      <Filter>Header Files\IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_impl_sdl2.h">
+      <Filter>Header Files\IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_internal.h">
+      <Filter>Header Files\IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imstb_rectpack.h">
+      <Filter>Header Files\IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imstb_textedit.h">
+      <Filter>Header Files\IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imstb_truetype.h">
+      <Filter>Header Files\IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneUI2.h">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="ExhaustTrail.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneGameOver.h">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Line.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LeaderBoard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="GameEngineLog.txt" />
+    <Text Include="GameEngineLog.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\bulletFrag.glsl" />
-    <None Include="shaders\bulletVert.glsl" />
-    <None Include="shaders\clickGridFrag.glsl" />
-    <None Include="shaders\clickGridVert.glsl" />
-    <None Include="shaders\computer.glsl" />
-    <None Include="shaders\defaultFrag.glsl" />
-    <None Include="shaders\defaultVert.glsl" />
-    <None Include="shaders\friendlyShipFrag.glsl" />
-    <None Include="shaders\friendlyShipVert.glsl" />
-    <None Include="shaders\loadVerticiesFrag.glsl" />
-    <None Include="shaders\loadVerticiesVert.glsl" />
-    <None Include="shaders\planetFrag.glsl" />
-    <None Include="shaders\planetVert.glsl" />
-    <None Include="shaders\skyboxFrag.glsl" />
-    <None Include="shaders\skyboxVert.glsl" />
-    <None Include="shaders\particleFrag.glsl" />
-    <None Include="shaders\particleVert.glsl" />
+    <None Include="shaders\defaultFrag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\defaultVert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\skyboxFrag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\skyboxVert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\computer.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\loadVerticiesFrag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\loadVerticiesVert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\particleFrag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\particleVert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\bulletFrag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\bulletVert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\planetFrag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\planetVert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\friendlyShipFrag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\friendlyShipVert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\clickGridFrag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\clickGridVert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\selectionFrag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\selectionVert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
