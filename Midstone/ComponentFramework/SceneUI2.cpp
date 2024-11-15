@@ -87,7 +87,7 @@ SceneUI2::~SceneUI2() {
 bool SceneUI2::OnCreate() {
 	Debug::Info("Loading assets Scene2g: ", __FILE__, __LINE__);
 
-	SoundEngine->play2D("audio/StartScreenSound.mp3", true); // Audio For Main Screen
+	SoundEngine->play2D("audio/BackGroundMusic3.mp3", true); // Audio For Main Screen
 	
 
 	printf("On Create finished!!!!!");
