@@ -470,16 +470,15 @@ void Scene3g::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip, const
 		else {
 			rotationTimer = 0;
 		}
-		//ship->FindClosestEnemy(targetShip);
 		
 		if (ship->currentTargetIndex == targetShip->shipIndex) {
 			Vec3 targetDirection = targetShip->transform.getPos() - ship->transform.getPos();
 			Quaternion targetQuad = QMath::lookAt(targetDirection, UP);
 			ship->transform.setOrientation(targetQuad);
 			ship->initialDirection = targetDirection;
-			testLine.RecalculateLine(targetShip->transform.getPos(), ship->transform.getPos());
+			testLine.RecalculateLine(targetShip->aimingPoint, ship->transform.getPos());
 		}
-		std::cout << "potentialTarget: " << ship->potentialTarget->shipIndex << std::endl;
+		
 		if (ship->isSwitchingTarget) {
 			ship->slerpT = ship->slerpT + deltaTime;
 			if (ship->slerpT >= 1) {
@@ -487,13 +486,9 @@ void Scene3g::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip, const
 				ship->currentTargetIndex = ship->closestEnemy->shipIndex;
 				ship->isSwitchingTarget = false;
 				ship->slerpT = 0;
-				std::cout << "Switch index: " << ship->currentTargetIndex << std::endl;
 			}
-			testLine.RecalculateLine(ship->potentialTarget->transform.getPos(), ship->transform.getPos());
+			testLine.RecalculateLine(ship->potentialTarget->aimingPoint, ship->transform.getPos());
 		}
-
-		//testLine.RecalculateLine(ship->closestEnemy->transform.getPos(), ship->transform.getPos());
-	
 	}
 }
 
@@ -614,7 +609,6 @@ void Scene3g::createActors()
 		ship->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
 		ship->setIndex(enemyIndex);
 		enemyIndex++;
-		std::cout << "index: " << ship->shipIndex << std::endl;
 	}
 
 	for (int i = 0; i < startingFleetSize; i++) {
