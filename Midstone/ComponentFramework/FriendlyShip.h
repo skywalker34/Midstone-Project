@@ -44,8 +44,12 @@ class FriendlyShip :
 		EnemyShip* closestEnemy;
 		EnemyShip* potentialTarget;
 
+		EnemyShip* activeTarget;
+
 		Vec4 color = BLUE;
 		bool isMoving = false;
+		bool isChasing = false;
+
 		bool canFire = true;
 		
 		float timeSinceShot = 0;//the time since the ship has last fired a shot
@@ -75,6 +79,7 @@ class FriendlyShip :
 		void Update(const float deltaTime);
 		void Render(Shader* shader) const;
 		void RenderBullets(Shader* shader) const;
+		void RenderRange(Shader* shader) const;
 		
 		void Fire();
 		void moveToDestination(Vec3 destination);

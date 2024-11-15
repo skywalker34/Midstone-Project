@@ -125,6 +125,9 @@ void Scene3g::OnDestroy() {
 	loadVertsToBuffer->OnDestroy();
 	delete loadVertsToBuffer;
 
+	lineShader->OnDestroy();
+	delete lineShader;
+
 
 	// Cleanup
 	ImGui_ImplOpenGL3_Shutdown();
@@ -276,34 +279,7 @@ void Scene3g::Render() {
 	
 
 
-	for (FriendlyShip* ship : playerFleet) {
-		
-		//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
-		glUseProgram(friendlyShipShader->GetProgram());
-		glUniformMatrix4fv(friendlyShipShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
-		glUniformMatrix4fv(friendlyShipShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-		glUniform3fv(friendlyShipShader->GetUniformID("lightPos"), 1, lightPos);
-		glUniform4fv(friendlyShipShader->GetUniformID("primaryColour"), 1, ORANGE);
-		glUniform4fv(friendlyShipShader->GetUniformID("secondaryColour"), 1, GREY);
-		glUniform4fv(friendlyShipShader->GetUniformID("tertiaryColour"), 1, BLUE);
-		ship->Render(friendlyShipShader);
 
-
-
-
-		
-		glUseProgram(bulletShader->GetProgram());
-		glUniformMatrix4fv(bulletShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
-		glUniformMatrix4fv(bulletShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-		glUniform3fv(bulletShader->GetUniformID("cameraPos"), 1, playerController.camera.transform.getPos());
-		ship->RenderBullets(bulletShader);
-		
-
-
-		if (ship->isMoving && isGameRunning) {
-			ship->exhaustTrail.Render(particleShader, computeShader);
-		}
-	}
 
 
 
@@ -341,23 +317,47 @@ void Scene3g::Render() {
 	glUniform3fv(planetShader->GetUniformID("cameraPos"), 1, playerController.camera.transform.getPos());
 	planet.Render(planetShader);
 
-	if (isGivingOrders) {
+
+
+
+	for (FriendlyShip* ship : playerFleet) {
+
+		//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
+		glUseProgram(friendlyShipShader->GetProgram());
+		glUniformMatrix4fv(friendlyShipShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+		glUniformMatrix4fv(friendlyShipShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+		glUniform3fv(friendlyShipShader->GetUniformID("lightPos"), 1, lightPos);
+		glUniform4fv(friendlyShipShader->GetUniformID("primaryColour"), 1, ORANGE);
+		glUniform4fv(friendlyShipShader->GetUniformID("secondaryColour"), 1, GREY);
+		glUniform4fv(friendlyShipShader->GetUniformID("tertiaryColour"), 1, BLUE);
+		ship->Render(friendlyShipShader);
+
+
+
+
+
+		glUseProgram(bulletShader->GetProgram());
+		glUniformMatrix4fv(bulletShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+		glUniformMatrix4fv(bulletShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+		glUniform3fv(bulletShader->GetUniformID("cameraPos"), 1, playerController.camera.transform.getPos());
+		ship->RenderBullets(bulletShader);
+
+		
+
+
+		if (ship->isMoving && isGameRunning) {
+			ship->exhaustTrail.Render(particleShader, computeShader);
+		}
+
+
 
 		glUseProgram(shader->GetProgram());
 		glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 		glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, testModelMat);
-		glUniform4fv(shader->GetUniformID("meshColor"), 1, ORANGE);
-		testMesh->Render(GL_TRIANGLES);
-
-
-	
-		glUseProgram(gridShader->GetProgram());
-		glUniformMatrix4fv(gridShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
-		glUniformMatrix4fv(gridShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-		playerController.Render(gridShader);
+		ship->RenderRange(shader);
 	}
-  
+
+
 	if (isMouseOverShip) {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -368,6 +368,30 @@ void Scene3g::Render() {
 		selectionSphere.Render(selectionShader);
 		glDisable(GL_BLEND);
 	}
+
+	if (isGivingOrders) {
+
+		if (!isMouseOverShip) {
+			glUseProgram(shader->GetProgram());
+			glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+			glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+			glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, testModelMat);
+			glUniform4fv(shader->GetUniformID("meshColor"), 1, ORANGE);
+			testMesh->Render(GL_TRIANGLES);
+		}
+
+
+	
+		glUseProgram(gridShader->GetProgram());
+		glUniformMatrix4fv(gridShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+		glUniformMatrix4fv(gridShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+		playerController.Render(gridShader);
+	}
+     
+
+	
+
+	
 
 	// IMGUI STUFF
 	ImGui_ImplOpenGL3_NewFrame();
@@ -469,7 +493,11 @@ void Scene3g::SetActiveShip()
 					playerController.has3DClick = false;
 					shipWaypoint = ship->transform.getPos();
 					isGivingOrders = false;
-					playerFleet[activeShip]->moveToDestination(shipWaypoint);
+
+					printf("ATTACKING! \n");
+
+					playerFleet[activeShip]->isChasing = true;
+					playerFleet[activeShip]->activeTarget = ship;
 					activeShip = -1;
 				}
 				break;
