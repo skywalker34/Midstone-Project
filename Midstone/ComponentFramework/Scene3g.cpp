@@ -66,8 +66,11 @@ bool Scene3g::OnCreate() {
 	particleMesh = new Mesh("meshes/Mario.obj");
 	particleMesh->OnCreate();
 
-	SoundEngine->play2D("audio/BackGroundMusic.mp3", true); // Audio For Game 
-	SoundEngine->setSoundVolume(0.0f);
+
+	SoundEngine->setSoundVolume(0.4f);
+	SoundEngine->play2D("audio/BackGroundMusic2.mp3", true); // Audio For Game 
+	
+
 
 
 	createModels();
@@ -480,7 +483,6 @@ void Scene3g::SpawnEnemy(const float deltaTime)
 void Scene3g::SetActiveShip()
 {
 
-
 	playerController.calculateLine(); //get the raycast into the screen
 
 	int i = 0;
@@ -496,6 +498,7 @@ void Scene3g::SetActiveShip()
 				isGivingOrders = true;
 				
 				playerController.has3DClick = false;
+        SoundEngine->play2D("audio/SelectionSound.mp3", false); // Audio For Selection Ship
 			}
 			break;
 		}
@@ -538,8 +541,10 @@ void Scene3g::SetActiveShip()
 
 	testModelMat = MMath::translate(playerController.hoverPos) * MMath::scale(1, 1, 1);
 	if (playerController.has3DClick && isGivingOrders) {
+
 		if (activeShip >= 0) {
 			shipWaypoint = playerController.getClickPos();
+			
 			playerFleet[activeShip]->moveToDestination(shipWaypoint);
 			isGivingOrders = false;
 			activeShip = -1;
@@ -547,11 +552,13 @@ void Scene3g::SetActiveShip()
 	}
 
 
+
 	if (playerController.hasCanceledOrder) {
 		isGivingOrders = false;
 		activeShip = -1;
 
 		playerController.hasCanceledOrder = false;
+
 	}
 	
 }
@@ -644,6 +651,11 @@ void Scene3g::UpdateEnemyFleet(const float deltaTime)
 			if (COLLISION::SphereSphereCollisionDetected(enemyFleet[i]->collisionSphere, planet.collisionSphere)) {
 				planet.takeDamage(1);
 
+				
+				SoundEngine->setSoundVolume(0.2f);
+				SoundEngine->play2D("audio/PlanetGotHit.mp3", false); // Planet Got Hit Sound
+
+				
 				DestroyEnenmy(i);
 			}
 
@@ -668,7 +680,9 @@ void Scene3g::GameOver()
 	//END GAME LOGIC HERE PLEASE
 	std::cout << "\033[32m" << "GAMEOVER!" << "\033[0m" << std::endl;
 	SaveStats();
+	SoundEngine->play2D("audio/GameoverSound.mp3", false);
 	gameOverBool = true;
+	
 }
 
 

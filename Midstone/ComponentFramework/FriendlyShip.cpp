@@ -65,6 +65,9 @@ void FriendlyShip::OnDestroy()
 
 	delete model;
 
+	SoundEngine->drop();
+	SoundEngineFlying->drop();
+
 }
 
 void FriendlyShip::Update(const float deltaTime)
@@ -87,6 +90,13 @@ void FriendlyShip::Update(const float deltaTime)
 
 	if (hasReachDestination()) {
 		isMoving = false;
+
+		bool HappenOnce = true;
+		if (HappenOnce == true && isMoving == false)
+		{
+			SoundEngineFlying->stopAllSounds();
+			HappenOnce = false;
+		}
 	}
 
 	if (isMoving) {
@@ -205,9 +215,27 @@ void FriendlyShip::Fire()
     if (bullets.back()->OnCreate() == false) {
         printf("Bullet failed! \n");
     }
+
+	// Audio
 	Vec3 bulletSpawn = transform.getPos();
 	irrklang::vec3df position(bulletSpawn.x, bulletSpawn.y, bulletSpawn.z);
-	SoundEngine->play3D("audio/LaserShooting.mp3", position, false); // Audio For Shooting Noise
+	int RandomChance = rand() % 3 + 1; // Random number From 1 to 3
+	if (RandomChance == 1)
+	{
+		SoundEngine->play3D("audio/LaserShooting.mp3", position, false); // Audio For Shooting Noise
+		SoundEngine->setSoundVolume(1.0f);
+	}
+	if (RandomChance == 2)
+	{
+		SoundEngine->play3D("audio/DisturbedShooting.mp3", position, false); // Audio For Shooting Noise
+		SoundEngine->setSoundVolume(1.0f);
+
+	}
+	if (RandomChance == 3)
+	{
+		SoundEngine->play3D("audio/PewShoot.mp3", position, false); // Audio For Shooting Noise
+		SoundEngine->setSoundVolume(1.0f);
+	}
 }
 
 
@@ -216,6 +244,12 @@ void FriendlyShip::moveToDestination(Vec3 destination_)
 	destination = destination_;
 	isMoving = true;
 	slerpT = 0;
+
+	
+	irrklang::vec3df BodyPosition(body->pos.x, body->pos.y, body->pos.z);  
+	SoundEngineFlying->setSoundVolume(0.3f);
+	SoundEngineFlying->play3D("audio/RocketFlying.mp3", BodyPosition, true); 
+
 	if (wouldIntersectPlanet) {
 		Vec3 axis = VMath::cross(destination, transform.getPos());
 		Quaternion newPosition = QMath::angleAxisRotation(1.0f, axis);
