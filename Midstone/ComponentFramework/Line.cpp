@@ -48,6 +48,7 @@ void Line::RecalculateLine(Vec3 start, Vec3 end)
 
 	Vec3 foward = Vec3(0, 0, -1);
 
+
 	/*start.print("Starting line point: ");
 	end.print("Ending line point: ");*/
 	Quaternion q = Quaternion();
@@ -60,20 +61,23 @@ void Line::RecalculateLine(Vec3 start, Vec3 end)
 	}
 
 
+
 	transform.setOrientation(q);
 }
 
-void Line::draw()  {
 
+void Line::draw() {
 
-    glBindVertexArray(vao);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    glBindVertexArray(0);
+	glLineWidth(5.0f); // Set the line width to 5 pixels (adjust as needed)
+	glBindVertexArray(vao);
+	glDrawArrays(GL_LINES, 0, 3);
+	glBindVertexArray(0);
 
 
 }
 
 Line::~Line() {
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers(1, &vbo);
+	glDeleteVertexArrays(1, &vao);
+	glDeleteBuffers(1, &vbo);
 }
+

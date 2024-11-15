@@ -12,7 +12,7 @@ public:
 	Transform transform;
 	Model* model;
 
-
+	Vec4 meshColour = Vec4(1,1,1,1);
 	
 	Sphere* collisionSphere = nullptr;
 
