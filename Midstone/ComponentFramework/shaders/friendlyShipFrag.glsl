@@ -57,7 +57,7 @@ void main() {
 	float spec = max(dot(eyeDir, reflection), 0.0);
 	spec = pow(spec,1.0);
 	vec4 outputColour = (ka + ((diff * kd) + (spec *ks)) * kt) ;	
-
+	
 	//mix with an atmosphere colour at the edges
 	fragColour = outputColour = (ka + ((diff * kd) + (spec *ks)) * kt);
 	

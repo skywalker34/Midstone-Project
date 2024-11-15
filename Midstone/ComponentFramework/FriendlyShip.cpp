@@ -1,6 +1,6 @@
 #include "FriendlyShip.h"
 #include "Sphere.h"
-
+#include "Collision.h"
 
 
 //depreciated
@@ -103,11 +103,31 @@ void FriendlyShip::Update(const float deltaTime)
 		slerpT = slerpT >= 1 ? 1 : slerpT + deltaTime;
 		body->Update(deltaTime);
 		rotateTowardTarget(movingDirection);
+
 		isMoving = VMath::mag(destination - transform.getPos()) > 0.01;
+		
+		
 	}
 	else {
 		body->vel = Vec3();
 	}
+
+	if (isChasing && !activeTarget->deleteMe) { //if player clicks on a ship then on an enemy the ship enters chasing mode
+		destination = activeTarget->transform.getPos(); //set the destination to the enemy's pos
+		moveToDestination(destination);
+		//isMoving = VMath::mag(destination - transform.getPos()) > 0.01; //check if we've already reached the enemy
+		if (COLLISION::SphereSphereCollisionDetected(&detectionSphere, activeTarget->collisionSphere)) {
+			//reset the variables
+			isMoving = false;
+			activeTarget = nullptr;
+			isChasing = false;
+		}
+		else {
+			isMoving = true;
+
+		}
+	}
+
 	detectionSphere.center = transform.getPos();//update teh collision sphere to match the ships position
 	collisionSphere->center = transform.getPos();
 
@@ -130,14 +150,11 @@ void FriendlyShip::Render(Shader* shader) const
 	
 	model->mesh->Render(GL_TRIANGLES);
 
-	if (displayRange) {
-		
-		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, rangeSphereT.toModelMatrix());
-		//glUniform4fv(shader->GetUniformID("meshColor"), 1, color);
-		rangeSphere.mesh->Render(GL_LINES);
-	}
-
 	model->UnbindTextures();
+
+	
+
+	
 }
 
 void FriendlyShip::RenderBullets(Shader* shader) const
@@ -147,13 +164,28 @@ void FriendlyShip::RenderBullets(Shader* shader) const
 	}
 }
 
+void FriendlyShip::RenderRange(Shader* shader) const
+{
+	if (displayRange) {
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, rangeSphereT.toModelMatrix());
+		glUniform4fv(shader->GetUniformID("meshColor"), 1, Vec4(0.2,0.3,0.5,0.4));
+		//glUniform4fv(shader->GetUniformID("meshColor"), 1, color);
+		rangeSphere.mesh->Render(GL_LINES);
+		glDisable(GL_BLEND);
+	}
+}
+
 void FriendlyShip::FindClosestEnemy(EnemyShip* enemy)
 {	
 	if (!isSwitchingTarget) {
 		currentTargetDistance = VMath::mag(transform.getPos() - closestEnemy->transform.getPos());
 		potentialTargetDistance = VMath::mag(transform.getPos() - enemy->transform.getPos());
 		potentialTarget = enemy;
+
 		potentialTarget->aimingPoint = potentialTarget->transform.getPos() + potentialTarget->body->vel;
+
 	}
 	
 	if (potentialTargetDistance < currentTargetDistance) {
@@ -236,10 +268,15 @@ void FriendlyShip::rotateTowardTarget(Vec3 target)
 	if (VMath::mag(target) < 0.0001) return;
 	//keeps the ship pointing toward where its going
 	if (slerpT < 1) {
-		Quaternion startQuad = QMath::lookAt(initialDirection, UP);
-		Quaternion targetQuad = QMath::lookAt(target, UP);
-		Quaternion currentQuat = QMath::normalize(QMath::slerp(startQuad, targetQuad, slerpT));
-		transform.setOrientation(currentQuat);
+
+		if (VMath::mag(target) != 0) {
+			Quaternion startQuad = QMath::lookAt(initialDirection, UP);
+			initialDirection.print("target: ");
+			Quaternion targetQuad = QMath::lookAt(target, UP);
+			Quaternion currentQuat = QMath::slerp(startQuad, targetQuad, slerpT);
+			transform.setOrientation(currentQuat);
+		}
+
 	}
 	else {
 		initialDirection = target;

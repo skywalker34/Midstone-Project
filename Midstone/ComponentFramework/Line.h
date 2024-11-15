@@ -13,7 +13,8 @@ using namespace MATH;
 class Line
 {
 public:
-   
+
+
     Transform transform;
     unsigned int vbo;
     unsigned int vao;

@@ -3,7 +3,7 @@
 #include <SDL.h>
 #include <DQMath.h>
 #include <Plane.h>
-
+#include "Collision.h"
 
 
 PlayerController::PlayerController()
@@ -70,7 +70,8 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 			//	below works *marginally* better (still jank af)
 			v = transform.getPos();
 			v += (VMath::normalize(-forwardVector) * CAMERA_SPEED);
-			transform.setPos(v);
+			
+			
 			break;
 
 		case SDL_SCANCODE_S:
@@ -79,7 +80,7 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 
 			v = transform.getPos();
 			v += (VMath::normalize(forwardVector) * CAMERA_SPEED);
-			transform.setPos(v);
+
 			break;
 
 			//future for strafing movement
@@ -87,7 +88,7 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 
 			v = transform.getPos();
 			v += (VMath::normalize(-rightVector) * CAMERA_SPEED);
-			transform.setPos(v);
+
 			//move the camera right
 			break;
 
@@ -95,21 +96,21 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 
 			v = transform.getPos();
 			v += (VMath::normalize(rightVector) * CAMERA_SPEED);
-			transform.setPos(v);
+	
 			//move the camera left
 			break;
 		case SDL_SCANCODE_Q:
 
 			v = transform.getPos();
 			v += (VMath::normalize(upVector) * CAMERA_SPEED);
-			transform.setPos(v);
+
 			//move the camera UP
 			break;
 		case SDL_SCANCODE_E:
 
 			v = transform.getPos();
 			v += (VMath::normalize(-upVector) * CAMERA_SPEED);
-			transform.setPos(v);
+
 			//move the camera down
 			break;
 
@@ -130,7 +131,13 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 
 
 		}
+
+
+		if (!COLLISION::SpherePointCollisionDetected(&innerBounds, v) && COLLISION::SpherePointCollisionDetected(&outerBounds, v)) transform.setPos(v);
+
 		break;
+
+		
 
 	case SDL_MOUSEBUTTONDOWN:
 	{
@@ -138,30 +145,12 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 		switch (sdlEvent.button.button){
 		case SDL_BUTTON_LEFT:
 			has3DClick = true;
-			
-
 			break;
 		case SDL_BUTTON_RIGHT:
 
-			Vec4 sdlPosPixelSpace = Vec4(sdlEvent.button.x, sdlEvent.button.y, 0, 1);
+			
 
-
-			Vec4 sdlPosNDCSpace = MMath::inverse(MMath::viewportNDC(SCREEN_WIDTH, SCREEN_HEIGHT)) * sdlPosPixelSpace;
-			// Let's get the front of the NDC box
-			sdlPosNDCSpace.z = -1.0f;
-
-			Vec4 sdlPosCameraSpace = MMath::inverse(camera.GetProjectionMatrix()) * sdlPosNDCSpace;
-			// Divide out the w component
-			sdlPosCameraSpace = sdlPosCameraSpace / sdlPosCameraSpace.w;
-
-			Vec4 sdlPosWorldSpace = MMath::inverse(MATHEX::DQMath::toMatrix4(camera.GetViewDQuaternion())) * sdlPosCameraSpace;
-
-			// Make a line from the camera position to the mouse
-			// Using the join of two points
-			line2 = transform.getPos() & sdlPosWorldSpace;
-
-
-			hasDQLine = true;
+			hasCanceledOrder = true;
 
 	
 			break;
@@ -180,7 +169,7 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 		break;
 	}
 
-	
+	mouseHoverPos = Vec3(sdlEvent.button.x, sdlEvent.button.y, 0);
 
 }
 
@@ -258,4 +247,31 @@ Vec3 PlayerController::get3DClickCoords(float sdl_X, float sdl_Y)
 
 
     return Vec3(intersectionWorldSpace.x, intersectionWorldSpace.y, intersectionWorldSpace.z);
+}
+
+void PlayerController::calculateLine()
+{
+	Vec4 sdlPosPixelSpace = Vec4(mouseHoverPos.x, mouseHoverPos.y, 0, 1);
+
+
+	Vec4 sdlPosNDCSpace = MMath::inverse(MMath::viewportNDC(SCREEN_WIDTH, SCREEN_HEIGHT)) * sdlPosPixelSpace;
+	// Let's get the front of the NDC box
+	sdlPosNDCSpace.z = -1.0f;
+
+	Vec4 sdlPosCameraSpace = MMath::inverse(camera.GetProjectionMatrix()) * sdlPosNDCSpace;
+	// Divide out the w component
+	sdlPosCameraSpace = sdlPosCameraSpace / sdlPosCameraSpace.w;
+
+	Vec4 sdlPosWorldSpace = MMath::inverse(MATHEX::DQMath::toMatrix4(camera.GetViewDQuaternion())) * sdlPosCameraSpace;
+
+	// Make a line from the camera position to the mouse
+	// Using the join of two points
+	line2 = transform.getPos() & sdlPosWorldSpace;
+
+}
+
+void PlayerController::setPlayerBounds(float innerDis, float outerDis)
+{
+	innerBounds = Sphere(ORIGIN, innerDis);
+	outerBounds = Sphere(ORIGIN, outerDis);
 }
