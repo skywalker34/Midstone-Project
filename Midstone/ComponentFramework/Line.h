@@ -5,24 +5,25 @@
 #include <Matrix.h>
 #include <glew.h>
 #include <vector>
+#include "Transform.h"
+
 
 using namespace MATH;
 
 class Line
 {
 public:
-    int shaderProgram;
-    unsigned int VBO, VAO;
-    std::vector<float> vertices;
-    Vec3 startPoint;
-    Vec3 endPoint;
-    Matrix4 MVP;
-    Vec3 lineColor;
+   
+    Transform transform;
+    unsigned int vbo;
+    unsigned int vao;
+    float vertices[3] = {
+     0.0f, 0.0f, -1.0f,
+    };
 
     Line();
     Line(Vec3 start, Vec3 end);
-    int setMVP(Matrix4 mvp);
-    int setColor(Vec3 color);
-    int draw();
+    void RecalculateLine(Vec3 start, Vec3 end);
+    void draw();
     ~Line();
 };

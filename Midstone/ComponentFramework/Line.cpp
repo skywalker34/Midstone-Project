@@ -1,96 +1,79 @@
 #include "Line.h"
-
+#include "QMath.h"
+#include "Constants.h"
 Line::Line() {}
 
 Line::Line(Vec3 start, Vec3 end) {
+ 
 
-    startPoint = start;
-    endPoint = end;
-    lineColor = Vec3(1, 0, 0);
-    MVP = Matrix4();
+	transform.setPos(start);
+
+	float num = VMath::mag(start - end);
+
+	transform.setScale(num, num, num);
+
+	Vec3 foward = Vec3(0, 0, -1);
+
+	/*start.print("Starting line point: ");
+	end.print("Ending line point: ");*/
+	Vec3 direction = VMath::normalize(end - start);
+
+	Quaternion q = QMath::lookAt(direction, UP);
 
 
-    const char* vertexShaderSource = "#version 330 core\n"
-        "layout (location = 0) in vec3 aPos;\n"
-        "uniform mat4 MVP;\n"
-        "void main()\n"
-        "{\n"
-        "   gl_Position = MVP * vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-        "}\0";
-    const char* fragmentShaderSource = "#version 330 core\n"
-        "out vec4 FragColor;\n"
-        "uniform vec3 color;\n"
-        "void main()\n"
-        "{\n"
-        "   FragColor = vec4(color, 1.0f);\n"
-        "}\n\0";
+	transform.setOrientation(q);
 
-    // vertex shader
-    int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-    // check for shader compile errors
+	
 
-    // fragment shader
-    int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-    // check for shader compile errors
 
-    // link shaders
-    shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    // check for linking errors
 
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+	// 1. bind Vertex Array Object
+	glBindVertexArray(vao);
+	glGenBuffers(1, &vbo);
+	// 2. copy our vertices array in a buffer for OpenGL to use
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	// 3. then set our vertex attributes pointers
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+}
 
-    vertices = {
-         start.x, start.y, start.z,
-         end.x, end.y, end.z,
+void Line::RecalculateLine(Vec3 start, Vec3 end)
+{
+	transform.setPos(start);
 
-    };
+	float num = VMath::mag(start - end);
 
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glBindVertexArray(VAO);
+	transform.setScale(num, num, num);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices.data(), GL_STATIC_DRAW);
+	Vec3 foward = Vec3(0, 0, -1);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+	/*start.print("Starting line point: ");
+	end.print("Ending line point: ");*/
+	Quaternion q = Quaternion();
+	Vec3 direction = VMath::normalize(end - start);
+	if (direction.x < VERY_SMALL && direction.y < VERY_SMALL && direction.z < VERY_SMALL) {
+		q = Quaternion();
+	}
+	else {
+		q = QMath::lookAt(direction, UP);
+	}
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	transform.setOrientation(q);
+}
+
+void Line::draw()  {
+
+
+    glBindVertexArray(vao);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);
 
-}
 
-int Line::setMVP(Matrix4 mvp) {
-    MVP = mvp;
-    return 1;
-}
-
-int Line::setColor(Vec3 color) {
-    lineColor = color;
-    return 1;
-}
-
-int Line::draw() {
-    glUseProgram(shaderProgram);
-    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "MVP"), 1, GL_FALSE, &MVP[0]);
-    glUniform3fv(glGetUniformLocation(shaderProgram, "color"), 1, &lineColor[0]);
-
-    glBindVertexArray(VAO);
-    glDrawArrays(GL_LINES, 0, 2);
-    return 1;
 }
 
 Line::~Line() {
-
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    glDeleteProgram(shaderProgram);
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &vbo);
 }
