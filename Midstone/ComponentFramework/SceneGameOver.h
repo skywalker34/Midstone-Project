@@ -12,8 +12,11 @@
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_opengl3.h"
+#include "LeaderBoard.h"
 
 using namespace MATH;
+
+using namespace std;
 
 /// Forward declarations 
 union SDL_Event;
@@ -29,6 +32,8 @@ private:
 	Window* window;
 
 	bool show_demo_window;
+
+	std::vector<Leaderboard> leaderboard;
 
 public:
 	explicit SceneGameOver();

@@ -1,19 +1,4 @@
-Score: 60
-Time: 168.11
--
-Score: 62
-Time: 215.389
--
-Score: 74
-Time: 229.016
--
-Score: 66
-Time: 219.154
--
-Score: 105
-Time: 264.991
--
-Score: 87
-Time: 242.163
--
-
+97.7873 25 AL
+96.8921 23 AB
+95.883 22 AT
+98.9773 24 VH
