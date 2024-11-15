@@ -62,7 +62,7 @@ bool Scene3g::OnCreate() {
 	particleMesh->OnCreate();
 
 	SoundEngine->setSoundVolume(0.4f);
-	SoundEngine->play2D("audio/BackGroundMusic.mp3", true); // Audio For Game 
+	SoundEngine->play2D("audio/BackGroundMusic2.mp3", true); // Audio For Game 
 	
 
 
@@ -549,7 +549,9 @@ void Scene3g::GameOver()
 	//END GAME LOGIC HERE PLEASE
 	std::cout << "\033[32m" << "GAMEOVER!" << "\033[0m" << std::endl;
 	SaveStats();
+	SoundEngine->play2D("audio/GameoverSound.mp3", false);
 	gameOverBool = true;
+	
 }
 
 
