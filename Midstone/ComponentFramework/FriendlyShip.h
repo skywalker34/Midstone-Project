@@ -9,9 +9,7 @@
 #include <QMath.h>
 #include <VMath.h>
 #include "EnemyShip.h"
-#include "irrKlang.h"
 
-using namespace irrklang;
 using namespace MATH;
 using namespace MATHEX;
 
@@ -44,8 +42,12 @@ class FriendlyShip :
 		EnemyShip* closestEnemy;
 		EnemyShip* potentialTarget;
 
+		EnemyShip* activeTarget;
+
 		Vec4 color = BLUE;
 		bool isMoving = false;
+		bool isChasing = false;
+
 		bool canFire = true;
 		
 		float timeSinceShot = 0;//the time since the ship has last fired a shot
@@ -64,7 +66,9 @@ class FriendlyShip :
 		float potentialTargetDistance;
 
 		Sphere detectionSphere;
+
 		ISoundEngine* SoundEngine = createIrrKlangDevice(); //Sound Device For Shooting Sounds
+		ISoundEngine* SoundEngineFlying = createIrrKlangDevice(); // Sound Device for flying
 
 		FriendlyShip();
 		FriendlyShip(Model* model_, Model* bulletModel_);
@@ -75,6 +79,7 @@ class FriendlyShip :
 		void Update(const float deltaTime);
 		void Render(Shader* shader) const;
 		void RenderBullets(Shader* shader) const;
+		void RenderRange(Shader* shader) const;
 		
 		void Fire();
 		void moveToDestination(Vec3 destination);

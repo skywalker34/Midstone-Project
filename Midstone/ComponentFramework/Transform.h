@@ -9,6 +9,7 @@ class Transform
 		Vec3 position;
 		Quaternion orientation;
 		Vec3 scale;
+		Matrix4 parent;
 
 	public:
 		//constructor
@@ -25,6 +26,9 @@ class Transform
 		void setScale(Vec3 s);
 		void setScale(float x, float y, float z) {
 			scale = Vec3(x, y, z);
+		}
+		void setParent(Matrix4 m) {
+			parent = m;
 		}
 		//Getters
 		Vec3 getPos() const;

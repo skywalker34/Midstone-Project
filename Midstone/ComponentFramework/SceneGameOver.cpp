@@ -91,6 +91,8 @@ SceneGameOver::~SceneGameOver() {
 bool SceneGameOver::OnCreate() {
 	Debug::Info("Loading assets SceneGameOver: ", __FILE__, __LINE__);
 
+
+	SoundEngine->play2D("audio/GameOverSceneMainSound.mp3", true); //Scene Sound for Game over
 	printf("On Create finished!!!!!");
 	return true;
 
@@ -104,6 +106,8 @@ void SceneGameOver::OnDestroy() {
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
+
+	SoundEngine->drop(); // Kills audio
 }
 
 void SceneGameOver::HandleEvents(const SDL_Event& sdlEvent)
@@ -140,7 +144,7 @@ void SceneGameOver::Render()
 	int my_image_height = 0;
 	GLuint my_image_texture = 0;
 	//PUT NEW IMAGE HERE
-	bool ret = LoadTextureFromFile("./textures/StartPhoto.jpg", &my_image_texture, &my_image_width, &my_image_height);
+	bool ret = LoadTextureFromFile("./textures/GameOverPhoto.png", &my_image_texture, &my_image_width, &my_image_height);
 	IM_ASSERT(ret);
 	ImDrawList* drawList = ImGui::GetBackgroundDrawList();
 	ImVec2 image_pos = ImVec2(0, 0); // Set image position

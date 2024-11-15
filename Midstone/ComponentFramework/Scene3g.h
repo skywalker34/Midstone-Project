@@ -34,6 +34,7 @@ private:
 	Shader* planetShader;
 	Shader* friendlyShipShader;
 	Shader* gridShader;
+	Shader* selectionShader;
 
 	ComputeShader* computeShader = nullptr;
 	Shader* loadVertsToBuffer = nullptr;
@@ -51,17 +52,27 @@ private:
 	Matrix4 testModelMat;
 	
 
-	
+	//UX ACTORS
+	Actor selectionSphere;
+	Actor enemySelectionSphere;
 	
 
 	
-	Vec3 lightPos = Vec3(0.0f, 75.0f, 150.0f);
+
+
+
+	
+	Vec3 lightPos = Vec3(0.0f, 0.0f, 150.0f);
 
 
 	PlayerController playerController;
 	Vec3 shipWaypoint;
 
 	Planet planet;
+
+	Shader* lineShader = nullptr;
+	Line pathLine = Line(Vec3(0, 0, 0), Vec3(1, 1, 1));
+	Line testLine = Line(Vec3(0, 0, 0), Vec3(100, 100, 100));
 
 	std::vector<FriendlyShip*> playerFleet;
 	std::vector<EnemyShip*> enemyFleet;
@@ -70,7 +81,7 @@ private:
 	int enemySpawnerCount = 1;
 
 	int activeShip = -1;
-	int startingFleetSize = 8;
+	int startingFleetSize = 2;
 	int enemyIndex = 0;
 	
 	float timeElapsed;
@@ -81,6 +92,7 @@ private:
 	bool drawInWireMode;
 	bool isGameRunning = true;
 	bool isGivingOrders = false;
+	bool isMouseOverShip = false;
 
 	Window* window;
 

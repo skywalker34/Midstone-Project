@@ -31,11 +31,13 @@ Vec3 EnemyShip::getTargetDirection()
 bool EnemyShip::OnCreate()
 {
 	health = 5; //may want to put this in constructor
-	aimingPoint = transform.getPos() + getTargetDirection() * speed;
-	
+	//aimingPoint = transform.getPos() + body->vel;
 	collisionSphere = new Sphere(transform.getPos(), 5.0f);
 
-	
+	irrklang::vec3df BodyPosition(body->pos.x, body->pos.y, body->pos.z);
+	SoundEngineFlying->setSoundVolume(0.1f);
+	SoundEngineFlying->play3D("audio/RocketFlying.mp3", BodyPosition, true);
+
 	printf("Ship Created! \n");
 
 	speed = 0.1;
@@ -48,11 +50,14 @@ void EnemyShip::OnDestroy()
 {
 	model = nullptr;
 
+	
 
 	body->OnDestroy();
 	delete body;
 
 	exhaustTrail.OnDestroy();
+
+	SoundEngineFlying->drop();
 
 }
 
@@ -63,9 +68,13 @@ void EnemyShip::setIndex(int index)
 
 void EnemyShip::Update(const float deltaTime)
 {
+	irrklang::vec3df bodypos(body->pos.x, body->pos.y, body->pos.z);
+	bool happenonce = true;
+	
+
 	body->ApplyForce(getTargetDirection() * speed);	//shouldn't have to do this every frame we nay want to move it
 	body->Update(deltaTime);
-	aimingPoint = transform.getPos() + body->vel * deltaTime;
+	//aimingPoint = transform.getPos() + body->vel;
 	transform.setOrientation(QMath::lookAt(getTargetDirection(), UP));
 	collisionSphere->center = transform.getPos();
 
@@ -87,8 +96,14 @@ void EnemyShip::Render(Shader* shader) const
 void EnemyShip::Hit()
 {
 	health -= 1; //reduce health
+	irrklang::vec3df bodypos(body->pos.x, body->pos.y, body->pos.z);
+	SoundEngine->setSoundVolume(0.5f);
+	SoundEngine->play3D("audio/Gothit.mp3.", bodypos, false); // Audio For Gothit Ships Noise
+	
+
 	if (health < 0) { //if dead set flag so scene knows to delete the ship
 		deleteMe = true;
+		SoundEngine->play3D("audio/DeadExplosion.mp3", bodypos, false); // Audio For Dying Ships Noise
 	}
 
 }

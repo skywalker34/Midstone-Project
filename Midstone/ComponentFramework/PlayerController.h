@@ -25,6 +25,7 @@ class PlayerController
 		Vec3 clickPos;
 
 		Vec3 forwardVector;
+		Vec3 mouseHoverPos;
 
 		
 		float planeDepth = 1;
@@ -35,11 +36,14 @@ class PlayerController
 
 		Vec3 hoverPos;
 
+		Sphere innerBounds;
+		Sphere outerBounds;
 
 		Transform transform; //temporary public
 		Camera camera;
 		bool has3DClick = false;
 		bool hasDQLine = false;
+		bool hasCanceledOrder = false;
 		bool OnCreate();
 		void OnDestroy();
 		void handleEvents(const SDL_Event& sdlEvent);
@@ -49,7 +53,10 @@ class PlayerController
 		void CreateGrid(Model* model_);
 		Vec3 getClickPos();//returns the position of a 3d click
 		Vec3 get3DClickCoords(float sdl_X, float sdl_Y);
+		void calculateLine();
 		DualQuat getLine() { hasDQLine = false;  return line2; };
+
+		void setPlayerBounds(float innerDis, float outerDis);
 
 		void updateModelMatrixToFaceCamera(Transform& transform);
 		

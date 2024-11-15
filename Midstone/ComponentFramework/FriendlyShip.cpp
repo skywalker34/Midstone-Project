@@ -1,6 +1,6 @@
 #include "FriendlyShip.h"
 #include "Sphere.h"
-
+#include "Collision.h"
 
 
 //depreciated
@@ -65,6 +65,9 @@ void FriendlyShip::OnDestroy()
 
 	delete model;
 
+	SoundEngine->drop();
+	SoundEngineFlying->drop();
+
 }
 
 void FriendlyShip::Update(const float deltaTime)
@@ -87,17 +90,44 @@ void FriendlyShip::Update(const float deltaTime)
 
 	if (hasReachDestination()) {
 		isMoving = false;
+
+		bool HappenOnce = true;
+		if (HappenOnce == true && isMoving == false)
+		{
+			SoundEngineFlying->stopAllSounds();
+			HappenOnce = false;
+		}
 	}
 
 	if (isMoving) {
 		slerpT = slerpT >= 1 ? 1 : slerpT + deltaTime;
 		body->Update(deltaTime);
 		rotateTowardTarget(movingDirection);
+
 		isMoving = VMath::mag(destination - transform.getPos()) > 0.01;
+		
+		
 	}
 	else {
 		body->vel = Vec3();
 	}
+
+	if (isChasing && !activeTarget->deleteMe) { //if player clicks on a ship then on an enemy the ship enters chasing mode
+		destination = activeTarget->transform.getPos(); //set the destination to the enemy's pos
+		moveToDestination(destination);
+		//isMoving = VMath::mag(destination - transform.getPos()) > 0.01; //check if we've already reached the enemy
+		if (COLLISION::SphereSphereCollisionDetected(&detectionSphere, activeTarget->collisionSphere)) {
+			//reset the variables
+			isMoving = false;
+			activeTarget = nullptr;
+			isChasing = false;
+		}
+		else {
+			isMoving = true;
+
+		}
+	}
+
 	detectionSphere.center = transform.getPos();//update teh collision sphere to match the ships position
 	collisionSphere->center = transform.getPos();
 
@@ -120,14 +150,11 @@ void FriendlyShip::Render(Shader* shader) const
 	
 	model->mesh->Render(GL_TRIANGLES);
 
-	if (displayRange) {
-		
-		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, rangeSphereT.toModelMatrix());
-		//glUniform4fv(shader->GetUniformID("meshColor"), 1, color);
-		rangeSphere.mesh->Render(GL_LINES);
-	}
-
 	model->UnbindTextures();
+
+	
+
+	
 }
 
 void FriendlyShip::RenderBullets(Shader* shader) const
@@ -137,18 +164,33 @@ void FriendlyShip::RenderBullets(Shader* shader) const
 	}
 }
 
+void FriendlyShip::RenderRange(Shader* shader) const
+{
+	if (displayRange) {
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, rangeSphereT.toModelMatrix());
+		glUniform4fv(shader->GetUniformID("meshColor"), 1, Vec4(0.2,0.3,0.5,0.4));
+		//glUniform4fv(shader->GetUniformID("meshColor"), 1, color);
+		rangeSphere.mesh->Render(GL_LINES);
+		glDisable(GL_BLEND);
+	}
+}
+
 void FriendlyShip::FindClosestEnemy(EnemyShip* enemy)
 {	
 	if (!isSwitchingTarget) {
 		currentTargetDistance = VMath::mag(transform.getPos() - closestEnemy->transform.getPos());
 		potentialTargetDistance = VMath::mag(transform.getPos() - enemy->transform.getPos());
 		potentialTarget = enemy;
-		potentialTarget->transform.getPos().print("potential target");
+
+		potentialTarget->aimingPoint = potentialTarget->transform.getPos() + potentialTarget->body->vel;
+
 	}
 	
 	if (potentialTargetDistance < currentTargetDistance) {
 		isSwitchingTarget = true;
-		rotateTowardTarget(potentialTarget->aimingPoint);
+		rotateTowardTarget(potentialTarget->aimingPoint - transform.getPos());
 	}
 }
 
@@ -173,9 +215,27 @@ void FriendlyShip::Fire()
     if (bullets.back()->OnCreate() == false) {
         printf("Bullet failed! \n");
     }
+
+	// Audio
 	Vec3 bulletSpawn = transform.getPos();
 	irrklang::vec3df position(bulletSpawn.x, bulletSpawn.y, bulletSpawn.z);
-	SoundEngine->play3D("audio/LaserShooting.mp3", position, false); // Audio For Shooting Noise
+	int RandomChance = rand() % 3 + 1; // Random number From 1 to 3
+	if (RandomChance == 1)
+	{
+		SoundEngine->play3D("audio/LaserShooting.mp3", position, false); // Audio For Shooting Noise
+		SoundEngine->setSoundVolume(1.0f);
+	}
+	if (RandomChance == 2)
+	{
+		SoundEngine->play3D("audio/DisturbedShooting.mp3", position, false); // Audio For Shooting Noise
+		SoundEngine->setSoundVolume(1.0f);
+
+	}
+	if (RandomChance == 3)
+	{
+		SoundEngine->play3D("audio/PewShoot.mp3", position, false); // Audio For Shooting Noise
+		SoundEngine->setSoundVolume(1.0f);
+	}
 }
 
 
@@ -184,6 +244,12 @@ void FriendlyShip::moveToDestination(Vec3 destination_)
 	destination = destination_;
 	isMoving = true;
 	slerpT = 0;
+
+	
+	irrklang::vec3df BodyPosition(body->pos.x, body->pos.y, body->pos.z);  
+	SoundEngineFlying->setSoundVolume(0.3f);
+	SoundEngineFlying->play3D("audio/RocketFlying.mp3", BodyPosition, true); 
+
 	if (wouldIntersectPlanet) {
 		Vec3 axis = VMath::cross(destination, transform.getPos());
 		Quaternion newPosition = QMath::angleAxisRotation(1.0f, axis);
@@ -191,8 +257,6 @@ void FriendlyShip::moveToDestination(Vec3 destination_)
 		body->vel = speed * VMath::normalize(movingDirection);
 	}
 	else {
-
-		
 		Vec3 diff =  destination - transform.getPos(); //"draw" a vector between the 2 points
 		movingDirection = VMath::normalize(diff);//"convert" thevector into just a direction (normalize)
 		body->vel = movingDirection * speed; //tell the ship to move along that vector
@@ -201,12 +265,19 @@ void FriendlyShip::moveToDestination(Vec3 destination_)
 
 void FriendlyShip::rotateTowardTarget(Vec3 target)
 {
+	if (VMath::mag(target) < 0.0001) return;
 	//keeps the ship pointing toward where its going
 	if (slerpT < 1) {
-		Quaternion startQuad = QMath::lookAt(initialDirection, UP);
-		Quaternion targetQuad = QMath::lookAt(target, UP);
-		Quaternion currentQuat = QMath::slerp(startQuad, targetQuad, slerpT);
-		transform.setOrientation(currentQuat);
+
+		if (VMath::mag(target) != 0) {
+			Quaternion startQuad = QMath::lookAt(initialDirection, UP);
+			initialDirection.print("target: ");
+			Quaternion targetQuad = QMath::lookAt(target, UP);
+			Quaternion currentQuat = QMath::normalize(QMath::slerp(startQuad, targetQuad, slerpT));
+			
+			transform.setOrientation(currentQuat);
+		}
+
 	}
 	else {
 		initialDirection = target;

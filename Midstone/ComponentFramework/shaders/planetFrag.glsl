@@ -21,7 +21,7 @@ void main() {
 	vec4 kd = vec4(1, 1, 1, 0.0);
 	vec4 ka = vec4(0.1, 0.1, 0.1, 0.0);
 	vec4 kt = texture(diffTexture,textureCoords); 
-
+	
 //	kd = vec4(0,0,0,1);
 //	ka = vec4(0,0,0,1);
 //	kt = vec4(0,0,0,1);
@@ -38,8 +38,10 @@ void main() {
 	spec = pow(spec,1.0) * texture(specTexture,textureCoords).x;
 	vec4 outputColour = (ka + ((diff * kd) + (spec *ks)) * kt) ;	
 
+	
+
 	//mix with an atmosphere colour at the edges
-	fragColour = mix(vec4(0.1f, 0.15f, 0.18f, 0.3f), -outputColour, dot(vertNormal, -incident));
+	fragColour = mix(vec4(0.1f, 0.15f, 0.18f, 0.8f), outputColour, dot(vertNormal, -incident));
 	
 	//fragColour = outputColour;
 }

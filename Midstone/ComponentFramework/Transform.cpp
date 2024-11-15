@@ -56,5 +56,6 @@ Matrix4 Transform::toModelMatrix() const
 	Matrix4 S = MMath::scale(scale);
 
 	Matrix4 modelMat = T * R * S;
+	modelMat = parent * modelMat;
 	return modelMat;
 }
