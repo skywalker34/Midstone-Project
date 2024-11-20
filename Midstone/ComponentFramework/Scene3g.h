@@ -16,6 +16,8 @@
 #include "imgui_impl_opengl3.h"
 #include "Line.h"
 #include "EnemySpawner.h"
+#include "Explosion.h"
+
 using namespace MATH;
 
 /// Forward declarations 

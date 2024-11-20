@@ -162,6 +162,9 @@
     <ClCompile Include="Line.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Explosion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Debug.h">
@@ -308,6 +311,9 @@
     <ClInclude Include="Line.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Explosion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="GameEngineLog.txt">
@@ -370,6 +376,12 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="shaders\selectionVert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\Explosion.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\ResetParticles.glsl">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
