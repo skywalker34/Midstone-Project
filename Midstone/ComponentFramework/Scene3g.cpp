@@ -311,13 +311,13 @@ void Scene3g::Render() {
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //temporary line
 
 
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 
 	if (activeShip >= 0) {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 		glUseProgram(lineShader->GetProgram());
 		glUniformMatrix4fv(lineShader->GetUniformID("projection"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 		glUniformMatrix4fv(lineShader->GetUniformID("view"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
@@ -325,9 +325,7 @@ void Scene3g::Render() {
 		pathLine.draw();
 	}
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+	
 
 
 
@@ -338,7 +336,7 @@ void Scene3g::Render() {
 	for (EnemyShip* ship : enemyFleet) {
 		//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
 		if (ship->deleteMe == false) { //shouldn't have to have this if here...
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //temporary line
+		
 			//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
 			glUseProgram(friendlyShipShader->GetProgram());
 			glUniformMatrix4fv(friendlyShipShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
@@ -370,7 +368,7 @@ void Scene3g::Render() {
 
 
 	for (Explosion* explosion : explosions) {
-		explosion->RenderDebris(shader);
+		explosion->RenderDebris(bulletShader);
 		explosion->Render(particleShader, computeExplosion);
 	}
 

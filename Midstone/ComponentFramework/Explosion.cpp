@@ -36,12 +36,12 @@ bool Explosion::OnCreate(Camera* cam_, Shader* loadVerts, Mesh* mesh_, Model* mo
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0); //unbind the buffer
 
 
-	modelMat = MMath::translate(0, 0, -20);
+	modelMat = MMath::translate(0, 5, -20);
 
 	for (int i = 0; i < debrisChunkCount; i++) {
 		debrisTransforms.push_back(new Transform());
 		debrisTransforms[i]->setParent(modelMat);
-		debrisTransforms[i]->setScale(Vec3(1, 1, 1));
+		debrisTransforms[i]->setScale(Vec3(0.5, 0.5, 0.5));
 
 		body.push_back(new Body(debrisTransforms[i], Vec3(), Vec3(), 1));
 	}
@@ -167,4 +167,7 @@ void Explosion::Render(Shader* shader, ComputeShader* comp)
 void Explosion::setPos(Vec3 pos_)
 {
 	modelMat = MMath::translate(pos_);
+	for (int i = 0; i < debrisChunkCount; i++) {
+		debrisTransforms[i]->setParent(modelMat);
+	}
 }
