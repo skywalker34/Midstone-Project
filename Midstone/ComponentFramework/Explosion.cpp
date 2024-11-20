@@ -41,7 +41,7 @@ bool Explosion::OnCreate(Camera* cam_, Shader* loadVerts, Mesh* mesh_, Model* mo
 	for (int i = 0; i < debrisChunkCount; i++) {
 		debrisTransforms.push_back(new Transform());
 		debrisTransforms[i]->setParent(modelMat);
-		debrisTransforms[i]->setScale(Vec3(0.1, 0.1, 0.1));
+		debrisTransforms[i]->setScale(Vec3(1, 1, 1));
 
 		body.push_back(new Body(debrisTransforms[i], Vec3(), Vec3(), 1));
 	}
@@ -50,7 +50,6 @@ bool Explosion::OnCreate(Camera* cam_, Shader* loadVerts, Mesh* mesh_, Model* mo
 
 	
 
-	printf("OnCreate Done!");
 	return true;
 }
 
@@ -163,4 +162,9 @@ void Explosion::Render(Shader* shader, ComputeShader* comp)
 		glUseProgram(0);
 	}
 	
+}
+
+void Explosion::setPos(Vec3 pos_)
+{
+	modelMat = MMath::translate(pos_);
 }

@@ -81,11 +81,31 @@ bool Scene3g::OnCreate() {
 	testMesh = new Mesh("meshes/Sphere.obj");
 	testMesh->OnCreate();
 
+	debris = Model("Debris.obj");
+	debris.OnCreate();
 	
 	enemyFleetSpawners.push_back(EnemySpawner(100.0f, 15, 5));
 	printf("On Create finished!!!!!");
-	return true;
+	
 
+
+	computeExplosion = new ComputeShader("shaders/Explosion.glsl");	//create the compute shader
+	if (computeExplosion->OnCreate() == false) {
+		std::cout << "Shader failed ... we have a problem\n";
+	}
+	computeReset = new ComputeShader("shaders/ResetParticles.glsl");	//create the compute shader
+	if (computeReset->OnCreate() == false) {
+		std::cout << "Shader failed ... we have a problem\n";
+	}
+
+	for (int i = 0; i < startingExplosions; i++) {
+		explosions.push_back(new Explosion());
+		if (explosions[i]->OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh, &debris) == false) {
+			std::cout << "Explosion failed ... we have a problem\n";
+		}
+	}
+	
+	return true;
 
 }
 
@@ -110,6 +130,11 @@ void Scene3g::OnDestroy() {
 	for (EnemyShip* ship : enemyFleet) {
 		ship->OnDestroy();
 		delete ship;
+	}
+
+	for (Explosion* explosion : explosions) {
+		explosion->OnDestroy();
+		delete explosion;
 	}
 
 	shader->OnDestroy();
@@ -238,7 +263,10 @@ void Scene3g::Update(const float deltaTime) {
 		GameOver();
 	}
 
-	
+	for (Explosion* explosion : explosions) {
+		explosion->Update(deltaTime);
+	}
+
 
 	static float spawnTimer = 0.0f; // Timer for spawning
 	spawnTimer += deltaTime;
@@ -341,7 +369,10 @@ void Scene3g::Render() {
 	planet.Render(planetShader);
 
 
-
+	for (Explosion* explosion : explosions) {
+		explosion->RenderDebris(shader);
+		explosion->Render(particleShader, computeExplosion);
+	}
 
 	for (FriendlyShip* ship : playerFleet) {
 
@@ -669,6 +700,28 @@ void Scene3g::UpdateEnemyFleet(const float deltaTime)
 void Scene3g::DestroyEnenmy(int index)
 {
 	score++;
+
+
+	Vec3 explosionPos = enemyFleet[index]->transform.getPos();
+	bool explosionAvailable = false;
+	for (Explosion* explosion : explosions) {
+		if (!explosion->animComplete) {
+			explosionAvailable = true; 
+			explosion->setPos(explosionPos);
+			explosion->ResetExplosion(computeReset);
+		}
+	}
+
+	if (!explosionAvailable) {
+		//if there are no explosions availabel then cretae a new one
+		explosions.push_back(new Explosion());
+		if (explosions[explosions.size()-1]->OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh, &debris) == false) {
+			std::cout << "Explosion failed ... we have a problem\n";
+		}
+		explosions[explosions.size() - 1]->setPos(explosionPos);
+		explosions[explosions.size() - 1]->ResetExplosion(computeReset);
+	}
+
 	enemyFleet[index]->OnDestroy();
 	delete enemyFleet[index];
 	enemyFleet[index] = nullptr;

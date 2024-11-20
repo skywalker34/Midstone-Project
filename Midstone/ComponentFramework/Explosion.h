@@ -51,6 +51,8 @@ public:
 	void RenderDebris(Shader* shader);
 	void Render(Shader* shader, ComputeShader* comp);
 
+	void setPos(Vec3 pos_);
+
 	
 
 

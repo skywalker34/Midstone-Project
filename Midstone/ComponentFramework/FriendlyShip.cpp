@@ -271,7 +271,7 @@ void FriendlyShip::rotateTowardTarget(Vec3 target)
 
 		if (VMath::mag(target) != 0) {
 			Quaternion startQuad = QMath::lookAt(initialDirection, UP);
-			initialDirection.print("target: ");
+		//	initialDirection.print("target: ");
 			Quaternion targetQuad = QMath::lookAt(target, UP);
 			Quaternion currentQuat = QMath::normalize(QMath::slerp(startQuad, targetQuad, slerpT));
 			
