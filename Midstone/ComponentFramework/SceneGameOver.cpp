@@ -64,7 +64,7 @@ static bool LoadTextureFromFile(const char* file_name, GLuint* out_texture, int*
 }
 
 SceneGameOver::SceneGameOver(Window* window_) : drawInWireMode{ true }, show_demo_window {true} {
-	Debug::Info("Created Scene2g: ", __FILE__, __LINE__);
+	Debug::Info("Created SceneGameOver: ", __FILE__, __LINE__);
 	window = window_;
 
 	// ImGUI stuff for initialize from Scotties Vid.
@@ -76,14 +76,20 @@ SceneGameOver::SceneGameOver(Window* window_) : drawInWireMode{ true }, show_dem
 	// Setup Platform/Renderer backends
 	ImGui_ImplSDL2_InitForOpenGL(window->getWindow(), window->getContext());
 	ImGui_ImplOpenGL3_Init("#version 450");
+
+	// Read text file
+	readLeaderboard("leaderboard.txt", leaderboard);
+
+	// Sort input from text file
+	sortLeaderboardByScore(leaderboard);
 }
 
 SceneGameOver::~SceneGameOver() {
-	Debug::Info("Deleted Scene2g: ", __FILE__, __LINE__);
+	Debug::Info("Deleted SceneGameOver: ", __FILE__, __LINE__);
 }
 
 bool SceneGameOver::OnCreate() {
-	Debug::Info("Loading assets Scene2g: ", __FILE__, __LINE__);
+	Debug::Info("Loading assets SceneGameOver: ", __FILE__, __LINE__);
 
 
 	SoundEngine->play2D("audio/GameOverSceneMainSound.mp3", true); //Scene Sound for Game over
@@ -94,7 +100,7 @@ bool SceneGameOver::OnCreate() {
 }
 
 void SceneGameOver::OnDestroy() {
-	Debug::Info("Deleting assets Scene0: ", __FILE__, __LINE__);
+	Debug::Info("Deleting assets SceneGameOver: ", __FILE__, __LINE__);
 
 	// Cleanup
 	ImGui_ImplOpenGL3_Shutdown();
@@ -150,6 +156,16 @@ void SceneGameOver::Render()
 	if (ImGui::Button("Main Menu", ImVec2(300, 90)))
 		switchButton = true;
 	//ImGui::PopFont();
+	ImGui::End();
+
+	ImGui::Begin("LeaderBoard", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+	//Formatting sucks
+	ImGui::Text("\t\t\t\t    LeaderBoard");
+	ImGui::Text("Time\t\t\t\t  Score\t\t Name(Initials)");
+	for (const auto& entry : leaderboard) {
+		//Holy this works?
+		ImGui::Text("%f\t\t\t %i\t\t    %s", entry.time, entry.score, entry.name.c_str());
+	}
 	ImGui::End();
 
 	//ImGui::ShowDemoWindow();
