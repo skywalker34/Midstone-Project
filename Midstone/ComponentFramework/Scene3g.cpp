@@ -734,7 +734,7 @@ void Scene3g::createModels()
 	}
 
 
-	planeModel = Model("Plane.obj", std::vector<std::string>{"Grid.png"});
+	planeModel = Model("Plane.obj", std::vector<std::string>{"Grid3.png"});
 	if (planeModel.OnCreate() == false) {
 		printf("Model failed to load");
 	}
