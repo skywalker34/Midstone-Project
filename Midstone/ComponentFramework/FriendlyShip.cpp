@@ -65,8 +65,7 @@ void FriendlyShip::OnDestroy()
 
 	delete model;
 
-	SoundEngine->drop();
-	SoundEngineFlying->drop();
+	
 
 }
 

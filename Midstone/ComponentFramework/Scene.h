@@ -15,6 +15,6 @@ public:
 	virtual void HandleEvents(const SDL_Event &sdlEvent) = 0;
 	bool switchButton = false; //temp flag to allow scenes to communicate with the manager
 	bool gameOverBool = false; //temp flag so when planet dies then GameOver screen occurs
-	ISoundEngine* SoundEngine = createIrrKlangDevice(); // For Audio Throughout All scenes
+	//ISoundEngine* SoundEngine = createIrrKlangDevice(); // For Audio Throughout All scenes
 };
 #endif

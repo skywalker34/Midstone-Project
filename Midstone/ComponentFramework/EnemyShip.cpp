@@ -57,7 +57,7 @@ void EnemyShip::OnDestroy()
 
 	exhaustTrail.OnDestroy();
 
-	SoundEngineFlying->drop();
+
 
 }
 
