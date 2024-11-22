@@ -16,6 +16,16 @@
 
 #include <chrono>
 
+
+void AlignForWidth(float width, float alignment = 0.5f)
+{
+	ImGuiStyle& style = ImGui::GetStyle();
+	float avail = ImGui::GetContentRegionAvail().x;
+	float off = (avail - width) * alignment;
+	if (off > 0.0f)
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
+}
+
 Scene3g::Scene3g(Window* window_) : shader{ nullptr }, 
 drawInWireMode{ false } {
 	Debug::Info("Created Scene0: ", __FILE__, __LINE__);
@@ -171,6 +181,7 @@ void Scene3g::HandleEvents(const SDL_Event& sdlEvent) {
 		case SDL_SCANCODE_P:
 			//allows us to pause and unpause time, whoah.
 			isGameRunning = !isGameRunning;
+			Debug::Info("Paused", __FILE__, __LINE__);
 			break;
 		case SDL_SCANCODE_F:
 			//TEMPORARY DELETE THIS LATER
@@ -217,6 +228,7 @@ void Scene3g::Update(const float deltaTime) {
 	
 	playerController.Update(deltaTime);
 
+	SoundEngine->setSoundVolume(volumeSlider);
 
 	if (!isGameRunning) return;
 
@@ -225,7 +237,6 @@ void Scene3g::Update(const float deltaTime) {
 	
 
 	timeElapsed += deltaTime;
-
 
 	SpawnEnemy(deltaTime);
 	SetActiveShip();
@@ -453,9 +464,45 @@ void Scene3g::Render() {
 		ImGui::Text("Score = %i", score);
 		ImGui::Text("Planet Health: = %i", planet.GetHealth());
 		ImGui::End();
-		ImGui::Begin("QuitButton", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-		if (ImGui::Button("Quit to Title", ImVec2(150, 30))) switchButton = true;
-		ImGui::End();
+
+		//Don't need because we its in pause menu now.
+		//ImGui::Begin("QuitButton", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+		//if (ImGui::Button("Quit to Title", ImVec2(150, 30))) switchButton = true;
+		//ImGui::End();
+
+		//Pause Menu Creation
+		if (!isGameRunning)
+		{
+			//Begin Pause Menu
+			ImGui::Begin("Pause Menu", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+			float width = 0.0f;
+			width = ImGui::CalcTextSize("Paused").x;
+			AlignForWidth(width);
+			ImGui::Text("Paused");
+
+			//Test for Volume Sliders (GET ANDY TO DO SOMETHING WITH THIS BECAUSE I DON'T KNOW ABOUT HOW THE SOUND ENGINE IS CONFIGURED.
+			//YOU PROBABLY WANT MORE THAN JUST SOUNDENGINE AND SOUNDENGINEFLYING)
+			const ImGuiSliderFlags flags_for_sliders = ImGuiSliderFlags_None;
+			ImGui::Text("Music Volume");
+			ImGui::SliderFloat("##1", &volumeSlider, 0.0f, 1.0f, "%.3f", flags_for_sliders);
+			ImGui::Text("Sfx Volume (NOT WORKING YET)");
+			ImGui::SliderFloat("##2", &sfxSlider, 0.0f, 1.0f, "%.3f", flags_for_sliders);
+
+			//Test For Ship Color (Or whatever this is used for but not working at the moment bear with me) Need to ask Andrew L about these
+			ImGui::Text("Ship Color");
+			//Probably store this in scene so we can pass it to the shader
+			static ImVec4 color = ImVec4(114.0f / 255.0f, 144.0f / 255.0f, 154.0f / 255.0f, 200.0f / 255.0f);
+			ImGui::ColorButton("MyColor##3c", *(ImVec4*)&color, ImGuiColorEditFlags_NoBorder), ImVec2(80, 80);
+			ImGui::ColorPicker3("##MyColor##5", (float*)&color, ImGuiColorEditFlags_PickerHueBar | ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoAlpha);
+
+			//Three Buttons to Unpause (Even though you can press P), Restart Scene, or Quit to title which was moved to this window.
+			if (ImGui::Button("Unpause", ImVec2(150, 30))) isGameRunning = true;
+			if (ImGui::Button("Restart", ImVec2(150, 30))) restartBool = true;
+			if (ImGui::Button("Quit to Title", ImVec2(150, 30))) switchButton = true;
+
+			//End Pause Menu
+			ImGui::End();
+		}
 		ImGui::PopFont(); // Pop the font after usage 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -693,9 +740,12 @@ void Scene3g::SaveStats() {
 	// Check if the file is open
 	if (outFile.is_open()) {
 		// Write the data to the file
-		outFile << "Score: " << score << "\n";
-		outFile << "Time: " << timeElapsed << "\n";
-		outFile << "-" << "\n";
+		outFile << timeElapsed << " " << score << " " << "\n";
+
+		//Old format for how Leaderboard.txt was layed out
+		//outFile << "Score: " << score << "\n";
+		//outFile << "Time: " << timeElapsed << "\n";
+		//outFile << "-" << "\n";
 
 		// Close the file
 		outFile.close();
