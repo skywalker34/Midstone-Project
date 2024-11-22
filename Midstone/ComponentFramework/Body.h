@@ -21,6 +21,8 @@ public:
 	Vec3 accel;
 	Transform* transform;
 	
+	Vec3 angularVel;
+	Quaternion orientation;
 
 	float mass;
 	const char* textureFile = "";
@@ -35,7 +37,9 @@ public:
 	void Render() const;
 	void ApplyForce(Vec3 force);
 	void setAccel(const Vec3 &accel_) { accel = accel_;}
-	
+	void UpdateAngularVel(float deltaTime);
+
+	void UpdateOrientation(float deltaTime);
 
 
 	const char* GetTextureFile() {

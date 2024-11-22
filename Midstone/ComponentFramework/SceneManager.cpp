@@ -116,7 +116,12 @@ void SceneManager::Run() {
 			BuildNewScene(SCENE_NUMBER::SCENEGAMEOVER);
 			mainMenu = false;
 		}
-		
+		if (!mainMenu && currentScene->restartBool)
+		{
+			currentScene->restartBool = false;
+			BuildNewScene(SCENE_NUMBER::SCENE3g);
+			mainMenu = false;
+		}
 
 		SDL_Delay(timer->GetSleepTime(fps));
 	}

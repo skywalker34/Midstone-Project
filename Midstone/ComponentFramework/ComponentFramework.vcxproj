@@ -134,6 +134,7 @@
     <ClCompile Include="EnemyShip.cpp" />
     <ClCompile Include="EnemySpawner.cpp" />
     <ClCompile Include="ExhaustTrail.cpp" />
+    <ClCompile Include="Explosion.cpp" />
     <ClCompile Include="FriendlyShip.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="imgui_demo.cpp" />
@@ -182,6 +183,7 @@
     <ClInclude Include="EnemyShip.h" />
     <ClInclude Include="EnemySpawner.h" />
     <ClInclude Include="ExhaustTrail.h" />
+    <ClInclude Include="Explosion.h" />
     <ClInclude Include="FriendlyShip.h" />
     <ClInclude Include="imconfig.h" />
     <ClInclude Include="imgui.h" />
@@ -232,12 +234,14 @@
     <None Include="shaders\computer.glsl" />
     <None Include="shaders\defaultFrag.glsl" />
     <None Include="shaders\defaultVert.glsl" />
+    <None Include="shaders\Explosion.glsl" />
     <None Include="shaders\friendlyShipFrag.glsl" />
     <None Include="shaders\friendlyShipVert.glsl" />
     <None Include="shaders\loadVerticiesFrag.glsl" />
     <None Include="shaders\loadVerticiesVert.glsl" />
     <None Include="shaders\planetFrag.glsl" />
     <None Include="shaders\planetVert.glsl" />
+    <None Include="shaders\ResetParticles.glsl" />
     <None Include="shaders\selectionFrag.glsl" />
     <None Include="shaders\selectionVert.glsl" />
     <None Include="shaders\skyboxFrag.glsl" />

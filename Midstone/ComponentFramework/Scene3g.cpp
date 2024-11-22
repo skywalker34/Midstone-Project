@@ -17,6 +17,16 @@
 
 #include <chrono>
 
+
+void AlignForWidth(float width, float alignment = 0.5f)
+{
+	ImGuiStyle& style = ImGui::GetStyle();
+	float avail = ImGui::GetContentRegionAvail().x;
+	float off = (avail - width) * alignment;
+	if (off > 0.0f)
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
+}
+
 Scene3g::Scene3g(Window* window_) : shader{ nullptr }, 
 drawInWireMode{ false } {
 	Debug::Info("Created Scene0: ", __FILE__, __LINE__);
@@ -68,6 +78,7 @@ bool Scene3g::OnCreate() {
 	particleMesh->OnCreate();
 
 
+
 	
 	audioManager = new AudioManager();
 	if (audioManager->OnCreate() == false) {
@@ -85,11 +96,31 @@ bool Scene3g::OnCreate() {
 	testMesh = new Mesh("meshes/Sphere.obj");
 	testMesh->OnCreate();
 
+	debris = Model("Debris.obj");
+	debris.OnCreate();
 	
 	enemyFleetSpawners.push_back(EnemySpawner(100.0f, 15, 5));
 	printf("On Create finished!!!!!");
-	return true;
+	
 
+
+	computeExplosion = new ComputeShader("shaders/Explosion.glsl");	//create the compute shader
+	if (computeExplosion->OnCreate() == false) {
+		std::cout << "Shader failed ... we have a problem\n";
+	}
+	computeReset = new ComputeShader("shaders/ResetParticles.glsl");	//create the compute shader
+	if (computeReset->OnCreate() == false) {
+		std::cout << "Shader failed ... we have a problem\n";
+	}
+
+	for (int i = 0; i < startingExplosions; i++) {
+		explosions.push_back(new Explosion());
+		if (explosions[i]->OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh, &debris) == false) {
+			std::cout << "Explosion failed ... we have a problem\n";
+		}
+	}
+	
+	return true;
 
 }
 
@@ -114,6 +145,11 @@ void Scene3g::OnDestroy() {
 	for (EnemyShip* ship : enemyFleet) {
 		ship->OnDestroy();
 		delete ship;
+	}
+
+	for (Explosion* explosion : explosions) {
+		explosion->OnDestroy();
+		delete explosion;
 	}
 
 	shader->OnDestroy();
@@ -176,6 +212,7 @@ void Scene3g::HandleEvents(const SDL_Event& sdlEvent) {
 		case SDL_SCANCODE_P:
 			//allows us to pause and unpause time, whoah.
 			isGameRunning = !isGameRunning;
+			Debug::Info("Paused", __FILE__, __LINE__);
 			break;
 		case SDL_SCANCODE_F:
 			//TEMPORARY DELETE THIS LATER
@@ -222,6 +259,7 @@ void Scene3g::Update(const float deltaTime) {
 	
 	playerController.Update(deltaTime);
 
+	SoundEngine->setSoundVolume(volumeSlider);
 
 	if (!isGameRunning) return;
 
@@ -230,7 +268,6 @@ void Scene3g::Update(const float deltaTime) {
 	
 
 	timeElapsed += deltaTime;
-
 
 	SpawnEnemy(deltaTime);
 	SetActiveShip();
@@ -243,7 +280,10 @@ void Scene3g::Update(const float deltaTime) {
 		GameOver();
 	}
 
-	
+	for (Explosion* explosion : explosions) {
+		explosion->Update(deltaTime);
+	}
+
 
 	static float spawnTimer = 0.0f; // Timer for spawning
 	spawnTimer += deltaTime;
@@ -288,13 +328,13 @@ void Scene3g::Render() {
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //temporary line
 
 
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 
 	if (activeShip >= 0) {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 		glUseProgram(lineShader->GetProgram());
 		glUniformMatrix4fv(lineShader->GetUniformID("projection"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 		glUniformMatrix4fv(lineShader->GetUniformID("view"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
@@ -302,9 +342,7 @@ void Scene3g::Render() {
 		pathLine.draw();
 	}
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+	
 
 
 
@@ -315,7 +353,7 @@ void Scene3g::Render() {
 	for (EnemyShip* ship : enemyFleet) {
 		//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
 		if (ship->deleteMe == false) { //shouldn't have to have this if here...
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //temporary line
+		
 			//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
 			glUseProgram(friendlyShipShader->GetProgram());
 			glUniformMatrix4fv(friendlyShipShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
@@ -346,7 +384,10 @@ void Scene3g::Render() {
 	planet.Render(planetShader);
 
 
-
+	for (Explosion* explosion : explosions) {
+		explosion->RenderDebris(bulletShader);
+		explosion->Render(particleShader, computeExplosion);
+	}
 
 	for (FriendlyShip* ship : playerFleet) {
 
@@ -458,9 +499,45 @@ void Scene3g::Render() {
 		ImGui::Text("Score = %i", score);
 		ImGui::Text("Planet Health: = %i", planet.GetHealth());
 		ImGui::End();
-		ImGui::Begin("QuitButton", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-		if (ImGui::Button("Quit to Title", ImVec2(150, 30))) switchButton = true;
-		ImGui::End();
+
+		//Don't need because we its in pause menu now.
+		//ImGui::Begin("QuitButton", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+		//if (ImGui::Button("Quit to Title", ImVec2(150, 30))) switchButton = true;
+		//ImGui::End();
+
+		//Pause Menu Creation
+		if (!isGameRunning)
+		{
+			//Begin Pause Menu
+			ImGui::Begin("Pause Menu", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+			float width = 0.0f;
+			width = ImGui::CalcTextSize("Paused").x;
+			AlignForWidth(width);
+			ImGui::Text("Paused");
+
+			//Test for Volume Sliders (GET ANDY TO DO SOMETHING WITH THIS BECAUSE I DON'T KNOW ABOUT HOW THE SOUND ENGINE IS CONFIGURED.
+			//YOU PROBABLY WANT MORE THAN JUST SOUNDENGINE AND SOUNDENGINEFLYING)
+			const ImGuiSliderFlags flags_for_sliders = ImGuiSliderFlags_None;
+			ImGui::Text("Music Volume");
+			ImGui::SliderFloat("##1", &volumeSlider, 0.0f, 1.0f, "%.3f", flags_for_sliders);
+			ImGui::Text("Sfx Volume (NOT WORKING YET)");
+			ImGui::SliderFloat("##2", &sfxSlider, 0.0f, 1.0f, "%.3f", flags_for_sliders);
+
+			//Test For Ship Color (Or whatever this is used for but not working at the moment bear with me) Need to ask Andrew L about these
+			ImGui::Text("Ship Color");
+			//Probably store this in scene so we can pass it to the shader
+			static ImVec4 color = ImVec4(114.0f / 255.0f, 144.0f / 255.0f, 154.0f / 255.0f, 200.0f / 255.0f);
+			ImGui::ColorButton("MyColor##3c", *(ImVec4*)&color, ImGuiColorEditFlags_NoBorder), ImVec2(80, 80);
+			ImGui::ColorPicker3("##MyColor##5", (float*)&color, ImGuiColorEditFlags_PickerHueBar | ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoAlpha);
+
+			//Three Buttons to Unpause (Even though you can press P), Restart Scene, or Quit to title which was moved to this window.
+			if (ImGui::Button("Unpause", ImVec2(150, 30))) isGameRunning = true;
+			if (ImGui::Button("Restart", ImVec2(150, 30))) restartBool = true;
+			if (ImGui::Button("Quit to Title", ImVec2(150, 30))) switchButton = true;
+
+			//End Pause Menu
+			ImGui::End();
+		}
 		ImGui::PopFont(); // Pop the font after usage 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -677,6 +754,28 @@ void Scene3g::UpdateEnemyFleet(const float deltaTime)
 void Scene3g::DestroyEnenmy(int index)
 {
 	score++;
+
+
+	Vec3 explosionPos = enemyFleet[index]->transform.getPos();
+	bool explosionAvailable = false;
+	for (Explosion* explosion : explosions) {
+		if (!explosion->animComplete) {
+			explosionAvailable = true; 
+			explosion->setPos(explosionPos);
+			explosion->ResetExplosion(computeReset);
+		}
+	}
+
+	if (!explosionAvailable) {
+		//if there are no explosions availabel then cretae a new one
+		explosions.push_back(new Explosion());
+		if (explosions[explosions.size()-1]->OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh, &debris) == false) {
+			std::cout << "Explosion failed ... we have a problem\n";
+		}
+		explosions[explosions.size() - 1]->setPos(explosionPos);
+		explosions[explosions.size() - 1]->ResetExplosion(computeReset);
+	}
+
 	enemyFleet[index]->OnDestroy();
 	delete enemyFleet[index];
 	enemyFleet[index] = nullptr;
@@ -702,9 +801,12 @@ void Scene3g::SaveStats() {
 	// Check if the file is open
 	if (outFile.is_open()) {
 		// Write the data to the file
-		outFile << "Score: " << score << "\n";
-		outFile << "Time: " << timeElapsed << "\n";
-		outFile << "-" << "\n";
+		outFile << timeElapsed << " " << score << " " << "\n";
+
+		//Old format for how Leaderboard.txt was layed out
+		//outFile << "Score: " << score << "\n";
+		//outFile << "Time: " << timeElapsed << "\n";
+		//outFile << "-" << "\n";
 
 		// Close the file
 		outFile.close();
@@ -743,7 +845,7 @@ void Scene3g::createModels()
 	}
 
 
-	planeModel = Model("Plane.obj", std::vector<std::string>{"Grid.png"});
+	planeModel = Model("Plane.obj", std::vector<std::string>{"Grid3.png"});
 	if (planeModel.OnCreate() == false) {
 		printf("Model failed to load");
 	}

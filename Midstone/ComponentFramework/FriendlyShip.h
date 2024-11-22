@@ -67,7 +67,7 @@ class FriendlyShip :
 
 		Sphere detectionSphere;
 
-		
+
 
 		FriendlyShip();
 		FriendlyShip(Model* model_, Model* bulletModel_);
