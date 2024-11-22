@@ -67,8 +67,6 @@ class FriendlyShip :
 
 		Sphere detectionSphere;
 
-		ISoundEngine* SoundEngine = createIrrKlangDevice(); //Sound Device For Shooting Sounds
-		ISoundEngine* SoundEngineFlying = createIrrKlangDevice(); // Sound Device for flying
 
 		FriendlyShip();
 		FriendlyShip(Model* model_, Model* bulletModel_);

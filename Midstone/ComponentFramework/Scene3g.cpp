@@ -67,8 +67,8 @@ bool Scene3g::OnCreate() {
 	particleMesh->OnCreate();
 
 
-	SoundEngine->setSoundVolume(0.4f);
-	SoundEngine->play2D("audio/BackGroundMusic2.mp3", true); // Audio For Game 
+	//SoundEngine->setSoundVolume(0.4f);
+	//SoundEngine->play2D("audio/BackGroundMusic2.mp3", true); // Audio For Game 
 	
 
 
