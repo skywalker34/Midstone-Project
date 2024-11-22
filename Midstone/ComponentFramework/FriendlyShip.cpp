@@ -9,10 +9,10 @@ FriendlyShip::FriendlyShip()
 	transform = Transform(Vec3(0.0f, 0.0f, 0.0f), Quaternion(1.0f, Vec3(0.0f, 0.0f, 0.0f)), Vec3(1.0f, 1.0f, 1.0f));
 	body = new Body(&transform, Vec3(), Vec3(), 1);
 
-	
-	
+
+
 	//printf("FriendlyShip Constructor: Transform initialized with position (%f, %f, %f)\n", transform.getPos().x, transform.getPos().y, transform.getPos().z);
-	
+
 }
 
 FriendlyShip::FriendlyShip(Model* model_, Model* bulletModel_)
@@ -27,11 +27,11 @@ FriendlyShip::FriendlyShip(Model* model_, Model* bulletModel_)
 
 bool FriendlyShip::OnCreate()
 {
-	
+
 	detectionSphere = Sphere(transform.getPos(), range);
-	
+
 	printf("Ship Created! \n");
-	
+
 	rangeSphere = Model("Sphere.obj");
 
 	if (rangeSphere.OnCreate() == false) return false;
@@ -41,7 +41,7 @@ bool FriendlyShip::OnCreate()
 	//we may want to go into 3dsmax and make a unit sphere 
 
 
-	
+
 	collisionSphere = new Sphere(transform.getPos(), 5.0f);
 	speed = 5;
 	return true;
@@ -57,7 +57,7 @@ void FriendlyShip::OnDestroy()
 	exhaustTrail.OnDestroy();
 
 	delete collisionSphere;
-	
+
 	for (Bullet* bullet : bullets) {
 		bullet->OnDestroy();
 		delete bullet;
@@ -72,7 +72,7 @@ void FriendlyShip::OnDestroy()
 
 void FriendlyShip::Update(const float deltaTime)
 {
-	
+
 	if (!canFire) {
 		timeSinceShot += deltaTime;
 		canFire = timeSinceShot >= rateOfFire && !isMoving;
@@ -105,8 +105,6 @@ void FriendlyShip::Update(const float deltaTime)
 		rotateTowardTarget(movingDirection);
 
 		isMoving = VMath::mag(destination - transform.getPos()) > 0.01;
-		
-		
 	}
 	else {
 		body->vel = Vec3();
@@ -144,17 +142,17 @@ void FriendlyShip::Update(const float deltaTime)
 void FriendlyShip::Render(Shader* shader) const
 {
 
-	model->BindTextures(0,0);
+	model->BindTextures(0, 0);
 
 	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, transform.toModelMatrix());
-	
+
 	model->mesh->Render(GL_TRIANGLES);
 
 	model->UnbindTextures();
 
-	
 
-	
+
+
 }
 
 void FriendlyShip::RenderBullets(Shader* shader) const
@@ -170,7 +168,7 @@ void FriendlyShip::RenderRange(Shader* shader) const
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, rangeSphereT.toModelMatrix());
-		glUniform4fv(shader->GetUniformID("meshColor"), 1, Vec4(0.2,0.3,0.5,0.4));
+		glUniform4fv(shader->GetUniformID("meshColor"), 1, Vec4(0.2, 0.3, 0.5, 0.4));
 		//glUniform4fv(shader->GetUniformID("meshColor"), 1, color);
 		rangeSphere.mesh->Render(GL_LINES);
 		glDisable(GL_BLEND);
@@ -178,7 +176,7 @@ void FriendlyShip::RenderRange(Shader* shader) const
 }
 
 void FriendlyShip::FindClosestEnemy(EnemyShip* enemy)
-{	
+{
 	if (!isSwitchingTarget) {
 		currentTargetDistance = VMath::mag(transform.getPos() - closestEnemy->transform.getPos());
 		potentialTargetDistance = VMath::mag(transform.getPos() - enemy->transform.getPos());
@@ -187,8 +185,10 @@ void FriendlyShip::FindClosestEnemy(EnemyShip* enemy)
 		potentialTarget->aimingPoint = potentialTarget->transform.getPos() + potentialTarget->body->vel;
 
 	}
-	
-	if (potentialTargetDistance < currentTargetDistance) {
+
+	bool isInRange = COLLISION::SphereSphereCollisionDetected(&detectionSphere, enemy->collisionSphere);
+
+	if (potentialTargetDistance < currentTargetDistance && isInRange) {
 		isSwitchingTarget = true;
 		rotateTowardTarget(potentialTarget->aimingPoint - transform.getPos());
 	}
@@ -196,25 +196,25 @@ void FriendlyShip::FindClosestEnemy(EnemyShip* enemy)
 
 void FriendlyShip::Fire()
 {
-    canFire = false; 
-    timeSinceShot = 0;
+	canFire = false;
+	timeSinceShot = 0;
 
-    // Calculate the direction the ship is facing
-    
+	// Calculate the direction the ship is facing
 
-    // Add some randomness to the direction to simulate flak guns
-    float randomOffsetX = static_cast<float>(rand()) / RAND_MAX - 1.0f;
-    float randomOffsetY = static_cast<float>(rand()) / RAND_MAX - 1.0f;
-    float randomOffsetZ = static_cast<float>(rand()) / RAND_MAX - 1.0f;
-    Vec3 randomOffset = VMath::normalize(Vec3(randomOffsetX, randomOffsetY, randomOffsetZ));
 
-    // Adjust the target direction slightly
-    Vec3 adjustedDirection = VMath::normalize(targetDirection + randomOffset * 0.1f); // Adjust the scale as needed
+	// Add some randomness to the direction to simulate flak guns
+	float randomOffsetX = static_cast<float>(rand()) / RAND_MAX - 1.0f;
+	float randomOffsetY = static_cast<float>(rand()) / RAND_MAX - 1.0f;
+	float randomOffsetZ = static_cast<float>(rand()) / RAND_MAX - 1.0f;
+	Vec3 randomOffset = VMath::normalize(Vec3(randomOffsetX, randomOffsetY, randomOffsetZ));
 
-    bullets.push_back(new Bullet(transform, 1.0f, adjustedDirection, &bulletModel));
-    if (bullets.back()->OnCreate() == false) {
-        printf("Bullet failed! \n");
-    }
+	// Adjust the target direction slightly
+	Vec3 adjustedDirection = VMath::normalize(targetDirection + randomOffset * 0.1f); // Adjust the scale as needed
+
+	bullets.push_back(new Bullet(transform, 1.0f, adjustedDirection, &bulletModel));
+	if (bullets.back()->OnCreate() == false) {
+		printf("Bullet failed! \n");
+	}
 
 	// Audio
 	Vec3 bulletSpawn = transform.getPos();
@@ -245,10 +245,10 @@ void FriendlyShip::moveToDestination(Vec3 destination_)
 	isMoving = true;
 	slerpT = 0;
 
-	
-	irrklang::vec3df BodyPosition(body->pos.x, body->pos.y, body->pos.z);  
+
+	irrklang::vec3df BodyPosition(body->pos.x, body->pos.y, body->pos.z);
 	SoundEngineFlying->setSoundVolume(0.3f);
-	SoundEngineFlying->play3D("audio/RocketFlying.mp3", BodyPosition, true); 
+	SoundEngineFlying->play3D("audio/RocketFlying.mp3", BodyPosition, true);
 
 	if (wouldIntersectPlanet) {
 		Vec3 axis = VMath::cross(destination, transform.getPos());
@@ -257,7 +257,7 @@ void FriendlyShip::moveToDestination(Vec3 destination_)
 		body->vel = speed * VMath::normalize(movingDirection);
 	}
 	else {
-		Vec3 diff =  destination - transform.getPos(); //"draw" a vector between the 2 points
+		Vec3 diff = destination - transform.getPos(); //"draw" a vector between the 2 points
 		movingDirection = VMath::normalize(diff);//"convert" thevector into just a direction (normalize)
 		body->vel = movingDirection * speed; //tell the ship to move along that vector
 	}
@@ -271,10 +271,9 @@ void FriendlyShip::rotateTowardTarget(Vec3 target)
 
 		if (VMath::mag(target) != 0) {
 			Quaternion startQuad = QMath::lookAt(initialDirection, UP);
-		//	initialDirection.print("target: ");
 			Quaternion targetQuad = QMath::lookAt(target, UP);
 			Quaternion currentQuat = QMath::normalize(QMath::slerp(startQuad, targetQuad, slerpT));
-			
+
 			transform.setOrientation(currentQuat);
 		}
 
