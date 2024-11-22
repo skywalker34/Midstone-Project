@@ -9,14 +9,14 @@ bool Explosion::OnCreate(Camera* cam_, Shader* loadVerts, Mesh* mesh_, Model* mo
 	//create the buffer to hold the vertex positions between the vert stage and compute "stage"
 	glGenBuffers(1, &posBuffer);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, posBuffer);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Vec3) * 10000, NULL, GL_DYNAMIC_COPY); //null canse the loadVertsToBuffer shader will handle it
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Vec3) * BUF_SIZE, NULL, GL_DYNAMIC_COPY); //null canse the loadVertsToBuffer shader will handle it
 	//the size of these buffers are bigger then they need to be because unless I deduplicate the mesh I can't get the true vertex count
 	//thanks, artists
 
 	//safest bet for the vertcount is multiply the listed size by 4 and then round up and you should have more than enough space
 	//inefficient on storage/VRAM I know but I don't have any ideas on how to solve this problem
 
-	//give all of our particles a starting velocity so they can orbit 
+	
 	Vec3 initialVelocities[10000];
 	for (int i = 0; i < BUF_SIZE; i++) {
 		initialVelocities[i] = Vec3(0.0, 0.0, 0.0);
@@ -143,10 +143,10 @@ void Explosion::Render(Shader* shader, ComputeShader* comp)
 
 		glUseProgram(comp->GetProgram());
 
-		glUniform1i(comp->GetUniformID("yDispatch"), 100); //amount of dispatches in the y direction(?) so the GPUs can work in parralel doing these calculations
+		glUniform1i(comp->GetUniformID("yDispatch"), YDISPATCH); //amount of dispatches in the y direction(?) so the GPUs can work in parralel doing these calculations
 		glUniform1f(comp->GetUniformID("simSpeed"), 60); //frequency 
 		glUniform1f(comp->GetUniformID("randSeed"), rand()); //seed for rng
-		glDispatchCompute(100, 100, 1);//make sure the dispatch in the y parameter heres matches that in the uniform above
+		glDispatchCompute(BUF_SIZE / YDISPATCH, YDISPATCH, 1);//make sure the dispatch in the y parameter heres matches that in the uniform above
 		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
 		glUseProgram(shader->GetProgram());
