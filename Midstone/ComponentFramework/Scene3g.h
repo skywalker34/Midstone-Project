@@ -96,6 +96,8 @@ private:
 
 	Window* window;
 
+	float volumeSlider = 0.4f;
+	float sfxSlider = 0.4f;
 
 	void SaveStats();
 public:

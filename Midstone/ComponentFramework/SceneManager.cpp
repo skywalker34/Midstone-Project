@@ -61,7 +61,7 @@ bool SceneManager::Initialize(std::string name_, int width_, int height_) {
 	/********************************   Default first scene   ***********************/
 
 
-	BuildNewScene(SCENE_NUMBER::SCENEGAMEOVER); 
+	BuildNewScene(SCENE_NUMBER::SCENE3g); 
 
 
 	/********************************************************************************/
@@ -116,7 +116,12 @@ void SceneManager::Run() {
 			BuildNewScene(SCENE_NUMBER::SCENEGAMEOVER);
 			mainMenu = false;
 		}
-		
+		if (!mainMenu && currentScene->restartBool)
+		{
+			currentScene->restartBool = false;
+			BuildNewScene(SCENE_NUMBER::SCENE3g);
+			mainMenu = false;
+		}
 
 		SDL_Delay(timer->GetSleepTime(fps));
 	}
