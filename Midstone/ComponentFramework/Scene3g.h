@@ -16,6 +16,8 @@
 #include "imgui_impl_opengl3.h"
 #include "Line.h"
 #include "EnemySpawner.h"
+#include "Explosion.h"
+
 using namespace MATH;
 
 /// Forward declarations 
@@ -37,6 +39,10 @@ private:
 	Shader* selectionShader;
 
 	ComputeShader* computeShader = nullptr;
+	ComputeShader* computeExplosion = nullptr;
+	ComputeShader* computeReset = nullptr;
+
+
 	Shader* loadVertsToBuffer = nullptr;
 	Shader* particleShader = nullptr;
 
@@ -47,6 +53,7 @@ private:
 	Model bulletModel;
 	Model sphereModel;
 	Model planeModel;
+	Model debris;
 
 	Mesh* testMesh; //DELETE LATER
 	Matrix4 testModelMat;
@@ -77,6 +84,8 @@ private:
 	std::vector<FriendlyShip*> playerFleet;
 	std::vector<EnemyShip*> enemyFleet;
 
+	std::vector<Explosion*> explosions;
+
 	std::vector<EnemySpawner> enemyFleetSpawners;
 	int enemySpawnerCount = 1;
 
@@ -84,6 +93,8 @@ private:
 	int startingFleetSize = 2;
 	int enemyIndex = 0;
 	
+	int startingExplosions = 10; //we're going to create 10 explosions and recycle them whenever an enemy blows up.
+
 	float timeElapsed;
 	float rotationTimer = 0;
 

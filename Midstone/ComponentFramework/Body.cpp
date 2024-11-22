@@ -1,5 +1,5 @@
 #include "Body.h"
-
+#include "QMath.h"
 
 
 
@@ -25,7 +25,33 @@ void Body::Update(const float deltaTime) {
 
 }
 
+void Body::UpdateAngularVel(float deltaTime)
+{
+	// Change angular velocity based on angular accel
+	//angularVel = angularVel + angularAccel * deltaTime;
+}
 
+
+
+void Body::UpdateOrientation(float deltaTime)
+{
+	// Get the angle from the angular velocity vector
+	float changeInAngleRadians = VMath::mag(angularVel) * deltaTime;
+	// if the angle is zero, get outta here
+	if (changeInAngleRadians < VERY_SMALL) {
+		return;
+	}
+	// Get the axis of rotation
+	Vec3 axisOfRotation = VMath::normalize(angularVel);
+	// Make a rotation quaternion using the axis and angle
+	// We could do the cos(theta/2) + axis *sin(theta/2) thing here
+	// Or cheat and use Scott's method
+	float changeInAngleDegrees = changeInAngleRadians * RADIANS_TO_DEGREES;
+	Quaternion rotation = QMath::angleAxisRotation(changeInAngleDegrees, axisOfRotation);
+	// Update the orientation by multiplying
+	orientation = orientation * rotation;
+	transform->setOrientation(QMath::normalize(orientation));
+}
 
 Body::~Body() {}
 

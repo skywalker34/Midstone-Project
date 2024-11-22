@@ -10,7 +10,7 @@
 #include "Texture.h"
 #include "Constants.h"
 #include <QMath.h>
-
+#include "Body.h"
 
 
 
@@ -25,8 +25,12 @@ Scene5g::~Scene5g() {
 bool Scene5g::OnCreate() {
 	Debug::Info("Loading assets Scene3p: ", __FILE__, __LINE__);
 
-	computeShader = new ComputeShader("shaders/computer.glsl");	//create the compute shader
+	computeShader = new ComputeShader("shaders/Explosion.glsl");	//create the compute shader
 	if (computeShader->OnCreate() == false) {
+		std::cout << "Shader failed ... we have a problem\n";
+	}
+	resetParticles = new ComputeShader("shaders/ResetParticles.glsl");	//create the compute shader
+	if (resetParticles->OnCreate() == false) {
 		std::cout << "Shader failed ... we have a problem\n";
 	}
 
@@ -57,6 +61,7 @@ bool Scene5g::OnCreate() {
 
 	//sphereModelMatrix = MMath::translate(0.2, -0.08, 0.0f); //if you're going to do ANYTHING with the model matrix make sure it is done BEFORE the verts are loaded into the buffer
 
+	std::srand(static_cast<unsigned int>(std::time(0)));
 
 	if (camera.OnCreate() == false) { //create the camera 
 		std::cout << "Camera failed ... we have a problem\n";
@@ -166,6 +171,12 @@ bool Scene5g::OnCreate() {
 	ship = new Mesh("meshes/Midstone_Enemy.obj");
 	ship->OnCreate();
 
+	debris =  Model("Debris.obj");
+	debris.OnCreate();
+
+	
+	explosion = new Explosion();
+	explosion->OnCreate(&playerController.camera, loadVertsToBuffer, sphere, &debris);
 
 	shipModelMatrix =   MMath::translate(0.0f,0.0f,0.0f) * MMath::rotate(90.0f, Vec3(0.0f, 1.0f, 0.0f)) ;
 
@@ -200,6 +211,8 @@ void Scene5g::OnDestroy() {
 	ship->OnDestroy();
 	delete ship;
 
+	debris.OnDestroy();
+
 	computeShader->OnDestroy();
 	delete computeShader;
 
@@ -209,6 +222,15 @@ void Scene5g::OnDestroy() {
 
 void Scene5g::HandleEvents(const SDL_Event& sdlEvent) {
 	playerController.handleEvents(sdlEvent);
+	switch (sdlEvent.type) {
+	case SDL_KEYDOWN:
+		switch (sdlEvent.key.keysym.scancode) {
+		case SDL_SCANCODE_L:
+			printf("Reset!");
+			explosion->ResetExplosion(resetParticles);
+			break;
+		}
+	}
 }
 
 void Scene5g::Update(const float deltaTime) {
@@ -230,12 +252,16 @@ void Scene5g::Update(const float deltaTime) {
 		frameCounter++;
 	}
 	shipPos.x -= deltaTime / 10;
-	shipModelMatrix = MMath::translate(shipPos) * MMath::rotate(90.0f, Vec3(0.0f, 1.0f, 0.0f));
+	shipModelMatrix = MMath::translate(shipPos * 40) * MMath::rotate(90.0f, Vec3(0.0f, 1.0f, 0.0f));
 	//sphereModelMatrix = MMath::translate(-shipPos) * MMath::rotate(90.0f, Vec3(0.0f, 1.0f, 0.0f));
 
 	
-	sphereModelMatrix = shipModelMatrix;
+	//sphereModelMatrix = shipModelMatrix;
 
+	sphereModelMatrix = MMath::translate(Vec3(0,0,-20));
+
+
+	explosion->Update(deltaTime);
 
 }
 
@@ -278,46 +304,53 @@ void Scene5g::Render() {
 
 
 
-	//bind the buffers
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, posBuffer);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, velBuffer);
+	////bind the buffers
+	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, posBuffer);
+	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, velBuffer);
 
-	if (frameCounter %	1 == 0) {
-		glUseProgram(computeShader->GetProgram());
+	//if (frameCounter %	1 == 0) {
+	//	glUseProgram(computeShader->GetProgram());
 
-		glUniform1i(computeShader->GetUniformID("yDispatch"), 100); //amount of dispatches in the y direction(?) so the GPUs can work in parralel doing these calculations
-		glUniform1f(computeShader->GetUniformID("simSpeed"), 60); //frequency 
-		glUniform1f(computeShader->GetUniformID("randSeed"), time); //frequency 
-		glUniform3fv(computeShader->GetUniformID("forwardVector"), 1, Vec3(0,0,-1)); //direction the "ship" is headed
-		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, sphereModelMatrix);
-		glDispatchCompute(100, 100, 1);//make sure the dispatch in the y parameter heres matches that in the uniform above
-		glMemoryBarrier(GL_ALL_BARRIER_BITS);
-	}
-	glUseProgram(shader->GetProgram());
-	glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
-	glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, sphereModelMatrix);
-	sphere->Render(GL_POINTS);
+	//	glUniform1i(computeShader->GetUniformID("yDispatch"), 100); //amount of dispatches in the y direction(?) so the GPUs can work in parralel doing these calculations
+	//	glUniform1f(computeShader->GetUniformID("simSpeed"), 60); //frequency 
+	//	glUniform1f(computeShader->GetUniformID("randSeed"), time); //frequency 
+	//	//glUniform3fv(computeShader->GetUniformID("forwardVector"), 1, Vec3(0,0,-1)); //direction the "ship" is headed
+	//	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, sphereModelMatrix);
+	//	glDispatchCompute(100, 100, 1);//make sure the dispatch in the y parameter heres matches that in the uniform above
+	//	glMemoryBarrier(GL_ALL_BARRIER_BITS);
+	//}
+	//glUseProgram(shader->GetProgram());
+	//glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+	//glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+	//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, sphereModelMatrix);
+	//sphere->Render(GL_POINTS);
 
-	//unbind the buffers
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
+	////unbind the buffers
+	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);
+	//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
 
-	glUseProgram(0);
+	//glUseProgram(0);
 
 
-	glUseProgram(normalShader->GetProgram());
-	glUniformMatrix4fv(normalShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
-	glUniformMatrix4fv(normalShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-	glUniformMatrix4fv(normalShader->GetUniformID("modelMatrix"), 1, GL_FALSE, shipModelMatrix);
-	glUniform4fv(normalShader->GetUniformID("meshColor"), 1, BLUE);
-	ship->Render(GL_TRIANGLES);
+	//glUseProgram(normalShader->GetProgram());
+	////glUniformMatrix4fv(normalShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+	//glUniformMatrix4fv(normalShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+	//glUniformMatrix4fv(normalShader->GetUniformID("modelMatrix"), 1, GL_FALSE, shipModelMatrix);
+	//glUniform4fv(normalShader->GetUniformID("meshColor"), 1, BLUE);
+	//ship->Render(GL_TRIANGLES);
 
-	glUseProgram(lineShader->GetProgram());
+	/*glUseProgram(lineShader->GetProgram());
 	glUniformMatrix4fv(lineShader->GetUniformID("projection"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 	glUniformMatrix4fv(lineShader->GetUniformID("view"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
 	glUniformMatrix4fv(lineShader->GetUniformID("model"), 1, GL_FALSE, testLine.transform.toModelMatrix());
-	testLine.draw();
+	testLine.draw();*/
+
+	//glUseProgram(shader->GetProgram());
+	////glUniformMatrix4fv(normalShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+	//glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+	explosion->RenderDebris(normalShader);
+	explosion->Render(shader, computeShader);
+	
 
 	glUseProgram(0);
 	

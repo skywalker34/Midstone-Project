@@ -8,6 +8,8 @@
 #include "Camera.h"
 #include "PlayerController.h"
 #include "Line.h"
+#include "Model.h"
+#include "Explosion.h"
 using namespace MATH;
 
 /// Forward declarations 
@@ -17,6 +19,8 @@ class Mesh;
 class Shader;
 class Texture;
 class ComputeShader;
+
+class Body;
 
 
 class Scene5g : public Scene {
@@ -36,11 +40,17 @@ private:
 
 
 	ComputeShader* computeShader = nullptr;
+	ComputeShader* resetParticles = nullptr;
 
 	Mesh* sphere = nullptr;
 	Mesh* ship = nullptr;
 
+	Model debris;
+	Explosion* explosion;
+
 	bool drawInWireMode = false;
+	
+
 	float time = 0;
 	float prevFrameTime = 0.0f; //time of the previous frame
 	float frameDelta = 0.0f; //time between frames
@@ -57,6 +67,10 @@ private:
 	PlayerController playerController;
 
 	std::vector<float> lineData{};
+
+
+	
+
 	GLuint posBuffer;
 	GLuint velBuffer;
 
