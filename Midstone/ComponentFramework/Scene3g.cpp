@@ -67,8 +67,8 @@ bool Scene3g::OnCreate() {
 	particleMesh->OnCreate();
 
 
-	SoundEngine->setSoundVolume(0.4f);
-	SoundEngine->play2D("audio/BackGroundMusic2.mp3", true); // Audio For Game 
+	//SoundEngine->setSoundVolume(0.4f);
+	//SoundEngine->play2D("audio/BackGroundMusic2.mp3", true); // Audio For Game 
 	
 
 
@@ -734,7 +734,7 @@ void Scene3g::createModels()
 	}
 
 
-	planeModel = Model("Plane.obj", std::vector<std::string>{"Grid.png"});
+	planeModel = Model("Plane.obj", std::vector<std::string>{"Grid3.png"});
 	if (planeModel.OnCreate() == false) {
 		printf("Model failed to load");
 	}
