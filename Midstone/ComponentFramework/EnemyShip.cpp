@@ -34,9 +34,11 @@ bool EnemyShip::OnCreate()
 	//aimingPoint = transform.getPos() + body->vel;
 	collisionSphere = new Sphere(transform.getPos(), 5.0f);
 
-	irrklang::vec3df BodyPosition(body->pos.x, body->pos.y, body->pos.z);
+	/*irrklang::vec3df BodyPosition(body->pos.x, body->pos.y, body->pos.z);
 	SoundEngineFlying->setSoundVolume(0.1f);
-	SoundEngineFlying->play3D("audio/RocketFlying.mp3", BodyPosition, true);
+	SoundEngineFlying->play3D("audio/RocketFlying.mp3", BodyPosition, true);*/
+
+	audioManager->PlaySound3DLooped("Rocket_Loop", transform.getPos());
 
 	printf("Ship Created! \n");
 
@@ -57,7 +59,7 @@ void EnemyShip::OnDestroy()
 
 	exhaustTrail.OnDestroy();
 
-	SoundEngineFlying->drop();
+
 
 }
 
@@ -96,14 +98,15 @@ void EnemyShip::Render(Shader* shader) const
 void EnemyShip::Hit()
 {
 	health -= 1; //reduce health
-	irrklang::vec3df bodypos(body->pos.x, body->pos.y, body->pos.z);
-	SoundEngine->setSoundVolume(0.5f);
-	SoundEngine->play3D("audio/Gothit.mp3.", bodypos, false); // Audio For Gothit Ships Noise
-	
+	//irrklang::vec3df bodypos(body->pos.x, body->pos.y, body->pos.z);
+	//SoundEngine->setSoundVolume(0.5f);
+	//SoundEngine->play3D("audio/Gothit.mp3.", bodypos, false); // Audio For Gothit Ships Noise
+	audioManager->PlaySound3D("Enemy_Hit", transform.getPos());
 
 	if (health < 0) { //if dead set flag so scene knows to delete the ship
 		deleteMe = true;
-		SoundEngine->play3D("audio/DeadExplosion.mp3", bodypos, false); // Audio For Dying Ships Noise
+		audioManager->PlaySound3D("Enemy_Explosion", transform.getPos());
+		//SoundEngine->play3D("audio/DeadExplosion.mp3", bodypos, false); // Audio For Dying Ships Noise
 	}
 
 }

@@ -11,6 +11,7 @@
 #include "Shader.h"
 #include "Body.h"
 #include "Model.h"
+#include "AudioManager.h"
 
 #include "ComputeShader.h"
 
@@ -77,11 +78,15 @@ bool Scene3g::OnCreate() {
 	particleMesh->OnCreate();
 
 
-	//SoundEngine->setSoundVolume(0.4f);
-	//SoundEngine->play2D("audio/BackGroundMusic2.mp3", true); // Audio For Game 
+
 	
+	audioManager = new AudioManager();
+	if (audioManager->OnCreate() == false) {
+		std::cout << "Audio failed ... we have a problem\n";
+	}
 
-
+	SoundEngine->setSoundVolume(0.4f);
+	SoundEngine->play2D("audio/BackGroundMusic2.mp3", true); // Audio For Game 
 
 	createModels();
 	createActors();
@@ -177,8 +182,9 @@ void Scene3g::OnDestroy() {
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
 
-
-	SoundEngine->drop(); // Removes Sound from scene
+	audioManager->OnDestroy();
+	delete audioManager;
+	//SoundEngine->drop(); // Removes Sound from scene
 }
 
 void Scene3g::HandleEvents(const SDL_Event& sdlEvent) {
@@ -546,6 +552,7 @@ void Scene3g::SpawnEnemy(const float deltaTime)
 		if (enemyFleetSpawners[i].canSpawn == true) {
 			enemyIndex++;
 			enemyFleet.push_back(new EnemyShip(enemyFleetSpawners[i].position, &enemyShipModel));
+			enemyFleet.back()->SetAudioManager(audioManager);
 			enemyFleet.back()->OnCreate();
 			enemyFleet.back()->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
 			enemyFleet.back()->setIndex(enemyIndex);
@@ -574,7 +581,8 @@ void Scene3g::SetActiveShip()
 				isGivingOrders = true;
 				
 				playerController.has3DClick = false;
-        SoundEngine->play2D("audio/SelectionSound.mp3", false); // Audio For Selection Ship
+				//SoundEngine->play2D("audio/SelectionSound.mp3", false); // Audio For Selection Ship
+				audioManager->PlaySound2D("Ship_Selected");
 			}
 			break;
 		}
@@ -728,8 +736,9 @@ void Scene3g::UpdateEnemyFleet(const float deltaTime)
 				planet.takeDamage(1);
 
 				
-				SoundEngine->setSoundVolume(0.2f);
-				SoundEngine->play2D("audio/PlanetGotHit.mp3", false); // Planet Got Hit Sound
+				//SoundEngine->setSoundVolume(0.2f);
+				audioManager->PlaySound2D("Planet_Hit");
+				//SoundEngine->play2D("audio/PlanetGotHit.mp3", false); // Planet Got Hit Sound
 
 				
 				DestroyEnenmy(i);
@@ -778,7 +787,8 @@ void Scene3g::GameOver()
 	//END GAME LOGIC HERE PLEASE
 	std::cout << "\033[32m" << "GAMEOVER!" << "\033[0m" << std::endl;
 	SaveStats();
-	SoundEngine->play2D("audio/GameoverSound.mp3", false);
+	audioManager->PlaySound2D("Game_Over");
+	//SoundEngine->play2D("audio/GameoverSound.mp3", false);
 	gameOverBool = true;
 	
 }
@@ -855,7 +865,9 @@ void Scene3g::createActors()
 
 
 	for (EnemyShip* ship : enemyFleet) {
+		ship->SetAudioManager(audioManager);
 		ship->OnCreate();
+		
 		ship->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
 		ship->setIndex(enemyIndex);
 		enemyIndex++;
@@ -876,9 +888,10 @@ void Scene3g::createActors()
 		float x = radius * cos(angle);													// Calculate x position
 		float z = radius * sin(angle);													// Calculate z position
 
-
+		
 		playerFleet[i]->transform.setPos(Vec3(x, 0.0f, z));
 		playerFleet[i]->OnCreate();
+		playerFleet[i]->SetAudioManager(audioManager);
 		playerFleet[i]->closestEnemy = enemyFleet.back();	// Set initail target
 		playerFleet[i]->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
 	}

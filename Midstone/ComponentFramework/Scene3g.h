@@ -27,6 +27,7 @@ class Shader;
 class Bullet;
 class Model;
 class ComputeShader;
+class AudioManager;
 
 class Scene3g : public Scene {
 private:
@@ -67,7 +68,7 @@ private:
 	
 
 
-
+	AudioManager* audioManager;
 	
 	Vec3 lightPos = Vec3(0.0f, 0.0f, 150.0f);
 

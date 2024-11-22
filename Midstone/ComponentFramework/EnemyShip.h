@@ -24,7 +24,7 @@ class EnemyShip :
 		//Body* body;
 		//Matrix4 shipModelMatrix;
 	Vec3 target; 
-	
+
 	public:
 		bool deleteMe = false;//flag to tell the scene when to delete this ship
 		int shipIndex;

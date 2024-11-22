@@ -68,6 +68,7 @@ class FriendlyShip :
 		Sphere detectionSphere;
 
 
+
 		FriendlyShip();
 		FriendlyShip(Model* model_, Model* bulletModel_);
 		bool OnCreate() override; //probably a way to do this without ovveriding
