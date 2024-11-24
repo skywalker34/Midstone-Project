@@ -259,7 +259,10 @@ void Scene3g::Update(const float deltaTime) {
 	
 	playerController.Update(deltaTime);
 
+	//MUSIC VOL
 	SoundEngine->setSoundVolume(volumeSlider);
+	//SFX VOL
+	audioManager->SoundEngine->setSoundVolume(sfxSlider);
 
 	if (!isGameRunning) return;
 
@@ -396,7 +399,8 @@ void Scene3g::Render() {
 		glUniformMatrix4fv(friendlyShipShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 		glUniformMatrix4fv(friendlyShipShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
 		glUniform3fv(friendlyShipShader->GetUniformID("lightPos"), 1, lightPos);
-		glUniform4fv(friendlyShipShader->GetUniformID("primaryColour"), 1, ORANGE);
+		glUniform4fv(friendlyShipShader->GetUniformID("primaryColour"), 1, Vec4(shipColor.x, shipColor.y, shipColor.z, shipColor.w));
+		//glUniform4fv(friendlyShipShader->GetUniformID("primaryColour"), 1, ORANGE);
 		glUniform4fv(friendlyShipShader->GetUniformID("secondaryColour"), 1, GREY);
 		glUniform4fv(friendlyShipShader->GetUniformID("tertiaryColour"), 1, BLUE);
 		ship->Render(friendlyShipShader);
@@ -505,35 +509,56 @@ void Scene3g::Render() {
 		//if (ImGui::Button("Quit to Title", ImVec2(150, 30))) switchButton = true;
 		//ImGui::End();
 
-		//Pause Menu Creation
+		//Pause Menu Creation (A lot of sloppy alignment but looks okay now)
 		if (!isGameRunning)
 		{
 			//Begin Pause Menu
 			ImGui::Begin("Pause Menu", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 			float width = 0.0f;
-			width = ImGui::CalcTextSize("Paused").x;
+			ImGui::SetWindowFontScale(2.0);
+			width = ImGui::CalcTextSize("Game Paused").x;
 			AlignForWidth(width);
-			ImGui::Text("Paused");
+			ImGui::Text("Game Paused", ImGuiWindowFlags_AlwaysAutoResize);
 
-			//Test for Volume Sliders (GET ANDY TO DO SOMETHING WITH THIS BECAUSE I DON'T KNOW ABOUT HOW THE SOUND ENGINE IS CONFIGURED.
-			//YOU PROBABLY WANT MORE THAN JUST SOUNDENGINE AND SOUNDENGINEFLYING)
+			//Okay so sliders are working.
 			const ImGuiSliderFlags flags_for_sliders = ImGuiSliderFlags_None;
+			ImGui::SetWindowFontScale(1.2);
+			width = ImGui::CalcTextSize("Music Volume").x;
+			AlignForWidth(width);
 			ImGui::Text("Music Volume");
+			ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f );
 			ImGui::SliderFloat("##1", &volumeSlider, 0.0f, 1.0f, "%.3f", flags_for_sliders);
-			ImGui::Text("Sfx Volume (NOT WORKING YET)");
+			width = ImGui::CalcTextSize("Sfx Volume").x;
+			AlignForWidth(width);
+			ImGui::Text("Sfx Volume");
+			ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f );
 			ImGui::SliderFloat("##2", &sfxSlider, 0.0f, 1.0f, "%.3f", flags_for_sliders);
 
-			//Test For Ship Color (Or whatever this is used for but not working at the moment bear with me) Need to ask Andrew L about these
+			//Primary Color Slider works
+			width = ImGui::CalcTextSize("Ship Color").x;
+			AlignForWidth(width);
 			ImGui::Text("Ship Color");
-			//Probably store this in scene so we can pass it to the shader
-			static ImVec4 color = ImVec4(114.0f / 255.0f, 144.0f / 255.0f, 154.0f / 255.0f, 200.0f / 255.0f);
-			ImGui::ColorButton("MyColor##3c", *(ImVec4*)&color, ImGuiColorEditFlags_NoBorder), ImVec2(80, 80);
-			ImGui::ColorPicker3("##MyColor##5", (float*)&color, ImGuiColorEditFlags_PickerHueBar | ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoAlpha);
+			//Probably store this in scene so we can pass it to the shader (NOW IN 3g.h file)
+			//static ImVec4 color = ImVec4(114.0f / 255.0f, 144.0f / 255.0f, 154.0f / 255.0f, 200.0f / 255.0f);
+			ImGui::ColorButton("MyColor##3c", *(ImVec4*)&shipColor, ImGuiColorEditFlags_NoBorder, ImVec2(ImGui::GetWindowWidth() * 0.95f, 20));
+			ImGui::ColorPicker3("##MyColor##5", (float*)&shipColor, ImGuiColorEditFlags_PickerHueBar | ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoAlpha);
 
 			//Three Buttons to Unpause (Even though you can press P), Restart Scene, or Quit to title which was moved to this window.
-			if (ImGui::Button("Unpause", ImVec2(150, 30))) isGameRunning = true;
-			if (ImGui::Button("Restart", ImVec2(150, 30))) restartBool = true;
-			if (ImGui::Button("Quit to Title", ImVec2(150, 30))) switchButton = true;
+			width = 150.0f;
+			AlignForWidth(width);
+			if (ImGui::Button("Unpause", ImVec2(150, 30))) isGameRunning = true; 
+			AlignForWidth(width);
+			if (ImGui::Button("Restart", ImVec2(150, 30)))
+			{
+				SoundEngine->drop();
+				restartBool = true;
+			}
+			AlignForWidth(width);
+			if (ImGui::Button("Quit to Title", ImVec2(150, 30))) 
+			{
+				SoundEngine->drop();
+				switchButton = true;
+			}
 
 			//End Pause Menu
 			ImGui::End();

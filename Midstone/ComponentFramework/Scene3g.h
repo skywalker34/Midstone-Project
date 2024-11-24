@@ -111,6 +111,8 @@ private:
 	float volumeSlider = 0.4f;
 	float sfxSlider = 0.4f;
 
+	ImVec4 shipColor = ImVec4(114.0f / 255.0f, 144.0f / 255.0f, 154.0f / 255.0f, 200.0f / 255.0f);
+
 	void SaveStats();
 public:
 	explicit Scene3g();
