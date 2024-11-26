@@ -184,7 +184,6 @@ void SceneGameplay::OnDestroy() {
 
 	audioManager->OnDestroy();
 	delete audioManager;
-	//SoundEngine->drop(); // Removes Sound from scene
 }
 
 void SceneGameplay::HandleEvents(const SDL_Event& sdlEvent) {
@@ -194,63 +193,19 @@ void SceneGameplay::HandleEvents(const SDL_Event& sdlEvent) {
 	//basically whats happening here is that the player controller has a boolean flag thats basically saying "I have something to tell you scenemanager"
 	//the scene knows to check for this flag and to recieve the message so the playercontroller does not need to have a reference to the scene
 	//its basically just throwing out this variable and hoping something is listening
+	//closest thing I could come up with to a delegate/event dispatcher
 	ImGui_ImplSDL2_ProcessEvent(&sdlEvent); // ImGui HandleEvents
 
 	switch (sdlEvent.type) {
 	case SDL_KEYDOWN:
 		switch (sdlEvent.key.keysym.scancode) {
-		case SDL_SCANCODE_L:
-			drawInWireMode = !drawInWireMode;
-			break;
-		case SDL_SCANCODE_Z:
-			if (activeShip >= 0) activeShip -= 1;
-			break;
-		case SDL_SCANCODE_X:
-			if(activeShip != startingFleetSize + 1) activeShip += 1;
-			break;
-
 		case SDL_SCANCODE_P:
 			//allows us to pause and unpause time, whoah.
 			isGameRunning = !isGameRunning;
 			Debug::Info("Paused", __FILE__, __LINE__);
 			break;
-		case SDL_SCANCODE_F:
-			//TEMPORARY DELETE THIS LATER
-			playerFleet[activeShip]->Fire();
-			break;
 		}
-
-
 		break;
-
-
-		//below is SUUUUUUPER temporary
-		//will be in collision namespace once its up and running
-		
-
-
-			//centrePoint = VMath::normalize(centrePoint4); //if I normalize the centre point I get the wrong answer 
-
-			
-
-
-
-			
-
-		
-		/////////////////////**DO NOT PUT ANY CONTROLS THAT AREN'T RELEVANT TO THE SCENE IN THE SCENE**\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-		//use player controller instead for player controls
-		/*case SDL_MOUSEMOTION:
-			break;
-
-		case SDL_MOUSEBUTTONDOWN:
-			break;
-
-		case SDL_MOUSEBUTTONUP:
-		break;
-
-		default:
-			break;*/
 	}
 }
 
@@ -268,7 +223,6 @@ void SceneGameplay::Update(const float deltaTime) {
 
 
 	planet.Update(deltaTime);
-	
 
 	timeElapsed += deltaTime;
 
@@ -279,7 +233,6 @@ void SceneGameplay::Update(const float deltaTime) {
 
 	planet.Update(deltaTime);
 	if (planet.GetHealth() < 0) {
-		//temp for now
 		GameOver();
 	}
 
@@ -287,21 +240,13 @@ void SceneGameplay::Update(const float deltaTime) {
 		explosion->Update(deltaTime);
 	}
 
-
 	static float spawnTimer = 0.0f; // Timer for spawning
 	spawnTimer += deltaTime;
-
 	if (spawnTimer >= 60.0f) { //spawn an enemySpawner every minute
 		enemyFleetSpawners.push_back(EnemySpawner(200.0f, 5, 5));
 		enemySpawnerCount++;
-		//std::cout << "Enemy Spawners: " << enemySpawnerCount << std::endl;
 		spawnTimer = 0.0f; // Reset the spawn timer
 	}
-
-	//testModelMat = MMath::translate(Vec3(0, 0, 70)) * MMath::scale(5, 5, 5);
-
-	//std::cout << std::endl << "Score: " << score << std::endl;
-	//std::cout << "Time Elapsed " << timeElapsed << std::endl;
 }
 
 void SceneGameplay::Render() {
@@ -310,16 +255,6 @@ void SceneGameplay::Render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	playerController.camera.RenderSkyBox();
-
-	/*if (drawInWireMode) {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	}
-	else {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-	}*/
-
-
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glUseProgram(lineShader->GetProgram());
@@ -335,7 +270,6 @@ void SceneGameplay::Render() {
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-
 	if (activeShip >= 0) {
 
 		glUseProgram(lineShader->GetProgram());
@@ -345,19 +279,8 @@ void SceneGameplay::Render() {
 		pathLine.draw();
 	}
 
-	
-
-
-
-
-
-
-
 	for (EnemyShip* ship : enemyFleet) {
-		//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
-		if (ship->deleteMe == false) { //shouldn't have to have this if here...
-		
-			//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
+		if (ship->deleteMe == false) { //don't render a ship thats to be deleted
 			glUseProgram(friendlyShipShader->GetProgram());
 			glUniformMatrix4fv(friendlyShipShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 			glUniformMatrix4fv(friendlyShipShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
@@ -366,12 +289,7 @@ void SceneGameplay::Render() {
 			glUniform4fv(friendlyShipShader->GetUniformID("secondaryColour"), 1, GREY);
 			glUniform4fv(friendlyShipShader->GetUniformID("tertiaryColour"), 1, RED);
 			ship->Render(friendlyShipShader);
-
-
-
-
-
-			if (isGameRunning) ship->exhaustTrail.Render(particleShader, computeShader);
+			if (isGameRunning) ship->exhaustTrail.Render(particleShader, computeShader); //if the games runnign render the associated particle system too
 
 		}
 	}
@@ -394,20 +312,14 @@ void SceneGameplay::Render() {
 
 	for (FriendlyShip* ship : playerFleet) {
 
-		//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
 		glUseProgram(friendlyShipShader->GetProgram());
 		glUniformMatrix4fv(friendlyShipShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 		glUniformMatrix4fv(friendlyShipShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
 		glUniform3fv(friendlyShipShader->GetUniformID("lightPos"), 1, lightPos);
 		glUniform4fv(friendlyShipShader->GetUniformID("primaryColour"), 1, Vec4(shipColor.x, shipColor.y, shipColor.z, shipColor.w));
-		//glUniform4fv(friendlyShipShader->GetUniformID("primaryColour"), 1, ORANGE);
 		glUniform4fv(friendlyShipShader->GetUniformID("secondaryColour"), 1, GREY);
 		glUniform4fv(friendlyShipShader->GetUniformID("tertiaryColour"), 1, BLUE);
 		ship->Render(friendlyShipShader);
-
-
-
-
 
 		glUseProgram(bulletShader->GetProgram());
 		glUniformMatrix4fv(bulletShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
@@ -415,14 +327,9 @@ void SceneGameplay::Render() {
 		glUniform3fv(bulletShader->GetUniformID("cameraPos"), 1, playerController.camera.transform.getPos());
 		ship->RenderBullets(bulletShader);
 
-
-
-
 		if (ship->isMoving && isGameRunning) {
 			ship->exhaustTrail.Render(particleShader, computeShader);
 		}
-
-
 
 		if (isGivingOrders) 
 		{
@@ -470,15 +377,6 @@ void SceneGameplay::Render() {
 		glUniformMatrix4fv(gridShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
 		playerController.Render(gridShader);
 	}
-
-
-
-
-
-		
-
-
-
 		
 		glUseProgram(0);
 }
@@ -499,10 +397,7 @@ void SceneGameplay::RenderIMGUI()
 	ImGui::Text("Planet Health: = %i", planet.GetHealth());
 	ImGui::End();
 
-	//Don't need because we its in pause menu now.
-	//ImGui::Begin("QuitButton", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-	//if (ImGui::Button("Quit to Title", ImVec2(150, 30))) switchButton = true;
-	//ImGui::End();
+
 
 	//Pause Menu Creation (A lot of sloppy alignment but looks okay now)
 	if (!isGameRunning)
@@ -534,7 +429,6 @@ void SceneGameplay::RenderIMGUI()
 		AlignForWidth(width);
 		ImGui::Text("Ship Color");
 		//Probably store this in scene so we can pass it to the shader (NOW IN 3g.h file)
-		//static ImVec4 color = ImVec4(114.0f / 255.0f, 144.0f / 255.0f, 154.0f / 255.0f, 200.0f / 255.0f);
 		ImGui::ColorButton("MyColor##3c", *(ImVec4*)&shipColor, ImGuiColorEditFlags_NoBorder, ImVec2(ImGui::GetWindowWidth() * 0.95f, 20));
 		ImGui::ColorPicker3("##MyColor##5", (float*)&shipColor, ImGuiColorEditFlags_PickerHueBar | ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoAlpha);
 
@@ -752,14 +646,8 @@ void SceneGameplay::UpdateEnemyFleet(const float deltaTime)
 			enemyFleet[i]->Update(deltaTime);
 
 			if (COLLISION::SphereSphereCollisionDetected(enemyFleet[i]->collisionSphere, planet.collisionSphere)) {
-				planet.takeDamage(1);
-
-				
-				//SoundEngine->setSoundVolume(0.2f);
+				planet.takeDamage(enemyFleet[i]->damage);
 				audioManager->PlaySound2D("Planet_Hit");
-				//SoundEngine->play2D("audio/PlanetGotHit.mp3", false); // Planet Got Hit Sound
-
-				
 				DestroyEnenmy(i);
 			}
 
@@ -807,7 +695,6 @@ void SceneGameplay::GameOver()
 	std::cout << "\033[32m" << "GAMEOVER!" << "\033[0m" << std::endl;
 	SaveStats();
 	audioManager->PlaySound2D("Game_Over");
-	//SoundEngine->play2D("audio/GameoverSound.mp3", false);
 	gameOverBool = true;
 	
 }
@@ -821,13 +708,6 @@ void SceneGameplay::SaveStats() {
 	if (outFile.is_open()) {
 		// Write the data to the file
 		outFile << timeElapsed << " " << score << " " << "\n";
-
-		//Old format for how Leaderboard.txt was layed out
-		//outFile << "Score: " << score << "\n";
-		//outFile << "Time: " << timeElapsed << "\n";
-		//outFile << "-" << "\n";
-
-		// Close the file
 		outFile.close();
 
 		std::cout << "Data appended to file successfully." << std::endl;
