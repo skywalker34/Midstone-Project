@@ -76,6 +76,9 @@ SceneUI2::SceneUI2(Window* window_) : drawInWireMode{ true }, show_demo_window {
 	// Setup Platform/Renderer backends
 	ImGui_ImplSDL2_InitForOpenGL(window->getWindow(), window->getContext());
 	ImGui_ImplOpenGL3_Init("#version 450");
+
+	// Load the font 
+	io.Fonts->AddFontFromFileTTF("./fonts/Galaksi.ttf", 16.0f);
 }
 
 SceneUI2::~SceneUI2() {

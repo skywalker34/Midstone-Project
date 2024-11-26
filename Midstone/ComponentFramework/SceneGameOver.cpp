@@ -77,6 +77,9 @@ SceneGameOver::SceneGameOver(Window* window_) : drawInWireMode{ true }, show_dem
 	ImGui_ImplSDL2_InitForOpenGL(window->getWindow(), window->getContext());
 	ImGui_ImplOpenGL3_Init("#version 450");
 
+	// Load the font 
+	io.Fonts->AddFontFromFileTTF("./fonts/Ethnocentric Rg It.otf", 12.0f);
+	//io.Fonts->AddFontFromFileTTF("./fonts/Galaksi.ttf", 15.0f);
 	// Read text file
 	readLeaderboard("leaderboard.txt", leaderboard);
 
