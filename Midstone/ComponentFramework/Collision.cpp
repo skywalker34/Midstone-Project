@@ -28,16 +28,6 @@ bool COLLISION::LineSphereCollisionDetected(const Sphere* body, const DualQuat l
 
 	if (dSquared > 0) { //if d^2 > 0 then the line and sphere intersect
 		return true;
-
-		/*Vec4 i1 = line ^ (M.plane + Plane(0, 0, 0, sqrt(dSquared))) * -1;
-		i1 = i1 / i1.w;
-		i1.print("Intersection Point 1");
-
-
-
-		Vec4 i2 = line ^ (M.plane + Plane(0, 0, 0, -sqrt(dSquared))) * -1;
-		i2 = i2 / i2.w;
-		i2.print("Intersection Point 2");*/
 	}
 
 	return false;
