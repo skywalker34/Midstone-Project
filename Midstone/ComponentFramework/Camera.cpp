@@ -76,10 +76,7 @@ Matrix4 Camera::GetViewMatrix()const {
 	return DQMath::toMatrix4(viewDq);
 }
 
-//void Camera::HandelEvents(const SDL_Event& sdlEvent) {
-//	trackball.HandleEvents(sdlEvent);
-//	orientation = trackball.getQuat();
-//}
+
 
 void Camera::RenderSkyBox() const {
 	if (skybox == nullptr) return;

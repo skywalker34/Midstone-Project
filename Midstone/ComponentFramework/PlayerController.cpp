@@ -64,10 +64,8 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 	case SDL_KEYDOWN: //code that allows the user to move the camera around
 		switch (sdlEvent.key.keysym.scancode) {
 		case SDL_SCANCODE_W:
-			//transform.setPos(transform.getPos() + (-direction * speed));
-			//^^^THIS should work, no idea why it doesn't
-
-			//	below works *marginally* better (still jank af)
+			
+			//	below works *marginally* better 
 			v = transform.getPos();
 			v += (VMath::normalize(-forwardVector) * CAMERA_SPEED);
 			
@@ -75,8 +73,7 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 			break;
 
 		case SDL_SCANCODE_S:
-			//transform.setPos(transform.getPos() + (direction * speed));
-
+			
 
 			v = transform.getPos();
 			v += (VMath::normalize(forwardVector) * CAMERA_SPEED);
@@ -184,9 +181,6 @@ void PlayerController::Update(const float deltaTime)
 
 	camera.SetView(transform);
 	clickGrid.transform.setOrientation(transform.getOrientation());
-
-	/*Vec3 cameraToGrid = VMath::normalize(camera.transform.getPos() - get3DClickCoords(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)) * (planeDepth);
-	Vec3 newCridPosition =camera.transform.getPos() - cameraToGrid;*/
 
 	clickGrid.transform.setPos(get3DClickCoords(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2));
 

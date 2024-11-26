@@ -13,8 +13,7 @@ Bullet::Bullet(Transform spawnPos, float speed_, Vec3 forward_, Model** model_){
 
 bool Bullet::OnCreate()
 {
-	/*modelTemp = Model("Sphere.obj");
-	if (modelTemp.OnCreate() == false) return false;*/
+	
 	transform.setScale(0.5f, 0.5f, 0.5f);
 
 	initialPos = transform.getPos();
@@ -58,6 +57,5 @@ void Bullet::Render(Shader* shader) const
 	
 
 	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, transform.toModelMatrix());
-	//glUniform4fv(shader->GetUniformID("meshColor"), 1, color);
 	(*modelTemp)->mesh->Render(GL_TRIANGLES);
 }

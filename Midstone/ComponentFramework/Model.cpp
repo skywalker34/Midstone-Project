@@ -52,6 +52,5 @@ void Model::OnDestroy()
 		delete texture;
 	}
 
-	/*shader->OnDestroy();
-	delete shader;*/
+	
 }

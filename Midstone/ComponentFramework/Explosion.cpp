@@ -85,8 +85,7 @@ void Explosion::OnExplode()
 
 		body[i]->ApplyForce(rv); //create a random vector
 		body[i]->angularVel = (Vec3(fmod(rand(), 2 * 2) - 1, fmod(rand(), 2 * 2) - 1, fmod(rand(), 2 * 2) - 1)); //create a random vector
-		//std::cout << "Debris chunk " << i << " position: " << debrisTransforms[i]->getPos().x << ", " << debrisTransforms[i]->getPos().y << ", " << debrisTransforms[i]->getPos().z << std::endl;
-
+		
 	}
 	onExplode = false;
 }
@@ -122,7 +121,6 @@ void Explosion::RenderDebris(Shader* shader)
 
 
 			glUseProgram(shader->GetProgram());
-			//glUniformMatrix4fv(normalShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 			glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, cam->GetViewMatrix());
 			glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, cam->GetProjectionMatrix());
 			glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, debrisTransforms[i]->toModelMatrix());

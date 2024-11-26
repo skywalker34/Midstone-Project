@@ -14,8 +14,6 @@ Line::Line(Vec3 start, Vec3 end) {
 
 	Vec3 foward = Vec3(0, 0, -1);
 
-	/*start.print("Starting line point: ");
-	end.print("Ending line point: ");*/
 	Vec3 direction = VMath::normalize(end - start);
 
 	Quaternion q = QMath::lookAt(direction, UP);
@@ -48,9 +46,6 @@ void Line::RecalculateLine(Vec3 start, Vec3 end)
 
 	Vec3 foward = Vec3(0, 0, -1);
 
-
-	/*start.print("Starting line point: ");
-	end.print("Ending line point: ");*/
 	Quaternion q = Quaternion();
 	Vec3 direction = VMath::normalize(end - start);
 	if (direction.x < VERY_SMALL && direction.y < VERY_SMALL && direction.z < VERY_SMALL) {

@@ -52,6 +52,3 @@ bool COLLISION::SpherePointCollisionDetected(const Sphere* body, const Vec3 pos)
 
 
 
-//void COLLISION::SphereSphereCollisionResponse(Sphere* body1, Sphere* body2) {
-//	std::cout << "We have impact baby or in this case... I SEE YOU!" << std::endl;
-//}
