@@ -1,7 +1,7 @@
 #include <glew.h>
 #include <iostream>
 #include <SDL.h>
-#include "SceneUI2.h"
+#include "SceneMainMenu.h"
 #include <MMath.h>
 #include <QMath.h>
 #include <VMath.h>
@@ -63,8 +63,8 @@ static bool LoadTextureFromFile(const char* file_name, GLuint* out_texture, int*
 	}
 }
 
-SceneUI2::SceneUI2(Window* window_) : drawInWireMode{ true }, show_demo_window {true} {
-	Debug::Info("Created Scene2g: ", __FILE__, __LINE__);
+SceneMainMenu::SceneMainMenu(Window* window_) : drawInWireMode{ true }, show_demo_window {true} {
+	Debug::Info("Created Main Menu: ", __FILE__, __LINE__);
 	window = window_;
 
 	// ImGUI stuff for initialize from Scotties Vid.
@@ -78,14 +78,14 @@ SceneUI2::SceneUI2(Window* window_) : drawInWireMode{ true }, show_demo_window {
 	ImGui_ImplOpenGL3_Init("#version 450");
 }
 
-SceneUI2::~SceneUI2() {
-	Debug::Info("Deleted Scene2g: ", __FILE__, __LINE__);
+SceneMainMenu::~SceneMainMenu() {
+	Debug::Info("Deleted Main Menu: ", __FILE__, __LINE__);
 
 
 }
 
-bool SceneUI2::OnCreate() {
-	Debug::Info("Loading assets Scene2g: ", __FILE__, __LINE__);
+bool SceneMainMenu::OnCreate() {
+	Debug::Info("Loading assets Main Menu: ", __FILE__, __LINE__);
 
 	SoundEngine->play2D("audio/BackGroundMusic3.mp3", true); // Audio For Main Screen
 	
@@ -96,7 +96,7 @@ bool SceneUI2::OnCreate() {
 
 }
 
-void SceneUI2::OnDestroy() {
+void SceneMainMenu::OnDestroy() {
 	Debug::Info("Deleting assets Scene0: ", __FILE__, __LINE__);
 
 	// Cleanup
@@ -106,33 +106,31 @@ void SceneUI2::OnDestroy() {
 	SoundEngine->drop(); // Removes Sound from scene
 }
 
-void SceneUI2::HandleEvents(const SDL_Event& sdlEvent) 
+void SceneMainMenu::HandleEvents(const SDL_Event& sdlEvent) 
 {
 	ImGui_ImplSDL2_ProcessEvent(&sdlEvent); // ImGui HandleEvents
 }
 
-void SceneUI2::Update(const float deltaTime) 
+void SceneMainMenu::Update(const float deltaTime) 
 {
 }
 
-void SceneUI2::Render() 
+void SceneMainMenu::Render() 
 {
 	/// Set the background color then clear the screen
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
+	glUseProgram(0);
+}
+
+void SceneMainMenu::RenderIMGUI()
+{
+
 	// IMGUI STUFF
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame();
-
-	//This is the font stuff if you can find a working one then yeah. But otherwise im gonna keep it default for now.
-	//ImGuiIO& io = ImGui::GetIO();
-	//ImFontConfig config;
-	//config.OversampleH = 2;
-	//io.Fonts->AddFontDefault();
-	//ImFont* font_title = io.Fonts->AddFontFromFileTTF("./fonts/Comic Sans MS.ttf", 23.0f, &config);
-	//IM_ASSERT(font_title != NULL);
-	//io.Fonts->Build();
 
 	ImGui::NewFrame();
 
@@ -156,8 +154,6 @@ void SceneUI2::Render()
 	//ImGui::ShowDemoWindow();
 	ImGui::Render(); // Calling This before CurrentScene render wont work
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-	glUseProgram(0);
 }
 
 

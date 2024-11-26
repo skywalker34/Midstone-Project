@@ -29,7 +29,7 @@ class Model;
 class ComputeShader;
 class AudioManager;
 
-class Scene3g : public Scene {
+class SceneGameplay : public Scene {
 private:
 
 	Shader* shader;
@@ -115,14 +115,15 @@ private:
 
 	void SaveStats();
 public:
-	explicit Scene3g();
-	Scene3g(Window* window_);
-	virtual ~Scene3g();
+	explicit SceneGameplay();
+	SceneGameplay(Window* window_);
+	virtual ~SceneGameplay();
 
 	virtual bool OnCreate() override;
 	virtual void OnDestroy() override;
 	virtual void Update(const float deltaTime) override;
 	virtual void Render() override;
+	virtual void RenderIMGUI() override;
 	virtual void HandleEvents(const SDL_Event& sdlEvent) override;
 	void SpawnEnemy(const float deltaTime);
 	void SetActiveShip();

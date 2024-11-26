@@ -45,9 +45,6 @@
     <ClCompile Include="Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Scene0g.cpp">
-      <Filter>Source Files\Scenes</Filter>
-    </ClCompile>
     <ClCompile Include="SceneManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -59,9 +56,6 @@
     </ClCompile>
     <ClCompile Include="Body.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene0p.cpp">
-      <Filter>Source Files\Scenes</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
@@ -87,9 +81,6 @@
     <ClCompile Include="SkyBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Scene1g.cpp">
-      <Filter>Source Files\Scenes</Filter>
-    </ClCompile>
     <ClCompile Include="Actor.cpp">
       <Filter>Source Files\Actors</Filter>
     </ClCompile>
@@ -108,23 +99,14 @@
     <ClCompile Include="Planet.cpp">
       <Filter>Source Files\Actors</Filter>
     </ClCompile>
-    <ClCompile Include="Scene2g.cpp">
-      <Filter>Source Files\Scenes</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneUI.cpp">
-      <Filter>Source Files\Scenes</Filter>
-    </ClCompile>
     <ClCompile Include="Collision.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Scene3g.cpp">
+    <ClCompile Include="SceneGameplay.cpp">
       <Filter>Source Files\Scenes</Filter>
     </ClCompile>
     <ClCompile Include="EnemySpawner.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene5g.cpp">
-      <Filter>Source Files\Scenes</Filter>
     </ClCompile>
     <ClCompile Include="ComputeShader.cpp">
       <Filter>Source Files</Filter>
@@ -150,7 +132,7 @@
     <ClCompile Include="imgui_widgets.cpp">
       <Filter>Source Files\IMGUI</Filter>
     </ClCompile>
-    <ClCompile Include="SceneUI2.cpp">
+    <ClCompile Include="SceneMainMenu.cpp">
       <Filter>Source Files\Scenes</Filter>
     </ClCompile>
     <ClCompile Include="ExhaustTrail.cpp">
@@ -168,6 +150,9 @@
     <ClCompile Include="LeaderBoard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AudioManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Debug.h">
@@ -180,9 +165,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Scene.h">
-      <Filter>Header Files\Scenes</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene0g.h">
       <Filter>Header Files\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="SceneManager.h">
@@ -199,9 +181,6 @@
     </ClInclude>
     <ClInclude Include="Body.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene0p.h">
-      <Filter>Header Files\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
@@ -227,9 +206,6 @@
     <ClInclude Include="SkyBox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Scene1g.h">
-      <Filter>Header Files\Scenes</Filter>
-    </ClInclude>
     <ClInclude Include="Constants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -251,23 +227,11 @@
     <ClInclude Include="Planet.h">
       <Filter>Header Files\Actors</Filter>
     </ClInclude>
-    <ClInclude Include="Scene2g.h">
-      <Filter>Header Files\Scenes</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneUI.h">
-      <Filter>Header Files\Scenes</Filter>
-    </ClInclude>
     <ClInclude Include="Collision.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Scene3g.h">
-      <Filter>Header Files\Scenes</Filter>
-    </ClInclude>
     <ClInclude Include="EnemySpawner.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene5g.h">
-      <Filter>Header Files\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="ComputeShader.h">
       <Filter>Header Files</Filter>
@@ -302,7 +266,7 @@
     <ClInclude Include="stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SceneUI2.h">
+    <ClInclude Include="SceneMainMenu.h">
       <Filter>Header Files\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="ExhaustTrail.h">
@@ -319,6 +283,12 @@
     </ClInclude>
     <ClInclude Include="LeaderBoard.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneGameplay.h">
+      <Filter>Header Files\Scenes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

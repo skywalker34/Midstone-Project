@@ -44,6 +44,7 @@ public:
 	virtual void OnDestroy() override;
 	virtual void Update(const float deltaTime) override;
 	virtual void Render() override;
+	virtual void RenderIMGUI() override;
 	virtual void HandleEvents(const SDL_Event& sdlEvent) override;
 };
 

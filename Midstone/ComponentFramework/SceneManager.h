@@ -17,17 +17,8 @@ public:
 	
 private:
 	enum class SCENE_NUMBER {
-		SCENE0g = 0,
-		SCENE0p,
-		SCENE1g,
-		SCENE2g,
-		SCENE2,
-		SCENE3g,
-		SCENE4,
-		SCENE5g,
-		SCENE6,
-		SCENEUI,
-		SCENEUI2,
+		SCENEGAMEPLAY,
+		SCENEMAINMENU,
 		SCENEGAMEOVER
 	};
 

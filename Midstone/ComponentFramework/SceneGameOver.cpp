@@ -125,18 +125,17 @@ void SceneGameOver::Render()
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	
+
+	glUseProgram(0);
+}
+
+void SceneGameOver::RenderIMGUI()
+{
 	// IMGUI STUFF
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame();
 
-	//This is the font stuff if you can find a working one then yeah. But otherwise im gonna keep it default for now.
-	//ImGuiIO& io = ImGui::GetIO();
-	//ImFontConfig config;
-	//config.OversampleH = 2;
-	//io.Fonts->AddFontDefault();
-	//ImFont* font_title = io.Fonts->AddFontFromFileTTF("./fonts/Comic Sans MS.ttf", 23.0f, &config);
-	//IM_ASSERT(font_title != NULL);
-	//io.Fonts->Build();
 
 	ImGui::NewFrame();
 
@@ -171,8 +170,6 @@ void SceneGameOver::Render()
 	//ImGui::ShowDemoWindow();
 	ImGui::Render(); // Calling This before CurrentScene render wont work
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-	glUseProgram(0);
 }
 
 

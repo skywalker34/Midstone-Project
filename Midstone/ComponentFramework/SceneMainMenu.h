@@ -1,5 +1,5 @@
-#ifndef SCENEUI2_H
-#define SCENEUI2_H
+#ifndef SCENEMAINMENU_H
+#define SCENEMAINMENU_H
 #include "Scene.h"
 #include "Vector.h"
 #include "PlayerController.h"
@@ -20,7 +20,7 @@ union SDL_Event;
 class Mesh;
 class Shader;
 
-class SceneUI2 : public Scene {
+class SceneMainMenu : public Scene {
 private:
 	
 	bool drawInWireMode;
@@ -31,14 +31,15 @@ private:
 	bool show_demo_window;
 
 public:
-	explicit SceneUI2();
-	SceneUI2(Window* window_);
-	virtual ~SceneUI2();
+	explicit SceneMainMenu();
+	SceneMainMenu(Window* window_);
+	virtual ~SceneMainMenu();
 
 	virtual bool OnCreate() override;
 	virtual void OnDestroy() override;
 	virtual void Update(const float deltaTime) override;
 	virtual void Render() override;
+	virtual void RenderIMGUI() override;
 	virtual void HandleEvents(const SDL_Event& sdlEvent) override;
 };
 
