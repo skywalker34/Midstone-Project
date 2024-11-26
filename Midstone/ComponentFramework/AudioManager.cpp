@@ -12,7 +12,7 @@ AudioManager::AudioManager()
     gameOver = "audio/GameoverSound.mp3";
     shipSelected = "audio/SelectionSound.mp3";
     rocketLoop = "audio/RocketFlying.mp3";
-
+   
     // Initialize random seed
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 }
@@ -51,6 +51,7 @@ void AudioManager::PlaySound2D(const std::string& name)
     {
         SoundEngine->play2D(shipSelected.c_str(), false);
     }
+    
 }
 
 void AudioManager::PlaySound3D(const std::string& name, const Vec3& pos)

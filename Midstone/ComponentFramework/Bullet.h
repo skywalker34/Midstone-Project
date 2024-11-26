@@ -21,11 +21,6 @@ class Bullet :
 
     Model** modelTemp; //until I think of something better this is "temporary"...
 
-    //Functions
-    //OnCreate();
-    //OnDestroy()
-
-
     
 
 public:

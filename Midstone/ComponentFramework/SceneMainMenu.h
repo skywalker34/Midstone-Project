@@ -30,6 +30,7 @@ private:
 
 	bool show_demo_window;
 
+
 public:
 	explicit SceneMainMenu();
 	SceneMainMenu(Window* window_);

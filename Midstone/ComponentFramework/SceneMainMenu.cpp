@@ -79,6 +79,10 @@ SceneMainMenu::SceneMainMenu(Window* window_) : drawInWireMode{ true }, show_dem
 
 	// Load the font 
 	io.Fonts->AddFontFromFileTTF("./fonts/Galaksi.ttf", 16.0f);
+
+	SoundEngine->play2D("audio/BackGroundMusic3.mp3", true); // Audio For Main Screen
+
+
 }
 
 SceneMainMenu::~SceneMainMenu() {
@@ -90,9 +94,7 @@ SceneMainMenu::~SceneMainMenu() {
 bool SceneMainMenu::OnCreate() {
 	Debug::Info("Loading assets Main Menu: ", __FILE__, __LINE__);
 
-	SoundEngine->play2D("audio/BackGroundMusic3.mp3", true); // Audio For Main Screen
 	
-
 	printf("On Create finished!!!!!");
 	return true;
 
