@@ -43,7 +43,8 @@ drawInWireMode{ false } {
 	ImGui_ImplOpenGL3_Init("#version 450");
 
 	// Load the font 
-	io.Fonts->AddFontFromFileTTF("./fonts/Comic Sans MS.ttf", 16.0f);
+	//io.Fonts->AddFontFromFileTTF("./fonts/Galaksi.ttf", 16.0f);
+	io.Fonts->AddFontFromFileTTF("./fonts/Ethnocentric Rg It.otf", 10.0f);
 	// Adjust path and size as needed
 	io.FontDefault = io.Fonts->Fonts.back(); // Set as default font (optional)
 }
