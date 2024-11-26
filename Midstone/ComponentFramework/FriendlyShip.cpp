@@ -87,17 +87,12 @@ void FriendlyShip::Update(const float deltaTime)
 		}
 	}
 
-	if (hasReachDestination()) {
-		isMoving = false;
-
-		bool HappenOnce = true;
+	
 		if (HappenOnce == true && isMoving == false)
 		{
-			//SoundEngineFlying->stopAllSounds();
 			audioManager->StopSound3DLooped(rocketSoundIndex);
 			HappenOnce = false;
 		}
-	}
 
 	if (isMoving) {
 		slerpT = slerpT >= 1 ? 1 : slerpT + deltaTime;
@@ -105,9 +100,11 @@ void FriendlyShip::Update(const float deltaTime)
 		rotateTowardTarget(movingDirection);
 
 		isMoving = VMath::mag(destination - transform.getPos()) > 0.01;
+
 	}
 	else {
 		body->vel = Vec3();
+		
 	}
 
 	if (isChasing && !activeTarget->deleteMe) { //if player clicks on a ship then on an enemy the ship enters chasing mode
@@ -119,6 +116,7 @@ void FriendlyShip::Update(const float deltaTime)
 			isMoving = false;
 			activeTarget = nullptr;
 			isChasing = false;
+			
 		}
 		else {
 			isMoving = true;
@@ -245,7 +243,7 @@ void FriendlyShip::moveToDestination(Vec3 destination_)
 	destination = destination_;
 	isMoving = true;
 	slerpT = 0;
-
+	HappenOnce = true;
 
 	
 	/*irrklang::vec3df BodyPosition(body->pos.x, body->pos.y, body->pos.z);  

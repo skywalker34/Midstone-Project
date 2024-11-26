@@ -66,7 +66,7 @@ class FriendlyShip :
 		float potentialTargetDistance;
 
 		Sphere detectionSphere;
-
+		bool HappenOnce = true;
 
 
 		FriendlyShip();
