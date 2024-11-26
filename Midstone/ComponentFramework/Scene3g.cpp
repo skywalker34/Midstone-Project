@@ -44,7 +44,7 @@ drawInWireMode{ false } {
 
 	// Load the font 
 	//io.Fonts->AddFontFromFileTTF("./fonts/Galaksi.ttf", 16.0f);
-	io.Fonts->AddFontFromFileTTF("./fonts/Ethnocentric Rg It.otf", 12.0f);
+	io.Fonts->AddFontFromFileTTF("./fonts/Ethnocentric Rg It.otf", 10.0f);
 	// Adjust path and size as needed
 	io.FontDefault = io.Fonts->Fonts.back(); // Set as default font (optional)
 }
