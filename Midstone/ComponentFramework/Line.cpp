@@ -12,8 +12,6 @@ Line::Line(Vec3 start, Vec3 end) {
 
 	transform.setScale(num, num, num);
 
-	Vec3 foward = Vec3(0, 0, -1);
-
 	Vec3 direction = VMath::normalize(end - start);
 
 	Quaternion q = QMath::lookAt(direction, UP);
@@ -44,7 +42,6 @@ void Line::RecalculateLine(Vec3 start, Vec3 end)
 
 	transform.setScale(num, num, num);
 
-	Vec3 foward = Vec3(0, 0, -1);
 
 	Quaternion q = Quaternion();
 	Vec3 direction = VMath::normalize(end - start);
@@ -63,7 +60,7 @@ void Line::RecalculateLine(Vec3 start, Vec3 end)
 
 void Line::draw() {
 
-	glLineWidth(5.0f); // Set the line width to 5 pixels (adjust as needed)
+	glLineWidth(lineThickness); // Set the line width defaulted to 5 pixels (adjust as needed)
 	glBindVertexArray(vao);
 	glDrawArrays(GL_LINES, 0, 3);
 	glBindVertexArray(0);

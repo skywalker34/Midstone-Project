@@ -5,12 +5,7 @@ class Bullet :
     public Actor
 {
     //Bullet is an actor that is spawned by ships
-    //Bullets will fly along a straight vector (uneffeted by physics) 
-
-    //Variable/Components
-    //Damage
-    //Speed (may be handled elsewhere)
-    //Model
+    //Bullets will fly along a straight vector (uneffected by physics) 
 
     float speed;
     Vec3 forward;
@@ -19,7 +14,7 @@ class Bullet :
     
     Vec4 color = ORANGE;
 
-    Model** modelTemp; //until I think of something better this is "temporary"...
+    Model** bulletModel; //until I think of something better this is "temporary"...
 
     
 

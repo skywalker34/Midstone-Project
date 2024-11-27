@@ -79,7 +79,6 @@ SceneGameOver::SceneGameOver(Window* window_) : drawInWireMode{ true }, show_dem
 
 	// Load the font 
 	io.Fonts->AddFontFromFileTTF("./fonts/Ethnocentric Rg It.otf", 12.0f);
-	//io.Fonts->AddFontFromFileTTF("./fonts/Galaksi.ttf", 15.0f);
 	// Read text file
 	readLeaderboard("leaderboard.txt", leaderboard);
 
@@ -154,10 +153,8 @@ void SceneGameOver::RenderIMGUI()
 
 	bool p_open = false;
 	ImGui::Begin("A START BUTTON MAYBE?", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-	//ImGui::PushFont(font_title);
 	if (ImGui::Button("Main Menu", ImVec2(300, 90)))
 		switchButton = true;
-	//ImGui::PopFont();
 	ImGui::End();
 
 	ImGui::Begin("LeaderBoard", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
@@ -170,7 +167,7 @@ void SceneGameOver::RenderIMGUI()
 	}
 	ImGui::End();
 
-	//ImGui::ShowDemoWindow();
+
 	ImGui::Render(); // Calling This before CurrentScene render wont work
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }

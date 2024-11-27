@@ -20,7 +20,7 @@ class EnemySpawner
 
 		int spawnMax;
 
-		Vec3 position; //might want to make a getter/setter instead
+		Vec3 position; 
 		EnemySpawner();
 
 		/// <summary>

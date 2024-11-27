@@ -19,7 +19,6 @@ public:
 		return shader;
 	}
 
-	// Ok, Umer will play nice and not make the Skybox public in Camera
 	GLuint GetTextureID() const {
 		return textureID;
 	}

@@ -43,7 +43,6 @@ drawInWireMode{ false } {
 	ImGui_ImplOpenGL3_Init("#version 450");
 
 	// Load the font 
-	//io.Fonts->AddFontFromFileTTF("./fonts/Galaksi.ttf", 16.0f);
 	io.Fonts->AddFontFromFileTTF("./fonts/Ethnocentric Rg It.otf", 10.0f);
 	// Adjust path and size as needed
 	io.FontDefault = io.Fonts->Fonts.back(); // Set as default font (optional)
@@ -94,8 +93,6 @@ bool SceneGameplay::OnCreate() {
 	createShaders();
 	createClickGrid();
 
-	testMesh = new Mesh("meshes/Sphere.obj");
-	testMesh->OnCreate();
 
 	debris = Model("Debris.obj");
 	debris.OnCreate();
@@ -302,7 +299,7 @@ void SceneGameplay::Render() {
 	glUniformMatrix4fv(planetShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 	glUniformMatrix4fv(planetShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
 	glUniform3fv(planetShader->GetUniformID("lightPos"), 1, lightPos);
-	glUniform3fv(planetShader->GetUniformID("cameraPos"), 1, playerController.camera.transform.getPos());
+	glUniform3fv(planetShader->GetUniformID("cameraPos"), 1, playerController.transform.getPos());
 	planet.Render(planetShader);
 
 
@@ -325,7 +322,7 @@ void SceneGameplay::Render() {
 		glUseProgram(bulletShader->GetProgram());
 		glUniformMatrix4fv(bulletShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 		glUniformMatrix4fv(bulletShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-		glUniform3fv(bulletShader->GetUniformID("cameraPos"), 1, playerController.camera.transform.getPos());
+		glUniform3fv(bulletShader->GetUniformID("cameraPos"), 1, playerController.transform.getPos());
 		ship->RenderBullets(bulletShader);
 
 		if (ship->isMoving && isGameRunning) {
@@ -353,7 +350,7 @@ void SceneGameplay::Render() {
 		glUseProgram(selectionShader->GetProgram());
 		glUniformMatrix4fv(selectionShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 		glUniformMatrix4fv(selectionShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-		glUniform3fv(selectionShader->GetUniformID("cameraPos"), 1, playerController.camera.transform.getPos());
+		glUniform3fv(selectionShader->GetUniformID("cameraPos"), 1, playerController.transform.getPos());
 		selectionSphere.Render(selectionShader);
 		glDisable(GL_BLEND);
 	}
@@ -366,9 +363,7 @@ void SceneGameplay::Render() {
 			glUseProgram(shader->GetProgram());
 			glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 			glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-			glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, testModelMat);
-			glUniform4fv(shader->GetUniformID("meshColor"), 1, ORANGE);
-			testMesh->Render(GL_TRIANGLES);
+			cursorSphere.Render(shader);
 		}
 
 
@@ -465,7 +460,7 @@ void SceneGameplay::SpawnEnemy(const float deltaTime)
 		enemyFleetSpawners[i].Update(deltaTime);
 		if (enemyFleetSpawners[i].canSpawn == true) {
 			enemyIndex++;
-			enemyFleet.push_back(new EnemyShip(enemyFleetSpawners[i].position, &enemyShipModel));
+			enemyFleet.push_back(new EnemyShip(enemyFleetSpawners[i].position, &enemyShipModel, ENEMY_DEFAULT_HEALTH));
 			enemyFleet.back()->SetAudioManager(audioManager);
 			enemyFleet.back()->OnCreate();
 			enemyFleet.back()->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
@@ -485,7 +480,6 @@ void SceneGameplay::SetActiveShip()
 	int i = 0;
 	for (FriendlyShip* ship : playerFleet) {
 		if (COLLISION::LineSphereCollisionDetected(ship->collisionSphere, playerController.getLine())) {
-			//selectionSphere.transform = ship->transform;
 
 			selectionSphere.meshColour = GREEN;
 			selectionSphere.transform.setParent(ship->transform.toModelMatrix());
@@ -523,8 +517,6 @@ void SceneGameplay::SetActiveShip()
 					shipWaypoint = ship->transform.getPos();
 					isGivingOrders = false;
 
-					printf("ATTACKING! \n");
-
 					playerFleet[activeShip]->isChasing = true;
 					playerFleet[activeShip]->activeTarget = ship;
 					activeShip = -1;
@@ -537,7 +529,10 @@ void SceneGameplay::SetActiveShip()
 		}
 	}
 
-	testModelMat = MMath::translate(playerController.hoverPos) * MMath::scale(1, 1, 1);
+
+
+	cursorSphere.transform.setPos(playerController.hoverPos);
+
 	if (playerController.has3DClick && isGivingOrders) {
 
 		if (activeShip >= 0) {
@@ -692,8 +687,8 @@ void SceneGameplay::DestroyEnenmy(int index)
 
 void SceneGameplay::GameOver()
 {
-	//END GAME LOGIC HERE PLEASE
-	std::cout << "\033[32m" << "GAMEOVER!" << "\033[0m" << std::endl;
+
+
 	SaveStats();
 	audioManager->PlaySound2D("Game_Over");
 	gameOverBool = true;
@@ -760,7 +755,7 @@ void SceneGameplay::createActors()
 		float x = radius * cos(angle);													// Calculate x position
 		float z = radius * sin(angle);													// Calculate z position
 
-		enemyFleet.push_back(new EnemyShip(Vec3(x, 0, z), &enemyShipModel));
+		enemyFleet.push_back(new EnemyShip(Vec3(x, 0, z), &enemyShipModel, ENEMY_DEFAULT_HEALTH));
 	}
 
 
@@ -794,6 +789,7 @@ void SceneGameplay::createActors()
 		playerFleet[i]->SetAudioManager(audioManager);
 		playerFleet[i]->closestEnemy = enemyFleet.back();	// Set initail target
 		playerFleet[i]->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
+		playerFleet[i]->rangeSphere = &sphereModel;
 	}
 
 	planet = Planet(PLANET_RADIUS, PLANET_HEALTH, &sphereModel, ORIGIN);
@@ -801,6 +797,8 @@ void SceneGameplay::createActors()
 
 	selectionSphere = Actor(Transform(), &sphereModel);
 	enemySelectionSphere = Actor(Transform(), &sphereModel);
+	cursorSphere = Actor(Transform(), &sphereModel);
+	cursorSphere.meshColour = ORANGE;
 	selectionSphere.transform.setPos(0, 0, -0.5);
 }
 

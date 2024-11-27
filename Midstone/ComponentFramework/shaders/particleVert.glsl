@@ -23,11 +23,7 @@ out vec4 color;
 
 
 void main() {
-//    vec3 position = (modelMatrix * vVertex).xyz;
-//
-//    //color = vec4(buf.data[gl_VertexID], 0.0);
-//
-//    position += buf.data[gl_VertexID];
+
 
     vec4 localPos =   vec4(buf.data[gl_VertexID], 1.0);
 

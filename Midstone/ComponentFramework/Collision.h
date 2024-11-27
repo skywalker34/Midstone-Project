@@ -6,17 +6,15 @@
 //From Game Physics
 using namespace MATHEX;
 using namespace MATH;
-// Instead of a class, let’s put all the collision equations in a namespace.
-// I got this idea from the book "Beautiful C++: 30 Core Guidelines for Writing
-// Clean, Safe, and Fast Code" 
+
 namespace COLLISION {
 	// Checks if two spheres have collided and return true or false.
 	bool SphereSphereCollisionDetected(const Sphere* body1, const Sphere* body2);
+	// Checks if a line (defined as a dual quaternion) and a sphere has collided
 	bool LineSphereCollisionDetected(const Sphere* body, const DualQuat line);
+	//checks if a point (in space) and a sphere have collided
 	bool SpherePointCollisionDetected(const Sphere* body, const Vec3 pos);
 
-	// If a collision has occurred do something
-	//void SphereSphereCollisionResponse(Sphere* body1, Sphere* body2);
 }
 
 #endif

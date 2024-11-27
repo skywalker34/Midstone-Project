@@ -31,7 +31,7 @@ class EnemyShip :
 		Vec3 aimingPoint;
 
 		EnemyShip();
-		EnemyShip(Vec3 pos, Model* model_);
+		EnemyShip(Vec3 pos, Model* model_, int health_);
 
 		void setTarget(Vec3 target_);
 		Vec3 getTargetDirection();

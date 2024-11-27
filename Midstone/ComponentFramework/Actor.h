@@ -8,7 +8,6 @@ class Actor
 public:	
 	//actor is any object in the scene with a visual repersentation
 	//Known actors: Planet, Ships(Friendlyship, enemyship)
-	//MATHEX::Sphere collider;
 	Transform transform;
 	Model* model;
 

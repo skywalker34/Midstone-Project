@@ -19,8 +19,7 @@ class FriendlyShip :
 public:
 
 
-	Model rangeSphere;
-
+	Model* rangeSphere;
 	Model* bulletModel;
 
 	Transform rangeSphereT;
@@ -73,9 +72,7 @@ public:
 
 	FriendlyShip();
 	FriendlyShip(Model* model_, Model* bulletModel_);
-	bool OnCreate() override; //probably a way to do this without ovveriding
-	//problem I was having is that ship inherits from actor so actor On creates model but the mesh is loaded in ship
-	//might be a solution with filepaths (leaving this here so I don't forget)
+	bool OnCreate() override; 
 	void OnDestroy();
 	void Update(const float deltaTime);
 	void Render(Shader* shader) const;

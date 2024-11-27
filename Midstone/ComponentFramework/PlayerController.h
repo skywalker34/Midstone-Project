@@ -29,6 +29,7 @@ class PlayerController
 
 		
 		float planeDepth = 1;
+		float scrollSpeed = 2;
 
 	public:
 		PlayerController();
@@ -39,7 +40,7 @@ class PlayerController
 		Sphere innerBounds;
 		Sphere outerBounds;
 
-		Transform transform; //temporary public
+		Transform transform; 
 		Camera camera;
 		bool has3DClick = false;
 		bool hasDQLine = false;
