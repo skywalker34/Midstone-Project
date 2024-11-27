@@ -9,29 +9,35 @@ uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 uniform vec3 lightPos;
-
+uniform vec3 cameraPos;
 
 layout(location = 0) out vec3 vertNormal;
 layout(location = 1) out vec3 lightDir;
 layout(location = 2) out vec3 eyeDir;
-layout(location = 3) out vec2 textureCoords; 
-
-
-
+layout(location = 3) out vec2 textureCoords;
+layout(location = 4) out vec3 incident;
 
 void main() {
+    // Convert light position from world space to model space
+    vec3 lightPosModel = vec3(inverse(modelMatrix) * vec4(lightPos, 1.0));
+    
+    //get teh vertex pos in world space
+    vec3 vertexPosWorldSpace = (modelMatrix * vVertex).xyz;
+    incident = normalize(vertexPosWorldSpace - cameraPos);
 
-    vec3 vertexPosWorldSpace = (modelMatrix * vVertex).xyz; 
-
-
+    //get the texture coords to pass to frag
     textureCoords = uvCoord;
+
+    //create and set the normal amt
     mat3 normalMatrix = mat3(transpose(inverse(modelMatrix)));
-    vertNormal = normalize(normalMatrix * vNormal); /// Rotate the normal to the correct orientation 
+    vertNormal = normalize(normalMatrix * vNormal); // Rotate the normal to the correct orientation
+
+
     vec3 vertPos = vec3(viewMatrix * modelMatrix * vVertex);
     vec3 vertDir = normalize(vertPos);
     eyeDir = -vertDir;
 
-    lightDir = normalize(vec3(lightPos) - vertPos); 
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vVertex;
+    lightDir = normalize(lightPosModel - vVertex.xyz);
     
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vVertex;
 }

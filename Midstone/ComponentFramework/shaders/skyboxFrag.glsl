@@ -6,5 +6,6 @@ uniform samplerCube skyboxTexture;
 layout(location = 0) out vec4 fragColor;
 
 void main() {
+//get the texture color and set it
     fragColor = texture(skyboxTexture, uvwCoords);
 }

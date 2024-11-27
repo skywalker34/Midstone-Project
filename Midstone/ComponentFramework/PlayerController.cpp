@@ -97,7 +97,6 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 			v += (VMath::normalize(-upVector) * CAMERA_SPEED);	
 			break;
 		}
-		break;
 
 		//check to make sure the player is staying within their sphereical bounds
 		if (!COLLISION::SpherePointCollisionDetected(&innerBounds, v) && COLLISION::SpherePointCollisionDetected(&outerBounds, v)) transform.setPos(v);
@@ -141,6 +140,7 @@ void PlayerController::Update(const float deltaTime)
 	mouseHoverPos3D = get3DClickCoords(x, y); 
 
 	camera.SetView(transform);
+
 	clickGrid.transform.setOrientation(transform.getOrientation());
 	clickGrid.transform.setPos(get3DClickCoords(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2));
 

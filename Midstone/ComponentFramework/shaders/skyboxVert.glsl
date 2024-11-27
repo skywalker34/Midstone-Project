@@ -10,6 +10,7 @@ layout(location = 2) uniform mat4 modelMatrix;
 out vec3 uvwCoords;
 
 void main() {
+//get the position
     uvwCoords = inVertex;
     gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(inVertex, 1.0);
 }

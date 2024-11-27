@@ -21,12 +21,17 @@ void main() {
     // Convert light position from world space to model space
     vec3 lightPosModel = vec3(inverse(modelMatrix) * vec4(lightPos, 1.0));
     
+    //get teh vertex pos in world space
     vec3 vertexPosWorldSpace = (modelMatrix * vVertex).xyz;
     incident = normalize(vertexPosWorldSpace - cameraPos);
 
+    //get the texture coords to pass to frag
     textureCoords = uvCoord;
+
+    //create and set the normal amt
     mat3 normalMatrix = mat3(transpose(inverse(modelMatrix)));
     vertNormal = normalize(normalMatrix * vNormal); // Rotate the normal to the correct orientation
+
 
     vec3 vertPos = vec3(viewMatrix * modelMatrix * vVertex);
     vec3 vertDir = normalize(vertPos);

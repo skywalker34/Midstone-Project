@@ -21,6 +21,8 @@ layout(location = 3) out vec2 textureCoords;
 
 void main() {
 
+//pretty much just phong
+
     vec3 lightPos = vec3(0,0,0);
     vec3 vertexPosWorldSpace = (modelMatrix * vVertex).xyz; 
 

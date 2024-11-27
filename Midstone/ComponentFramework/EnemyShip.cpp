@@ -68,7 +68,7 @@ void EnemyShip::setIndex(int index)
 
 void EnemyShip::Update(const float deltaTime)
 {
-	irrklang::vec3df bodypos(body->pos.x, body->pos.y, body->pos.z);
+	
 	bool happenonce = true;
 	
 
