@@ -27,7 +27,7 @@ void AlignForWidth(float width, float alignment = 0.5f)
 		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 }
 
-Scene3g::Scene3g(Window* window_) : shader{ nullptr }, 
+Scene3g::Scene3g(Window* window_) : shader{ nullptr },
 drawInWireMode{ false } {
 	Debug::Info("Created Scene0: ", __FILE__, __LINE__);
 	window = window_;
@@ -56,7 +56,7 @@ bool Scene3g::OnCreate() {
 	Debug::Info("Loading assets Scene0: ", __FILE__, __LINE__);
 
 
-	
+
 
 
 	computeShader = new ComputeShader("shaders/computer.glsl");	//create the compute shader
@@ -79,7 +79,7 @@ bool Scene3g::OnCreate() {
 
 
 
-	
+
 	audioManager = new AudioManager();
 	if (audioManager->OnCreate() == false) {
 		std::cout << "Audio failed ... we have a problem\n";
@@ -98,10 +98,10 @@ bool Scene3g::OnCreate() {
 
 	debris = Model("Debris.obj");
 	debris.OnCreate();
-	
+
 	enemyFleetSpawners.push_back(EnemySpawner(100.0f, 15, 5));
 	printf("On Create finished!!!!!");
-	
+
 
 
 	computeExplosion = new ComputeShader("shaders/Explosion.glsl");	//create the compute shader
@@ -119,7 +119,7 @@ bool Scene3g::OnCreate() {
 			std::cout << "Explosion failed ... we have a problem\n";
 		}
 	}
-	
+
 	return true;
 
 }
@@ -206,7 +206,7 @@ void Scene3g::HandleEvents(const SDL_Event& sdlEvent) {
 			if (activeShip != 0) activeShip -= 1;
 			break;
 		case SDL_SCANCODE_X:
-			if(activeShip != startingFleetSize + 1) activeShip += 1;
+			if (activeShip != startingFleetSize + 1) activeShip += 1;
 			break;
 
 		case SDL_SCANCODE_P:
@@ -226,18 +226,18 @@ void Scene3g::HandleEvents(const SDL_Event& sdlEvent) {
 
 		//below is SUUUUUUPER temporary
 		//will be in collision namespace once its up and running
-		
+
 
 
 			//centrePoint = VMath::normalize(centrePoint4); //if I normalize the centre point I get the wrong answer 
 
-			
 
 
 
-			
 
-		
+
+
+
 		/////////////////////**DO NOT PUT ANY CONTROLS THAT AREN'T RELEVANT TO THE SCENE IN THE SCENE**\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 		//use player controller instead for player controls
 		/*case SDL_MOUSEMOTION:
@@ -256,7 +256,7 @@ void Scene3g::HandleEvents(const SDL_Event& sdlEvent) {
 
 void Scene3g::Update(const float deltaTime) {
 
-	
+
 	playerController.Update(deltaTime);
 
 	//MUSIC VOL
@@ -268,7 +268,7 @@ void Scene3g::Update(const float deltaTime) {
 
 
 	planet.Update(deltaTime);
-	
+
 
 	timeElapsed += deltaTime;
 
@@ -345,7 +345,7 @@ void Scene3g::Render() {
 		pathLine.draw();
 	}
 
-	
+
 
 
 
@@ -356,7 +356,7 @@ void Scene3g::Render() {
 	for (EnemyShip* ship : enemyFleet) {
 		//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
 		if (ship->deleteMe == false) { //shouldn't have to have this if here...
-		
+
 			//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
 			glUseProgram(friendlyShipShader->GetProgram());
 			glUniformMatrix4fv(friendlyShipShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
@@ -424,7 +424,7 @@ void Scene3g::Render() {
 
 
 
-		if (isGivingOrders) 
+		if (isGivingOrders)
 		{
 
 
@@ -435,7 +435,7 @@ void Scene3g::Render() {
 		}
 
 
-		
+
 	}
 
 	if (isMouseOverShip)
@@ -450,10 +450,10 @@ void Scene3g::Render() {
 		glDisable(GL_BLEND);
 	}
 
-	if (isGivingOrders) 
+	if (isGivingOrders)
 	{
 
-		if (!isMouseOverShip) 
+		if (!isMouseOverShip)
 		{
 			glUseProgram(shader->GetProgram());
 			glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
@@ -475,98 +475,98 @@ void Scene3g::Render() {
 
 
 
-		// IMGUI STUFF
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplSDL2_NewFrame();
+	// IMGUI STUFF
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
 
-		//This is the font stuff if you can find a working one then yeah. But otherwise im gonna keep it default for now.
-		//ImGuiIO& io = ImGui::GetIO();
-		//ImFontConfig config;
-		//config.OversampleH = 2;
-		//io.Fonts->AddFontDefault();
-		//ImFont* textFont = io.Fonts->AddFontFromFileTTF("./fonts/Comic Sans MS.ttf", 23.0f, &config);
-		//IM_ASSERT(textFont != NULL);
-		//io.Fonts->Build();
+	//This is the font stuff if you can find a working one then yeah. But otherwise im gonna keep it default for now.
+	//ImGuiIO& io = ImGui::GetIO();
+	//ImFontConfig config;
+	//config.OversampleH = 2;
+	//io.Fonts->AddFontDefault();
+	//ImFont* textFont = io.Fonts->AddFontFromFileTTF("./fonts/Comic Sans MS.ttf", 23.0f, &config);
+	//IM_ASSERT(textFont != NULL);
+	//io.Fonts->Build();
 
 
 
-		// IMGUI STUFF 
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplSDL2_NewFrame();
-		ImGui::NewFrame();
-		bool p_open = false;
-		// Apply the font 
-		ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
-		// Use the loaded font
-		ImGui::Begin("Timer and Score", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-		ImGui::Text("Time = %f", timeElapsed);
-		ImGui::Text("Score = %i", score);
-		ImGui::Text("Planet Health: = %i", planet.GetHealth());
-		ImGui::End();
+	// IMGUI STUFF 
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
+	ImGui::NewFrame();
+	bool p_open = false;
+	// Apply the font 
+	ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
+	// Use the loaded font
+	ImGui::Begin("Timer and Score", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+	ImGui::Text("Time = %f", timeElapsed);
+	ImGui::Text("Score = %i", score);
+	ImGui::Text("Planet Health: = %i", planet.GetHealth());
+	ImGui::End();
 
-		//Don't need because we its in pause menu now.
-		//ImGui::Begin("QuitButton", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-		//if (ImGui::Button("Quit to Title", ImVec2(150, 30))) switchButton = true;
-		//ImGui::End();
+	//Don't need because we its in pause menu now.
+	//ImGui::Begin("QuitButton", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+	//if (ImGui::Button("Quit to Title", ImVec2(150, 30))) switchButton = true;
+	//ImGui::End();
 
-		//Pause Menu Creation (A lot of sloppy alignment but looks okay now)
-		if (!isGameRunning)
+	//Pause Menu Creation (A lot of sloppy alignment but looks okay now)
+	if (!isGameRunning)
+	{
+		//Begin Pause Menu
+		ImGui::Begin("Pause Menu", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+		float width = 0.0f;
+		ImGui::SetWindowFontScale(2.0);
+		width = ImGui::CalcTextSize("Game Paused").x;
+		AlignForWidth(width);
+		ImGui::Text("Game Paused", ImGuiWindowFlags_AlwaysAutoResize);
+
+		//Okay so sliders are working.
+		const ImGuiSliderFlags flags_for_sliders = ImGuiSliderFlags_None;
+		ImGui::SetWindowFontScale(1.2);
+		width = ImGui::CalcTextSize("Music Volume").x;
+		AlignForWidth(width);
+		ImGui::Text("Music Volume");
+		ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
+		ImGui::SliderFloat("##1", &volumeSlider, 0.0f, 1.0f, "%.3f", flags_for_sliders);
+		width = ImGui::CalcTextSize("Sfx Volume").x;
+		AlignForWidth(width);
+		ImGui::Text("Sfx Volume");
+		ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
+		ImGui::SliderFloat("##2", &sfxSlider, 0.0f, 1.0f, "%.3f", flags_for_sliders);
+
+		//Primary Color Slider works
+		width = ImGui::CalcTextSize("Ship Color").x;
+		AlignForWidth(width);
+		ImGui::Text("Ship Color");
+		//Probably store this in scene so we can pass it to the shader (NOW IN 3g.h file)
+		//static ImVec4 color = ImVec4(114.0f / 255.0f, 144.0f / 255.0f, 154.0f / 255.0f, 200.0f / 255.0f);
+		ImGui::ColorButton("MyColor##3c", *(ImVec4*)&shipColor, ImGuiColorEditFlags_NoBorder, ImVec2(ImGui::GetWindowWidth() * 0.95f, 20));
+		ImGui::ColorPicker3("##MyColor##5", (float*)&shipColor, ImGuiColorEditFlags_PickerHueBar | ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoAlpha);
+
+		//Three Buttons to Unpause (Even though you can press P), Restart Scene, or Quit to title which was moved to this window.
+		width = 150.0f;
+		AlignForWidth(width);
+		if (ImGui::Button("Unpause", ImVec2(150, 30))) isGameRunning = true;
+		AlignForWidth(width);
+		if (ImGui::Button("Restart", ImVec2(150, 30)))
 		{
-			//Begin Pause Menu
-			ImGui::Begin("Pause Menu", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-			float width = 0.0f;
-			ImGui::SetWindowFontScale(2.0);
-			width = ImGui::CalcTextSize("Game Paused").x;
-			AlignForWidth(width);
-			ImGui::Text("Game Paused", ImGuiWindowFlags_AlwaysAutoResize);
-
-			//Okay so sliders are working.
-			const ImGuiSliderFlags flags_for_sliders = ImGuiSliderFlags_None;
-			ImGui::SetWindowFontScale(1.2);
-			width = ImGui::CalcTextSize("Music Volume").x;
-			AlignForWidth(width);
-			ImGui::Text("Music Volume");
-			ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f );
-			ImGui::SliderFloat("##1", &volumeSlider, 0.0f, 1.0f, "%.3f", flags_for_sliders);
-			width = ImGui::CalcTextSize("Sfx Volume").x;
-			AlignForWidth(width);
-			ImGui::Text("Sfx Volume");
-			ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f );
-			ImGui::SliderFloat("##2", &sfxSlider, 0.0f, 1.0f, "%.3f", flags_for_sliders);
-
-			//Primary Color Slider works
-			width = ImGui::CalcTextSize("Ship Color").x;
-			AlignForWidth(width);
-			ImGui::Text("Ship Color");
-			//Probably store this in scene so we can pass it to the shader (NOW IN 3g.h file)
-			//static ImVec4 color = ImVec4(114.0f / 255.0f, 144.0f / 255.0f, 154.0f / 255.0f, 200.0f / 255.0f);
-			ImGui::ColorButton("MyColor##3c", *(ImVec4*)&shipColor, ImGuiColorEditFlags_NoBorder, ImVec2(ImGui::GetWindowWidth() * 0.95f, 20));
-			ImGui::ColorPicker3("##MyColor##5", (float*)&shipColor, ImGuiColorEditFlags_PickerHueBar | ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoAlpha);
-
-			//Three Buttons to Unpause (Even though you can press P), Restart Scene, or Quit to title which was moved to this window.
-			width = 150.0f;
-			AlignForWidth(width);
-			if (ImGui::Button("Unpause", ImVec2(150, 30))) isGameRunning = true; 
-			AlignForWidth(width);
-			if (ImGui::Button("Restart", ImVec2(150, 30)))
-			{
-				SoundEngine->drop();
-				restartBool = true;
-			}
-			AlignForWidth(width);
-			if (ImGui::Button("Quit to Title", ImVec2(150, 30))) 
-			{
-				SoundEngine->drop();
-				switchButton = true;
-			}
-
-			//End Pause Menu
-			ImGui::End();
+			SoundEngine->drop();
+			restartBool = true;
 		}
-		ImGui::PopFont(); // Pop the font after usage 
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-		glUseProgram(0);
+		AlignForWidth(width);
+		if (ImGui::Button("Quit to Title", ImVec2(150, 30)))
+		{
+			SoundEngine->drop();
+			switchButton = true;
+		}
+
+		//End Pause Menu
+		ImGui::End();
+	}
+	ImGui::PopFont(); // Pop the font after usage 
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	glUseProgram(0);
 }
 
 void Scene3g::SpawnEnemy(const float deltaTime)
@@ -585,7 +585,7 @@ void Scene3g::SpawnEnemy(const float deltaTime)
 		}
 	}
 
-	
+
 }
 
 void Scene3g::SetActiveShip()
@@ -604,7 +604,7 @@ void Scene3g::SetActiveShip()
 			if (playerController.has3DClick) {
 				activeShip = i;
 				isGivingOrders = true;
-				
+
 				playerController.has3DClick = false;
 				//SoundEngine->play2D("audio/SelectionSound.mp3", false); // Audio For Selection Ship
 				audioManager->PlaySound2D("Ship_Selected");
@@ -618,7 +618,7 @@ void Scene3g::SetActiveShip()
 
 	}
 
-	
+
 	if (isGivingOrders) { //if player has a ship selected and clicks on an enemy we want to attack that enenmy
 		for (EnemyShip* ship : enemyFleet) {
 			if (COLLISION::LineSphereCollisionDetected(ship->collisionSphere, playerController.getLine())) { //check for collision between player raycast and the enemy ships
@@ -653,8 +653,8 @@ void Scene3g::SetActiveShip()
 
 		if (activeShip >= 0) {
 			shipWaypoint = playerController.getClickPos();
-			
-			playerFleet[activeShip]->moveToDestination(shipWaypoint);
+
+			playerFleet[activeShip]->MoveToDestination(shipWaypoint);
 			isGivingOrders = false;
 			activeShip = -1;
 		}
@@ -669,7 +669,7 @@ void Scene3g::SetActiveShip()
 		playerController.hasCanceledOrder = false;
 
 	}
-	
+
 }
 
 void Scene3g::UpdatePlayerFleet(const float deltaTime)
@@ -710,7 +710,7 @@ void Scene3g::UpdatePlayerFleet(const float deltaTime)
 		}
 	}
 
-	
+
 
 }
 
@@ -724,7 +724,7 @@ void Scene3g::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip, const
 		else {
 			rotationTimer = 0;
 		}
-		
+
 		if (ship->currentTargetIndex == targetShip->shipIndex) {
 			Vec3 targetDirection = targetShip->transform.getPos() - ship->transform.getPos();
 			Quaternion targetQuad = QMath::lookAt(targetDirection, UP);
@@ -732,7 +732,7 @@ void Scene3g::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip, const
 			ship->initialDirection = targetDirection;
 			testLine.RecalculateLine(targetShip->aimingPoint, ship->transform.getPos());
 		}
-		
+
 		if (ship->isSwitchingTarget) {
 			ship->slerpT = ship->slerpT + deltaTime;
 			if (ship->slerpT >= 1) {
@@ -750,7 +750,7 @@ void Scene3g::UpdateEnemyFleet(const float deltaTime)
 {
 	for (int i = 0; i < enemyFleet.size(); i++) {
 		enemyFleet[i]->Update(deltaTime);
-		
+
 		if (enemyFleet[i]->deleteMe) {
 			DestroyEnenmy(i);
 		}
@@ -760,12 +760,12 @@ void Scene3g::UpdateEnemyFleet(const float deltaTime)
 			if (COLLISION::SphereSphereCollisionDetected(enemyFleet[i]->collisionSphere, planet.collisionSphere)) {
 				planet.takeDamage(1);
 
-				
+
 				//SoundEngine->setSoundVolume(0.2f);
 				audioManager->PlaySound2D("Planet_Hit");
 				//SoundEngine->play2D("audio/PlanetGotHit.mp3", false); // Planet Got Hit Sound
 
-				
+
 				DestroyEnenmy(i);
 			}
 
@@ -785,7 +785,7 @@ void Scene3g::DestroyEnenmy(int index)
 	bool explosionAvailable = false;
 	for (Explosion* explosion : explosions) {
 		if (!explosion->animComplete) {
-			explosionAvailable = true; 
+			explosionAvailable = true;
 			explosion->setPos(explosionPos);
 			explosion->ResetExplosion(computeReset);
 		}
@@ -794,7 +794,7 @@ void Scene3g::DestroyEnenmy(int index)
 	if (!explosionAvailable) {
 		//if there are no explosions availabel then cretae a new one
 		explosions.push_back(new Explosion());
-		if (explosions[explosions.size()-1]->OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh, &debris) == false) {
+		if (explosions[explosions.size() - 1]->OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh, &debris) == false) {
 			std::cout << "Explosion failed ... we have a problem\n";
 		}
 		explosions[explosions.size() - 1]->setPos(explosionPos);
@@ -815,7 +815,7 @@ void Scene3g::GameOver()
 	audioManager->PlaySound2D("Game_Over");
 	//SoundEngine->play2D("audio/GameoverSound.mp3", false);
 	gameOverBool = true;
-	
+
 }
 
 
@@ -892,7 +892,7 @@ void Scene3g::createActors()
 	for (EnemyShip* ship : enemyFleet) {
 		ship->SetAudioManager(audioManager);
 		ship->OnCreate();
-		
+
 		ship->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
 		ship->setIndex(enemyIndex);
 		enemyIndex++;
@@ -913,7 +913,7 @@ void Scene3g::createActors()
 		float x = radius * cos(angle);													// Calculate x position
 		float z = radius * sin(angle);													// Calculate z position
 
-		
+
 		playerFleet[i]->transform.setPos(Vec3(x, 0.0f, z));
 		playerFleet[i]->OnCreate();
 		playerFleet[i]->SetAudioManager(audioManager);
@@ -921,7 +921,7 @@ void Scene3g::createActors()
 		playerFleet[i]->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
 	}
 
-	planet = Planet(30.0f, 50, &sphereModel, ORIGIN);
+	planet = Planet(PLANET_RADIUS, PLANET_HEALTH, &sphereModel, ORIGIN);
 	planet.OnCreate();
 
 	selectionSphere = Actor(Transform(), &sphereModel);
@@ -953,7 +953,7 @@ void Scene3g::createShaders()
 	}
 
 	gridShader = new Shader("shaders/clickGridVert.glsl", "shaders/clickGridFrag.glsl");
-	if (gridShader->OnCreate() == false) 
+	if (gridShader->OnCreate() == false)
 	{
 		std::cout << "Shader failed ... we have a problem\n";
 	}

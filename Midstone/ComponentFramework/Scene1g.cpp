@@ -22,12 +22,12 @@ Scene1g::~Scene1g() {
 
 bool Scene1g::OnCreate() {
 	Debug::Info("Loading assets Scene0: ", __FILE__, __LINE__);
-	
-	
-	
+
+
+
 	DualQuat line = Vec4(0, 1, 0.5, 1) & Vec4(2, 2, 0.3, 1);
 	line = DQMath::normalize(line);
-	Vec4 centrePoint = Vec4(9,5,-0.1,1);
+	Vec4 centrePoint = Vec4(9, 5, -0.1, 1);
 	Flector M = centrePoint * line;
 	Plane pM = M.plane;//grab the plane part of the flector
 	Vec4 vM = M.point;//grab the trivector
@@ -36,7 +36,7 @@ bool Scene1g::OnCreate() {
 	float dSquared = (radius * radius) - (VMath::mag(vM) * VMath::mag(vM)); // d^2 = r^2 - (*<M>3)^2
 
 	if (dSquared > 0) { //if d^2 > 0 then the line and sphere intersect
-	
+
 		Vec4 i1 = line ^ (pM + Plane(0, 0, 0, sqrt(dSquared))) * -1;
 		i1 = i1 / i1.w;
 		i1.print("Intersection Point 1");
@@ -45,17 +45,17 @@ bool Scene1g::OnCreate() {
 		i2 = i2 / i2.w;
 		i2.print("Intersection Point 2");
 	}
-	
-	
 
-	
+
+
+
 
 	mesh = new Mesh("meshes/Sphere.obj");
 	mesh->OnCreate();
 
-	
 
-	
+
+
 
 	for (int i = 0; i <= startingFleetSize; i++) {
 		//enemyFleet.push_back(new EnemyShip(Vec3(fmod(rand(), 5), fmod(rand(), 5), fmod(rand(), 5))));
@@ -65,8 +65,8 @@ bool Scene1g::OnCreate() {
 		ship->setTarget(Vec3(0, 0, 0));	///temporary remove later
 
 	}
-	
-	
+
+
 	for (int i = 0; i <= startingFleetSize; i++) {
 		playerFleet.push_back(new FriendlyShip());
 	}
@@ -77,9 +77,9 @@ bool Scene1g::OnCreate() {
 		ship->transform.setPos(Vec3(0.0f, 0, 0));
 	}
 	//friendlyShip = FriendlyShip();
-	
-	
-	
+
+
+
 
 	shader = new Shader("shaders/defaultVert.glsl", "shaders/defaultFrag.glsl");
 	if (shader->OnCreate() == false) {
@@ -93,7 +93,7 @@ bool Scene1g::OnCreate() {
 	projectionMatrix = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);
 	viewMatrix = MMath::lookAt(Vec3(0.0f, 0.0f, 5.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
 	modelMatrix.loadIdentity();
-	
+
 
 	printf("On Create finished!!!!!");
 	return true;
@@ -104,12 +104,12 @@ bool Scene1g::OnCreate() {
 void Scene1g::OnDestroy() {
 	Debug::Info("Deleting assets Scene0: ", __FILE__, __LINE__);
 
-	
+
 
 	mesh->OnDestroy();
 	delete mesh;
 
-	
+
 
 	for (FriendlyShip* ship : playerFleet) {
 		ship->OnDestroy();
@@ -134,7 +134,7 @@ void Scene1g::HandleEvents(const SDL_Event& sdlEvent) {
 	//basically whats happening here is that the player controller has a boolean flag thats basically saying "I have something to tell you scenemanager"
 	//the scene knows to check for this flag and to recieve the message so the playercontroller does not need to have a reference to the scene
 	//its basically just throwing out this variable and hoping something is listening
-	
+
 
 	switch (sdlEvent.type) {
 	case SDL_KEYDOWN:
@@ -146,7 +146,7 @@ void Scene1g::HandleEvents(const SDL_Event& sdlEvent) {
 			if (activeShip != 0) activeShip -= 1;
 			break;
 		case SDL_SCANCODE_X:
-			if(activeShip != startingFleetSize + 1) activeShip += 1;
+			if (activeShip != startingFleetSize + 1) activeShip += 1;
 			break;
 
 		case SDL_SCANCODE_P:
@@ -165,18 +165,18 @@ void Scene1g::HandleEvents(const SDL_Event& sdlEvent) {
 
 		//below is SUUUUUUPER temporary
 		//will be in collision namespace once its up and running
-		
+
 
 
 			//centrePoint = VMath::normalize(centrePoint4); //if I normalize the centre point I get the wrong answer 
 
-			
 
 
 
-			
 
-		
+
+
+
 		/////////////////////**DO NOT PUT ANY CONTROLS THAT AREN'T RELEVANT TO THE SCENE IN THE SCENE**\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 		//use player controller instead for player controls
 		/*case SDL_MOUSEMOTION:
@@ -196,19 +196,19 @@ void Scene1g::HandleEvents(const SDL_Event& sdlEvent) {
 void Scene1g::Update(const float deltaTime) {
 
 
-	
+
 	if (isGameRunning) {
 		playerController.Update(deltaTime);
-		
+
 
 		if (playerController.has3DClick) {
 
-			
+
 			shipWaypoint = playerController.getClickPos();
-			playerFleet[activeShip]->moveToDestination(shipWaypoint);
-			
-			
-			
+			playerFleet[activeShip]->MoveToDestination(shipWaypoint);
+
+
+
 		}
 
 		//super temporay will need to be moved
@@ -225,7 +225,7 @@ void Scene1g::Update(const float deltaTime) {
 			//loop through the spheres
 			for (int i = 0; i < playerFleet.size(); i++) {
 				Vec4 centrePoint = playerFleet[i]->transform.getPos();
-				
+
 				Flector M = centrePoint * line;
 				Plane pM = M.plane;//grab the plane part of the flector
 				Vec4 vM = M.point;
@@ -247,7 +247,7 @@ void Scene1g::Update(const float deltaTime) {
 					i2 = i2 / i2.w;
 					i2.print("Intersection Point 2");
 				}
-				
+
 
 
 			}
@@ -265,7 +265,7 @@ void Scene1g::Update(const float deltaTime) {
 
 	}
 
-	
+
 
 }
 
@@ -286,7 +286,7 @@ void Scene1g::Render() {
 	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, modelMatrix);
 	glUniform4fv(shader->GetUniformID("meshColor"), 1, Vec4(0.2f, 0.2f, 0.2f, 0.2f));
 	mesh->Render(GL_TRIANGLES);
-	
+
 	for (FriendlyShip* ship : playerFleet) {
 		//glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, ship->shipModelMatrix);
 		ship->Render(shader);
