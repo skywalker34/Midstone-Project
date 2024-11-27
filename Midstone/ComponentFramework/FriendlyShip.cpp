@@ -42,7 +42,7 @@ bool FriendlyShip::OnCreate()
 
 
 
-	collisionSphere = new Sphere(transform.getPos(), 5.0f);
+	collisionSphere = new Sphere(transform.getPos(), collisionSphereRadius);
 	speed = 5;
 	return true;
 }
@@ -65,7 +65,7 @@ void FriendlyShip::OnDestroy()
 
 	delete model;
 
-	
+
 
 }
 
@@ -87,36 +87,41 @@ void FriendlyShip::Update(const float deltaTime)
 		}
 	}
 
-	
-		if (HappenOnce == true && isMoving == false)
-		{
-			audioManager->StopSound3DLooped(rocketSoundIndex);
-			HappenOnce = false;
-		}
+
+	if (HappenOnce == true && isMoving == false)
+	{
+		audioManager->StopSound3DLooped(rocketSoundIndex);
+		HappenOnce = false;
+	}
+
+	if (wouldIntersectPlanet) {
+		Orbit(orbitAxis);
+		CheckIntersection(transform.getPos());
+		MoveDirectly();
+	}
 
 	if (isMoving) {
 		slerpT = slerpT >= 1 ? 1 : slerpT + deltaTime;
 		body->Update(deltaTime);
-		rotateTowardTarget(movingDirection);
-
+		RotateTowardTarget(movingDirection);
 		isMoving = VMath::mag(destination - transform.getPos()) > 0.01;
 
 	}
 	else {
 		body->vel = Vec3();
-		
+
 	}
 
 	if (isChasing && !activeTarget->deleteMe) { //if player clicks on a ship then on an enemy the ship enters chasing mode
 		destination = activeTarget->transform.getPos(); //set the destination to the enemy's pos
-		moveToDestination(destination);
+		MoveToDestination(destination);
 		//isMoving = VMath::mag(destination - transform.getPos()) > 0.01; //check if we've already reached the enemy
 		if (COLLISION::SphereSphereCollisionDetected(&detectionSphere, activeTarget->collisionSphere)) {
 			//reset the variables
 			isMoving = false;
 			activeTarget = nullptr;
 			isChasing = false;
-			
+
 		}
 		else {
 			isMoving = true;
@@ -188,7 +193,7 @@ void FriendlyShip::FindClosestEnemy(EnemyShip* enemy)
 
 	if (potentialTargetDistance < currentTargetDistance && isInRange) {
 		isSwitchingTarget = true;
-		rotateTowardTarget(potentialTarget->aimingPoint - transform.getPos());
+		RotateTowardTarget(potentialTarget->aimingPoint - transform.getPos());
 	}
 }
 
@@ -238,43 +243,57 @@ void FriendlyShip::Fire()
 }
 
 
-void FriendlyShip::moveToDestination(Vec3 destination_)
+void FriendlyShip::MoveToDestination(Vec3 destination_)
 {
 	destination = destination_;
 	isMoving = true;
-	slerpT = 0;
 	HappenOnce = true;
 
-	
-	/*irrklang::vec3df BodyPosition(body->pos.x, body->pos.y, body->pos.z);  
-	SoundEngineFlying->setSoundVolume(0.3f);
-	SoundEngineFlying->play3D("audio/RocketFlying.mp3", BodyPosition, true); */
-
-	rocketSoundIndex = audioManager->PlaySound3DLooped("Rocket_Loop", transform.getPos());
-
+	CheckIntersection(transform.getPos());
 
 	if (wouldIntersectPlanet) {
-		Vec3 axis = VMath::cross(destination, transform.getPos());
-		Quaternion newPosition = QMath::angleAxisRotation(1.0f, axis);
-		movingDirection = QMath::rotate(transform.getPos(), newPosition) - transform.getPos();
-		body->vel = speed * VMath::normalize(movingDirection);
+		orbitAxis = VMath::cross(destination, transform.getPos());
+		slerpT = 0;
 	}
-	else {
-		Vec3 diff = destination - transform.getPos(); //"draw" a vector between the 2 points
-		movingDirection = VMath::normalize(diff);//"convert" thevector into just a direction (normalize)
-		body->vel = movingDirection * speed; //tell the ship to move along that vector
+	MoveDirectly();
+}
+
+void FriendlyShip::CheckIntersection(Vec3 initailPosition)
+{
+	float angle = acos(VMath::dot(VMath::normalize(initailPosition - ORIGIN), VMath::normalize(initailPosition - destination)));
+	wouldIntersectPlanet = VMath::mag(initailPosition - ORIGIN) * sin(angle) < PLANET_RADIUS + collisionSphereRadius;
+}
+
+void FriendlyShip::Orbit(Vec3 axis)
+{
+	Quaternion newPosition = QMath::angleAxisRotation(1.0f, axis);
+	movingDirection = QMath::rotate(transform.getPos(), newPosition) - transform.getPos();
+	if (slerpT >= 1) {
+		Quaternion rotationQuad = QMath::lookAt(movingDirection, UP);
+		transform.setOrientation(rotationQuad);
+		body->vel = speed * VMath::normalize(movingDirection);
 	}
 }
 
-void FriendlyShip::rotateTowardTarget(Vec3 target)
+void FriendlyShip::MoveDirectly()
 {
-	if (VMath::mag(target) < 0.0001) return;
+	if (!wouldIntersectPlanet) {
+		slerpT = 0;
+		Vec3 diff = destination - transform.getPos();	//"draw" a vector between the 2 points
+		movingDirection = VMath::normalize(diff);		//"convert" thevector into just a direction (normalize)
+		body->vel = movingDirection * speed;			//tell the ship to move along that vector
+	}
+}
+
+void FriendlyShip::RotateTowardTarget(Vec3 targetDirection)
+{
+	if (VMath::mag(targetDirection) < 0.0001) return;
 	//keeps the ship pointing toward where its going
 	if (slerpT < 1) {
 
-		if (VMath::mag(target) != 0) {
+		if (VMath::mag(targetDirection) != 0) {
 			Quaternion startQuad = QMath::lookAt(initialDirection, UP);
-			Quaternion targetQuad = QMath::lookAt(target, UP);
+			Quaternion targetQuad = QMath::lookAt(targetDirection, UP);
 			Quaternion currentQuat = QMath::normalize(QMath::slerp(startQuad, targetQuad, slerpT));
 
 			transform.setOrientation(currentQuat);
@@ -282,11 +301,11 @@ void FriendlyShip::rotateTowardTarget(Vec3 target)
 
 	}
 	else {
-		initialDirection = target;
+		initialDirection = targetDirection;
 	}
 }
 
-bool FriendlyShip::hasReachDestination()
+bool FriendlyShip::HasReachDestination()
 {
 	return VMath::mag(transform.getPos() - destination) < 1.0f;
 }

@@ -57,7 +57,7 @@ bool SceneGameplay::OnCreate() {
 	Debug::Info("Loading assets Scene0: ", __FILE__, __LINE__);
 
 
-	
+
 
 
 	computeShader = new ComputeShader("shaders/computer.glsl");	//create the compute shader
@@ -80,7 +80,7 @@ bool SceneGameplay::OnCreate() {
 
 
 
-	
+
 	audioManager = new AudioManager();
 	if (audioManager->OnCreate() == false) {
 		std::cout << "Audio failed ... we have a problem\n";
@@ -99,10 +99,10 @@ bool SceneGameplay::OnCreate() {
 
 	debris = Model("Debris.obj");
 	debris.OnCreate();
-	
+
 	enemyFleetSpawners.push_back(EnemySpawner(100.0f, 15, 5));
 	printf("On Create finished!!!!!");
-	
+
 
 
 	computeExplosion = new ComputeShader("shaders/Explosion.glsl");	//create the compute shader
@@ -120,7 +120,7 @@ bool SceneGameplay::OnCreate() {
 			std::cout << "Explosion failed ... we have a problem\n";
 		}
 	}
-	
+
 	return true;
 
 }
@@ -212,7 +212,7 @@ void SceneGameplay::HandleEvents(const SDL_Event& sdlEvent) {
 
 void SceneGameplay::Update(const float deltaTime) {
 
-	
+
 	playerController.Update(deltaTime);
 
 	//MUSIC VOL
@@ -343,7 +343,7 @@ void SceneGameplay::Render() {
 		}
 
 
-		
+
 	}
 
 	if (isMouseOverShip)
@@ -358,10 +358,10 @@ void SceneGameplay::Render() {
 		glDisable(GL_BLEND);
 	}
 
-	if (isGivingOrders) 
+	if (isGivingOrders)
 	{
 
-		if (!isMouseOverShip) 
+		if (!isMouseOverShip)
 		{
 			glUseProgram(shader->GetProgram());
 			glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
@@ -474,7 +474,7 @@ void SceneGameplay::SpawnEnemy(const float deltaTime)
 		}
 	}
 
-	
+
 }
 
 void SceneGameplay::SetActiveShip()
@@ -493,7 +493,7 @@ void SceneGameplay::SetActiveShip()
 			if (playerController.has3DClick) {
 				activeShip = i;
 				isGivingOrders = true;
-				
+
 				playerController.has3DClick = false;
 				//SoundEngine->play2D("audio/SelectionSound.mp3", false); // Audio For Selection Ship
 				audioManager->PlaySound2D("Ship_Selected");
@@ -507,7 +507,7 @@ void SceneGameplay::SetActiveShip()
 
 	}
 
-	
+
 	if (isGivingOrders) { //if player has a ship selected and clicks on an enemy we want to attack that enenmy
 		for (EnemyShip* ship : enemyFleet) {
 			if (COLLISION::LineSphereCollisionDetected(ship->collisionSphere, playerController.getLine())) { //check for collision between player raycast and the enemy ships
@@ -542,8 +542,8 @@ void SceneGameplay::SetActiveShip()
 
 		if (activeShip >= 0) {
 			shipWaypoint = playerController.getClickPos();
-			
-			playerFleet[activeShip]->moveToDestination(shipWaypoint);
+
+			playerFleet[activeShip]->MoveToDestination(shipWaypoint);
 			isGivingOrders = false;
 			activeShip = -1;
 		}
@@ -558,7 +558,7 @@ void SceneGameplay::SetActiveShip()
 		playerController.hasCanceledOrder = false;
 
 	}
-	
+
 }
 
 void SceneGameplay::UpdatePlayerFleet(const float deltaTime)
@@ -599,7 +599,7 @@ void SceneGameplay::UpdatePlayerFleet(const float deltaTime)
 		}
 	}
 
-	
+
 
 }
 
@@ -613,7 +613,7 @@ void SceneGameplay::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip,
 		else {
 			rotationTimer = 0;
 		}
-		
+
 		if (ship->currentTargetIndex == targetShip->shipIndex) {
 			Vec3 targetDirection = targetShip->transform.getPos() - ship->transform.getPos();
 			Quaternion targetQuad = QMath::lookAt(targetDirection, UP);
@@ -621,7 +621,7 @@ void SceneGameplay::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip,
 			ship->initialDirection = targetDirection;
 			testLine.RecalculateLine(targetShip->aimingPoint, ship->transform.getPos());
 		}
-		
+
 		if (ship->isSwitchingTarget) {
 			ship->slerpT = ship->slerpT + deltaTime;
 			if (ship->slerpT >= 1) {
@@ -639,7 +639,7 @@ void SceneGameplay::UpdateEnemyFleet(const float deltaTime)
 {
 	for (int i = 0; i < enemyFleet.size(); i++) {
 		enemyFleet[i]->Update(deltaTime);
-		
+
 		if (enemyFleet[i]->deleteMe) {
 			DestroyEnenmy(i);
 		}
@@ -668,7 +668,7 @@ void SceneGameplay::DestroyEnenmy(int index)
 	bool explosionAvailable = false;
 	for (Explosion* explosion : explosions) {
 		if (!explosion->animComplete) {
-			explosionAvailable = true; 
+			explosionAvailable = true;
 			explosion->setPos(explosionPos);
 			explosion->ResetExplosion(computeReset);
 		}
@@ -677,7 +677,7 @@ void SceneGameplay::DestroyEnenmy(int index)
 	if (!explosionAvailable) {
 		//if there are no explosions availabel then cretae a new one
 		explosions.push_back(new Explosion());
-		if (explosions[explosions.size()-1]->OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh, &debris) == false) {
+		if (explosions[explosions.size() - 1]->OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh, &debris) == false) {
 			std::cout << "Explosion failed ... we have a problem\n";
 		}
 		explosions[explosions.size() - 1]->setPos(explosionPos);
@@ -697,7 +697,7 @@ void SceneGameplay::GameOver()
 	SaveStats();
 	audioManager->PlaySound2D("Game_Over");
 	gameOverBool = true;
-	
+
 }
 
 
@@ -767,7 +767,7 @@ void SceneGameplay::createActors()
 	for (EnemyShip* ship : enemyFleet) {
 		ship->SetAudioManager(audioManager);
 		ship->OnCreate();
-		
+
 		ship->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
 		ship->setIndex(enemyIndex);
 		enemyIndex++;
@@ -788,7 +788,7 @@ void SceneGameplay::createActors()
 		float x = radius * cos(angle);													// Calculate x position
 		float z = radius * sin(angle);													// Calculate z position
 
-		
+
 		playerFleet[i]->transform.setPos(Vec3(x, 0.0f, z));
 		playerFleet[i]->OnCreate();
 		playerFleet[i]->SetAudioManager(audioManager);
@@ -796,7 +796,7 @@ void SceneGameplay::createActors()
 		playerFleet[i]->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
 	}
 
-	planet = Planet(30.0f, 50, &sphereModel, ORIGIN);
+	planet = Planet(PLANET_RADIUS, PLANET_HEALTH, &sphereModel, ORIGIN);
 	planet.OnCreate();
 
 	selectionSphere = Actor(Transform(), &sphereModel);
@@ -828,7 +828,7 @@ void SceneGameplay::createShaders()
 	}
 
 	gridShader = new Shader("shaders/clickGridVert.glsl", "shaders/clickGridFrag.glsl");
-	if (gridShader->OnCreate() == false) 
+	if (gridShader->OnCreate() == false)
 	{
 		std::cout << "Shader failed ... we have a problem\n";
 	}
