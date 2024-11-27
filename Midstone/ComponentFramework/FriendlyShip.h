@@ -19,8 +19,7 @@ class FriendlyShip :
 public:
 
 
-	Model rangeSphere;
-
+	Model* rangeSphere;
 	Model* bulletModel;
 
 	Transform rangeSphereT;

@@ -29,9 +29,7 @@ bool FriendlyShip::OnCreate()
 
 
 
-	rangeSphere = Model("Sphere.obj");
-
-	if (rangeSphere.OnCreate() == false) return false;
+	
 
 	rangeSphereT = transform;
 	rangeSphereT.setScale(Vec3(range, range, range)); //sphere mesh has radius of 2 units wo when we scale it by range we have to divide to get the actual range
@@ -49,7 +47,7 @@ void FriendlyShip::OnDestroy()
 
 	model = nullptr;
 
-	rangeSphere.OnDestroy();
+
 
 	exhaustTrail.OnDestroy();
 
@@ -60,7 +58,7 @@ void FriendlyShip::OnDestroy()
 		delete bullet;
 	}
 
-	delete model;
+
 
 
 
@@ -101,7 +99,7 @@ void FriendlyShip::Update(const float deltaTime)
 		slerpT = slerpT >= 1 ? 1 : slerpT + deltaTime;
 		body->Update(deltaTime);
 		RotateTowardTarget(movingDirection);
-		isMoving = VMath::mag(destination - transform.getPos()) > 0.01;
+		isMoving = !HasReachDestination();
 
 	}
 	else {
@@ -168,8 +166,7 @@ void FriendlyShip::RenderRange(Shader* shader) const
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, rangeSphereT.toModelMatrix());
 		glUniform4fv(shader->GetUniformID("meshColor"), 1, Vec4(0.2, 0.3, 0.5, 0.4));
-		//glUniform4fv(shader->GetUniformID("meshColor"), 1, color);
-		rangeSphere.mesh->Render(GL_LINES);
+		rangeSphere->mesh->Render(GL_LINES);
 		glDisable(GL_BLEND);
 	}
 }
@@ -198,8 +195,6 @@ void FriendlyShip::Fire()
 	canFire = false;
 	timeSinceShot = 0;
 
-	// Calculate the direction the ship is facing
-
 
 	// Add some randomness to the direction to simulate flak guns
 	float randomOffsetX = static_cast<float>(rand()) / RAND_MAX - 1.0f;
@@ -217,7 +212,7 @@ void FriendlyShip::Fire()
 
 	// Audio
 	Vec3 bulletSpawn = transform.getPos();
-	audioManager->PlaySound3D("Ship_SHooting", transform.getPos());
+	audioManager->PlaySound3D("Ship_Shooting", transform.getPos());
 
 }
 

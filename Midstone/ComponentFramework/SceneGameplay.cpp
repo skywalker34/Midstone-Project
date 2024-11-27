@@ -755,7 +755,7 @@ void SceneGameplay::createActors()
 		float x = radius * cos(angle);													// Calculate x position
 		float z = radius * sin(angle);													// Calculate z position
 
-		enemyFleet.push_back(new EnemyShip(Vec3(x, 0, z), &enemyShipModel));
+		enemyFleet.push_back(new EnemyShip(Vec3(x, 0, z), &enemyShipModel, ENEMY_DEFAULT_HEALTH));
 	}
 
 
@@ -789,6 +789,7 @@ void SceneGameplay::createActors()
 		playerFleet[i]->SetAudioManager(audioManager);
 		playerFleet[i]->closestEnemy = enemyFleet.back();	// Set initail target
 		playerFleet[i]->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
+		playerFleet[i]->rangeSphere = &sphereModel;
 	}
 
 	planet = Planet(PLANET_RADIUS, PLANET_HEALTH, &sphereModel, ORIGIN);
