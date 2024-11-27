@@ -56,12 +56,12 @@ private:
 	Model planeModel;
 	Model debris;
 
-	Mesh* testMesh; //DELETE LATER
-	Matrix4 testModelMat;
+	
 	
 
 	//UX ACTORS
 	Actor selectionSphere;
+	Actor cursorSphere;
 	Actor enemySelectionSphere;
 	
 

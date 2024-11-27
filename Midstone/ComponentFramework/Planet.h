@@ -17,9 +17,9 @@ class Planet :
         //Transform transform;
         //Model* model;
 
-    int health;
-    float radius; 
-    Transform atmosphere;
+    int health; //damage planet can take before it is destroyed
+    float radius; //planet's radius (used for scale and collision)
+    Transform atmosphere; //transform for the planet's atmosphere mesh/texture
 
 public:
     Planet();

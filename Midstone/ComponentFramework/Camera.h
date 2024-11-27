@@ -22,9 +22,9 @@ private:
 	Matrix4 view;
 	SkyBox* skybox;
 	Trackball trackball;
-
+	Transform transform;
 public:
-	Transform transform;//temp here (move back to private later)
+	
 	Camera();
 	~Camera();
 	void SetView(const Quaternion& orientation_, const Vec3& position_);

@@ -7,10 +7,8 @@ using namespace MATH;
 
 const Vec3 ORIGIN = Vec3(0, 0, 0);
 
-const float CAMERA_TO_ORIGIN = 20;	// Remove or rename
-
+//Gameplay
 const float PLANET_RADIUS = 30.0f;
-
 const int PLANET_HEALTH = 50;
 
 // Direction

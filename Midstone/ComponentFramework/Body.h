@@ -1,12 +1,8 @@
 #ifndef BODY_H
 #define BODY_H
-#include <Vector.h> /// This is in GameDev
+#include <Vector.h> 
 #include "Transform.h"
 using namespace MATH; 
-
-/// Just forward declair these classes so I can define a pointer to them
-/// Used later in the course
-
 
 
 class Body {
@@ -33,7 +29,6 @@ public:
 	bool OnCreate();
 	void OnDestroy();
 	void Update(const float deltaTime);
-	//Transform Update(const float deltaTime, Transform t);
 	void Render() const;
 	void ApplyForce(Vec3 force);
 	void setAccel(const Vec3 &accel_) { accel = accel_;}

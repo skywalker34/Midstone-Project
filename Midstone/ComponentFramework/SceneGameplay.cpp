@@ -94,8 +94,8 @@ bool SceneGameplay::OnCreate() {
 	createShaders();
 	createClickGrid();
 
-	testMesh = new Mesh("meshes/Sphere.obj");
-	testMesh->OnCreate();
+	/*cursorMesh = new Mesh("meshes/Sphere.obj");
+	cursorMesh->OnCreate();*/
 
 	debris = Model("Debris.obj");
 	debris.OnCreate();
@@ -302,7 +302,7 @@ void SceneGameplay::Render() {
 	glUniformMatrix4fv(planetShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 	glUniformMatrix4fv(planetShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
 	glUniform3fv(planetShader->GetUniformID("lightPos"), 1, lightPos);
-	glUniform3fv(planetShader->GetUniformID("cameraPos"), 1, playerController.camera.transform.getPos());
+	glUniform3fv(planetShader->GetUniformID("cameraPos"), 1, playerController.transform.getPos());
 	planet.Render(planetShader);
 
 
@@ -325,7 +325,7 @@ void SceneGameplay::Render() {
 		glUseProgram(bulletShader->GetProgram());
 		glUniformMatrix4fv(bulletShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 		glUniformMatrix4fv(bulletShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-		glUniform3fv(bulletShader->GetUniformID("cameraPos"), 1, playerController.camera.transform.getPos());
+		glUniform3fv(bulletShader->GetUniformID("cameraPos"), 1, playerController.transform.getPos());
 		ship->RenderBullets(bulletShader);
 
 		if (ship->isMoving && isGameRunning) {
@@ -353,7 +353,7 @@ void SceneGameplay::Render() {
 		glUseProgram(selectionShader->GetProgram());
 		glUniformMatrix4fv(selectionShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 		glUniformMatrix4fv(selectionShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-		glUniform3fv(selectionShader->GetUniformID("cameraPos"), 1, playerController.camera.transform.getPos());
+		glUniform3fv(selectionShader->GetUniformID("cameraPos"), 1, playerController.transform.getPos());
 		selectionSphere.Render(selectionShader);
 		glDisable(GL_BLEND);
 	}
@@ -366,9 +366,7 @@ void SceneGameplay::Render() {
 			glUseProgram(shader->GetProgram());
 			glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 			glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-			glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, testModelMat);
-			glUniform4fv(shader->GetUniformID("meshColor"), 1, ORANGE);
-			testMesh->Render(GL_TRIANGLES);
+			cursorSphere.Render(shader);
 		}
 
 
@@ -537,7 +535,10 @@ void SceneGameplay::SetActiveShip()
 		}
 	}
 
-	testModelMat = MMath::translate(playerController.hoverPos) * MMath::scale(1, 1, 1);
+
+
+	cursorSphere.transform.setPos(playerController.hoverPos);
+
 	if (playerController.has3DClick && isGivingOrders) {
 
 		if (activeShip >= 0) {
@@ -801,6 +802,8 @@ void SceneGameplay::createActors()
 
 	selectionSphere = Actor(Transform(), &sphereModel);
 	enemySelectionSphere = Actor(Transform(), &sphereModel);
+	cursorSphere = Actor(Transform(), &sphereModel);
+	cursorSphere.meshColour = ORANGE;
 	selectionSphere.transform.setPos(0, 0, -0.5);
 }
 

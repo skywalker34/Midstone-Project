@@ -4,7 +4,7 @@
 
 Bullet::Bullet(Transform spawnPos, float speed_, Vec3 forward_, Model** model_){
 
-	modelTemp = model_;
+	bulletModel = model_;
 	transform = spawnPos;
 	
 	speed = speed_;
@@ -57,5 +57,5 @@ void Bullet::Render(Shader* shader) const
 	
 
 	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, transform.toModelMatrix());
-	(*modelTemp)->mesh->Render(GL_TRIANGLES);
+	(*bulletModel)->mesh->Render(GL_TRIANGLES);
 }

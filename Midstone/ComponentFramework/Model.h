@@ -10,7 +10,7 @@ class Model
 {
 private:
 	std::string meshFilePath = "meshes/";	//ensure this matches where our meshes are kept
-	std::string textureFilePath = "textures/";
+	std::string textureFilePath = "textures/";	//ensure this matches where our textures are kept
 
 	std::string meshFileName;
 	std::vector<std::string> textureFileNames;

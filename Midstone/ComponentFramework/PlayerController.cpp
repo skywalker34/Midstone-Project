@@ -110,16 +110,6 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 
 			//move the camera down
 			break;
-
-		case SDL_SCANCODE_O:
-			//if player hits o reset them to the origin
-			transform = Transform();
-			if(planeDepth == 0); 
-			{
-				//push the plane into the screen a bit more so theres no divide by zero
-				planeDepth += 1 ;
-			}
-			break;
 		case SDL_SCANCODE_C:
 			//switches between orbit and free mode
 			camera.toggleOrbitMode();
@@ -160,7 +150,7 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 		break;
 
 	case SDL_MOUSEWHEEL:
-		planeDepth += sdlEvent.wheel.preciseY;
+		planeDepth += sdlEvent.wheel.preciseY * scrollSpeed;
 		//plane depth increases if the mouse is wheeled up (by the amount the mouse is wheeled)
 		//plane depth decreases if the mouse is wheeled down (by the amount the mouse is wheeled)
 		break;
@@ -181,7 +171,6 @@ void PlayerController::Update(const float deltaTime)
 
 	camera.SetView(transform);
 	clickGrid.transform.setOrientation(transform.getOrientation());
-
 	clickGrid.transform.setPos(get3DClickCoords(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2));
 
 	
