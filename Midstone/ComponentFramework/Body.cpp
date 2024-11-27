@@ -7,6 +7,7 @@
 
 
 Body::Body(Transform* tran, Vec3 vel_, Vec3 acc_, float mass_) {
+	//set values
 	transform = tran;
 	vel = vel_;
 	accel = acc_;
@@ -16,12 +17,8 @@ Body::Body(Transform* tran, Vec3 vel_, Vec3 acc_, float mass_) {
 
 void Body::Update(const float deltaTime) {
 
-	Vec3 v = transform->getPos();
-	
-
 	transform->setPos(transform->getPos() + vel * deltaTime + 0.5f * accel * deltaTime * deltaTime);//sets new position using kinematics
 	vel += accel * deltaTime;//update velocity
-
 
 }
 
@@ -53,6 +50,7 @@ Body::~Body() {}
 
 
 void Body::ApplyForce(Vec3 force) {
+	//use newtons second law (rearranged) to applya  force
 	accel = force / mass;
 }
 
@@ -63,6 +61,4 @@ bool Body::OnCreate() {
 void Body::OnDestroy() {
 }
 
-void Body::Render() const {
-}
 

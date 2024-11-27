@@ -9,6 +9,9 @@
 
 using namespace MATH;
 
+/// <summary>
+/// Mainly for use in debugging, draws a purely graphical line from one pos to another in world space
+/// </summary>
 class Line
 {
 public:

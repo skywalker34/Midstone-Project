@@ -11,7 +11,9 @@ using namespace MATH;
 union SDL_Event;
 
 
-
+/// <summary>
+/// How th eplayer interacts with the world. Takes the form of a free floating camera the player may control
+/// </summary>
 class PlayerController
 {
 	private:

@@ -2,7 +2,9 @@
 #include <VMath.h>
 
 using namespace MATH;
-
+/// <summary>
+/// Simple object that spawns enemy ships (side note: technically doesn't have to spawn enemies its really justa  tiemr with a pos that fires at given interval)
+/// </summary>
 class EnemySpawner
 {
     float elapsedTime = 1;//time since last spawn (start at 1 for % use)

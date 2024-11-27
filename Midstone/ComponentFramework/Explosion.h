@@ -5,7 +5,9 @@
 #include "Transform.h"
 #include "Camera.h"
 #include "ComputeShader.h"
-
+/// <summary>
+/// Particle system to be triggered and lasts a set duration before going away.
+/// </summary>
 class Explosion
 {
     Model* model; //reference to the larger model used for the debris chunks

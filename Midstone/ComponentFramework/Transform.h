@@ -2,7 +2,11 @@
 #include <Vector.h> /// This is in GameDev
 #include <Quaternion.h> /// This is in GameDev
 using namespace MATH;
-//simple component class that acts as a container for a position, scale and orientation
+
+
+/// <summary>
+///simple component class that acts as a container for a position, scale and orientation
+/// </summary>
 class Transform
 {
 	private:

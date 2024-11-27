@@ -10,7 +10,9 @@ class Camera;
 class Shader;
 class Mesh;
 class ComputeShader;
-
+/// <summary>
+/// Particle system using compute shader to give the ship an exhaust trail jet stream
+/// </summary>
 class ExhaustTrail
 {
     Mesh* mesh; // Reference to the particle mesh

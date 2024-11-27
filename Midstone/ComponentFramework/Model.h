@@ -6,6 +6,9 @@
 #include "Vector.h"
 #include <string>
 
+/// <summary>
+/// Combines a mesh and compatible textures into one class (used for easier flyweight design pattern)
+/// </summary>
 class Model
 {
 private:
