@@ -15,9 +15,6 @@ void main(){
 
     //psuedo glow, go!
 	//we're pretty much just doing a temu fresnel effect with white and orange(bullet color customization?)
-
-    
-
 	fragColour =  mix(vec4(1, 0.6, 0.0f, 1.0f), vec4(1,1,1,1), dot(normal, -incident));
 	
 	

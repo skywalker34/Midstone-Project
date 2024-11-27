@@ -21,7 +21,7 @@ void main() {
     //this is either incredibly smart or incredibly stupid
     //I think this will solve the longstanding "vertex index" issue
     vec3 position = (modelMatrix * vVertex).xyz; //get the position of this vertex from the mesh.cpp vbo
-    buf.data[gl_VertexID] = position; //send it onto my way cooler awesomer buffer that only works half the time
+    buf.data[gl_VertexID] = position; //send it onto my way cooler awesomer buffer
     gl_Position =vec4(1000,1000,1000,1);//send the vertext pos to timbucktoo so odds are you can't see it when it renders
     
 }

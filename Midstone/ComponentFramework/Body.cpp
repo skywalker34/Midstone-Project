@@ -15,7 +15,7 @@ Body::Body(Transform* tran, Vec3 vel_, Vec3 acc_, float mass_) {
 }
 
 void Body::Update(const float deltaTime) {
-	//refactor this if I can figure out references/shared/pointers (I was banging my head against teh wall for 2 days so I'm just going to do the return for the time being.
+
 	Vec3 v = transform->getPos();
 	
 
@@ -25,11 +25,7 @@ void Body::Update(const float deltaTime) {
 
 }
 
-void Body::UpdateAngularVel(float deltaTime)
-{
-	// Change angular velocity based on angular accel
-	//angularVel = angularVel + angularAccel * deltaTime;
-}
+
 
 
 

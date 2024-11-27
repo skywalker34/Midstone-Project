@@ -18,6 +18,7 @@ public:
     Transform transform;
     unsigned int vbo;
     unsigned int vao;
+    float lineThickness = 5.0f;
     float vertices[3] = {
      0.0f, 0.0f, -1.0f,
     };

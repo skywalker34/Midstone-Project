@@ -32,7 +32,7 @@ public:
 	void Render() const;
 	void ApplyForce(Vec3 force);
 	void setAccel(const Vec3 &accel_) { accel = accel_;}
-	void UpdateAngularVel(float deltaTime);
+	
 
 	void UpdateOrientation(float deltaTime);
 

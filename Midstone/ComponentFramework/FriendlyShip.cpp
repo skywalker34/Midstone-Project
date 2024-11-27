@@ -10,9 +10,6 @@ FriendlyShip::FriendlyShip()
 	body = new Body(&transform, Vec3(), Vec3(), 1);
 
 
-
-	//printf("FriendlyShip Constructor: Transform initialized with position (%f, %f, %f)\n", transform.getPos().x, transform.getPos().y, transform.getPos().z);
-
 }
 
 FriendlyShip::FriendlyShip(Model* model_, Model* bulletModel_)
@@ -30,12 +27,12 @@ bool FriendlyShip::OnCreate()
 
 	detectionSphere = Sphere(transform.getPos(), range);
 
-	printf("Ship Created! \n");
+
 
 	rangeSphere = Model("Sphere.obj");
 
 	if (rangeSphere.OnCreate() == false) return false;
-	printf("Ship Created! \n");
+
 	rangeSphereT = transform;
 	rangeSphereT.setScale(Vec3(range, range, range)); //sphere mesh has radius of 2 units wo when we scale it by range we have to divide to get the actual range
 	//we may want to go into 3dsmax and make a unit sphere 
@@ -115,7 +112,6 @@ void FriendlyShip::Update(const float deltaTime)
 	if (isChasing && !activeTarget->deleteMe) { //if player clicks on a ship then on an enemy the ship enters chasing mode
 		destination = activeTarget->transform.getPos(); //set the destination to the enemy's pos
 		MoveToDestination(destination);
-		//isMoving = VMath::mag(destination - transform.getPos()) > 0.01; //check if we've already reached the enemy
 		if (COLLISION::SphereSphereCollisionDetected(&detectionSphere, activeTarget->collisionSphere)) {
 			//reset the variables
 			isMoving = false;
@@ -222,24 +218,7 @@ void FriendlyShip::Fire()
 	// Audio
 	Vec3 bulletSpawn = transform.getPos();
 	audioManager->PlaySound3D("Ship_SHooting", transform.getPos());
-	//irrklang::vec3df position(bulletSpawn.x, bulletSpawn.y, bulletSpawn.z);
-	//int RandomChance = rand() % 3 + 1; // Random number From 1 to 3
-	//if (RandomChance == 1)
-	//{
-	//	SoundEngine->play3D("audio/LaserShooting.mp3", position, false); // Audio For Shooting Noise
-	//	SoundEngine->setSoundVolume(1.0f);
-	//}
-	//if (RandomChance == 2)
-	//{
-	//	SoundEngine->play3D("audio/DisturbedShooting.mp3", position, false); // Audio For Shooting Noise
-	//	SoundEngine->setSoundVolume(1.0f);
 
-	//}
-	//if (RandomChance == 3)
-	//{
-	//	SoundEngine->play3D("audio/PewShoot.mp3", position, false); // Audio For Shooting Noise
-	//	SoundEngine->setSoundVolume(1.0f);
-	//}
 }
 
 

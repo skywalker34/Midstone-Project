@@ -150,13 +150,10 @@ void SceneMainMenu::RenderIMGUI()
 
 	bool p_open = false;
 	ImGui::Begin("A START BUTTON MAYBE?", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-	//ImGui::PushFont(font_title);
 	if (ImGui::Button("START GAME", ImVec2(300, 90)))
 		switchButton = true;
-	//ImGui::PopFont();
 	ImGui::End();
 
-	//ImGui::ShowDemoWindow();
 	ImGui::Render(); // Calling This before CurrentScene render wont work
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }

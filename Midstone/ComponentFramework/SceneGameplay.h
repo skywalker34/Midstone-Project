@@ -100,6 +100,7 @@ private:
 	float rotationTimer = 0;
 
 	int score = 0;
+	const int ENEMY_DEFAULT_HEALTH = 5;
 
 	bool drawInWireMode;
 	bool isGameRunning = true;

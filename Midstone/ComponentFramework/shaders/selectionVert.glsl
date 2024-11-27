@@ -12,7 +12,7 @@ layout(location = 2) uniform mat4 modelMatrix;
 layout(location = 3) uniform vec3 cameraPos;
 
 
-out vec3 incident; // You could call this "incoming" if you like
+out vec3 incident; 
 out vec3 normal;
 
 void main() {

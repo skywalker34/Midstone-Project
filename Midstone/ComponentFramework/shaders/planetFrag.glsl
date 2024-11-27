@@ -15,16 +15,12 @@ layout (binding = 1) uniform sampler2D specTexture;
 
 void main() {
     vec4 ks = vec4(0.3, 0.3, 0.3, 0.0);
-	//vec4 kd = vec4(0.0, 0.0, 0.8, 0.0);
-	//vec4 ka = vec4(0.001, 0.001, 0.001, 0.0);
 
 	vec4 kd = vec4(1, 1, 1, 0.0);
 	vec4 ka = vec4(0.1, 0.1, 0.1, 0.0);
 	vec4 kt = texture(diffTexture,textureCoords); 
 	
-//	kd = vec4(0,0,0,1);
-//	ka = vec4(0,0,0,1);
-//	kt = vec4(0,0,0,1);
+
 
 
 
@@ -40,8 +36,7 @@ void main() {
 
 	
 
-	//mix with an atmosphere colour at the edges
+
 	fragColour = mix(vec4(0.1f, 0.15f, 0.18f, 0.8f), outputColour, dot(vertNormal, -incident));
-	
-	//fragColour = outputColour;
+
 }

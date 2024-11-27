@@ -43,7 +43,6 @@ drawInWireMode{ false } {
 	ImGui_ImplOpenGL3_Init("#version 450");
 
 	// Load the font 
-	//io.Fonts->AddFontFromFileTTF("./fonts/Galaksi.ttf", 16.0f);
 	io.Fonts->AddFontFromFileTTF("./fonts/Ethnocentric Rg It.otf", 10.0f);
 	// Adjust path and size as needed
 	io.FontDefault = io.Fonts->Fonts.back(); // Set as default font (optional)
@@ -94,8 +93,6 @@ bool SceneGameplay::OnCreate() {
 	createShaders();
 	createClickGrid();
 
-	/*cursorMesh = new Mesh("meshes/Sphere.obj");
-	cursorMesh->OnCreate();*/
 
 	debris = Model("Debris.obj");
 	debris.OnCreate();
@@ -463,7 +460,7 @@ void SceneGameplay::SpawnEnemy(const float deltaTime)
 		enemyFleetSpawners[i].Update(deltaTime);
 		if (enemyFleetSpawners[i].canSpawn == true) {
 			enemyIndex++;
-			enemyFleet.push_back(new EnemyShip(enemyFleetSpawners[i].position, &enemyShipModel));
+			enemyFleet.push_back(new EnemyShip(enemyFleetSpawners[i].position, &enemyShipModel, ENEMY_DEFAULT_HEALTH));
 			enemyFleet.back()->SetAudioManager(audioManager);
 			enemyFleet.back()->OnCreate();
 			enemyFleet.back()->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
@@ -483,7 +480,6 @@ void SceneGameplay::SetActiveShip()
 	int i = 0;
 	for (FriendlyShip* ship : playerFleet) {
 		if (COLLISION::LineSphereCollisionDetected(ship->collisionSphere, playerController.getLine())) {
-			//selectionSphere.transform = ship->transform;
 
 			selectionSphere.meshColour = GREEN;
 			selectionSphere.transform.setParent(ship->transform.toModelMatrix());
@@ -520,8 +516,6 @@ void SceneGameplay::SetActiveShip()
 					playerController.has3DClick = false;
 					shipWaypoint = ship->transform.getPos();
 					isGivingOrders = false;
-
-					printf("ATTACKING! \n");
 
 					playerFleet[activeShip]->isChasing = true;
 					playerFleet[activeShip]->activeTarget = ship;
@@ -693,8 +687,8 @@ void SceneGameplay::DestroyEnenmy(int index)
 
 void SceneGameplay::GameOver()
 {
-	//END GAME LOGIC HERE PLEASE
-	std::cout << "\033[32m" << "GAMEOVER!" << "\033[0m" << std::endl;
+
+
 	SaveStats();
 	audioManager->PlaySound2D("Game_Over");
 	gameOverBool = true;
