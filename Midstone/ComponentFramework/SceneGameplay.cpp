@@ -192,6 +192,8 @@ void SceneGameplay::HandleEvents(const SDL_Event& sdlEvent) {
 	//the scene knows to check for this flag and to recieve the message so the playercontroller does not need to have a reference to the scene
 	//its basically just throwing out this variable and hoping something is listening
 	//closest thing I could come up with to a delegate/event dispatcher
+
+
 	ImGui_ImplSDL2_ProcessEvent(&sdlEvent); // ImGui HandleEvents
 
 	switch (sdlEvent.type) {
@@ -531,7 +533,7 @@ void SceneGameplay::SetActiveShip()
 
 
 
-	cursorSphere.transform.setPos(playerController.hoverPos);
+	cursorSphere.transform.setPos(playerController.mouseHoverPos3D);
 
 	if (playerController.has3DClick && isGivingOrders) {
 
@@ -687,12 +689,9 @@ void SceneGameplay::DestroyEnenmy(int index)
 
 void SceneGameplay::GameOver()
 {
-
-
 	SaveStats();
 	audioManager->PlaySound2D("Game_Over");
 	gameOverBool = true;
-
 }
 
 
@@ -740,7 +739,7 @@ void SceneGameplay::createModels()
 	}
 
 
-	planeModel = Model("Plane.obj", std::vector<std::string>{"Grid3.png"});
+	planeModel = Model("Plane.obj", std::vector<std::string>{"Grid2.png"});
 	if (planeModel.OnCreate() == false) {
 		printf("Model failed to load");
 	}

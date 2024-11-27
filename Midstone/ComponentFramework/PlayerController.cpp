@@ -14,11 +14,12 @@ PlayerController::PlayerController()
 
 bool PlayerController::OnCreate()
 {
-	//here for future improvements
-	transform.setPos(Vec3(0, 0, 75));
-	
-	
 
+	//move the player controller out
+	transform.setPos(Vec3(STARTING_POS)); 
+	
+	
+	//if any on creates fail, then the whole thing fails, return false
 	if (camera.OnCreate() == false) return false;
 
 	if (clickGrid.OnCreate() == false) return false;
@@ -28,13 +29,15 @@ bool PlayerController::OnCreate()
 
 void PlayerController::OnDestroy()
 {
+	//only thing to destroy is teh grid
 	clickGrid.OnDestroy();
 }
 
 void PlayerController::CreateGrid(Model* model_)
 {
-	Transform t;
-	t.setScale(20, 20, 1);
+	Transform t; //temp default transform
+	t.setScale(65, 65, 1); //set the grid scale to large so player never sees the edges
+	//create the actor
 	clickGrid = Actor(t, model_);
 	clickGrid.OnCreate();
 }
@@ -64,64 +67,40 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 	case SDL_KEYDOWN: //code that allows the user to move the camera around
 		switch (sdlEvent.key.keysym.scancode) {
 		case SDL_SCANCODE_W:
-			
-			//	below works *marginally* better 
+			//move the camera foward
 			v = transform.getPos();
 			v += (VMath::normalize(-forwardVector) * CAMERA_SPEED);
-			
-			
 			break;
-
 		case SDL_SCANCODE_S:
-			
-
+			//move the camera aback
 			v = transform.getPos();
 			v += (VMath::normalize(forwardVector) * CAMERA_SPEED);
-
 			break;
-
-			//future for strafing movement
 		case SDL_SCANCODE_A:
-
+			//Move the camera left
 			v = transform.getPos();
 			v += (VMath::normalize(-rightVector) * CAMERA_SPEED);
-
-			//move the camera right
 			break;
-
 		case SDL_SCANCODE_D:
-
+			//Move the camera Right
 			v = transform.getPos();
 			v += (VMath::normalize(rightVector) * CAMERA_SPEED);
-	
-			//move the camera left
 			break;
 		case SDL_SCANCODE_Q:
-
+			//Move Camera up
 			v = transform.getPos();
 			v += (VMath::normalize(upVector) * CAMERA_SPEED);
-
-			//move the camera UP
 			break;
 		case SDL_SCANCODE_E:
-
+			//Move camera down
 			v = transform.getPos();
-			v += (VMath::normalize(-upVector) * CAMERA_SPEED);
-
-			//move the camera down
+			v += (VMath::normalize(-upVector) * CAMERA_SPEED);	
 			break;
-		case SDL_SCANCODE_C:
-			//switches between orbit and free mode
-			camera.toggleOrbitMode();
-			
-			break;
-
-
 		}
+		break;
 
-
+		//check to make sure the player is staying within their sphereical bounds
 		if (!COLLISION::SpherePointCollisionDetected(&innerBounds, v) && COLLISION::SpherePointCollisionDetected(&outerBounds, v)) transform.setPos(v);
-
 		break;
 
 		
@@ -134,29 +113,22 @@ void PlayerController::handleEvents(const SDL_Event& sdlEvent)
 			has3DClick = true;
 			break;
 		case SDL_BUTTON_RIGHT:
-
-			
-
 			hasCanceledOrder = true;
-
-	
 			break;
 		}
 		break;
 	}
 	break;
-
-	case SDL_MOUSEBUTTONUP:
-		break;
-
 	case SDL_MOUSEWHEEL:
-		planeDepth += sdlEvent.wheel.preciseY * scrollSpeed;
 		//plane depth increases if the mouse is wheeled up (by the amount the mouse is wheeled)
 		//plane depth decreases if the mouse is wheeled down (by the amount the mouse is wheeled)
+		planeDepth += sdlEvent.wheel.preciseY * scrollSpeed;
+		if(planeDepth > PLANE_MAX_DEPTH || planeDepth < PLANE_MIN_DEPTH) planeDepth -= sdlEvent.wheel.preciseY * scrollSpeed; //check if the edit moves the plane outside of its bounds, if so revert the change
+		
 		break;
 	}
 
-	mouseHoverPos = Vec3(sdlEvent.button.x, sdlEvent.button.y, 0);
+	mouseHoverPos2D = Vec3(sdlEvent.button.x, sdlEvent.button.y, 0);
 
 }
 
@@ -166,8 +138,7 @@ void PlayerController::Update(const float deltaTime)
 	int x, y;
 	SDL_GetMouseState(&x, &y);
 
-	hoverPos = get3DClickCoords(x, y);
-
+	mouseHoverPos3D = get3DClickCoords(x, y); 
 
 	camera.SetView(transform);
 	clickGrid.transform.setOrientation(transform.getOrientation());
@@ -179,6 +150,7 @@ void PlayerController::Update(const float deltaTime)
 
 void PlayerController::Render(Shader* shader) const
 {
+	//renders the grid
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	clickGrid.model->BindTextures(0,0);
@@ -191,9 +163,9 @@ void PlayerController::Render(Shader* shader) const
 
 Vec3 PlayerController::getClickPos()
 {
+	//tells whatever is listening that the player has clicked
 	has3DClick = false;
 	return clickPos;
-	
 }
 
 Vec3 PlayerController::get3DClickCoords(float sdl_X, float sdl_Y)
@@ -210,13 +182,13 @@ Vec3 PlayerController::get3DClickCoords(float sdl_X, float sdl_Y)
     sdlPosCameraSpace = sdlPosCameraSpace / sdlPosCameraSpace.w;
 
     // Make a line from the camera position to the mouse in camera space
-    line = Vec4(0, 0, 0, 1) & sdlPosCameraSpace;
+    DualQuat line_ = Vec4(0, 0, 0, 1) & sdlPosCameraSpace;
 
     // Make a plane in camera space (depth along the z-axis)
     Plane planeCameraSpace = Plane(0, 0, 1, planeDepth);
 
     // Calculate intersection point in camera space
-    Vec4 intersectionCameraSpace = line ^ planeCameraSpace;
+    Vec4 intersectionCameraSpace = line_ ^ planeCameraSpace;
     intersectionCameraSpace = intersectionCameraSpace / intersectionCameraSpace.w;
 
     // Transform the intersection point to world space
@@ -226,7 +198,7 @@ Vec3 PlayerController::get3DClickCoords(float sdl_X, float sdl_Y)
 
 	// Make a line from the camera position to the mouse
 	// Using the join of two points
-	line = transform.getPos() & sdlPosWorldSpace;
+	line_ = transform.getPos() & sdlPosWorldSpace;
 
 
     return Vec3(intersectionWorldSpace.x, intersectionWorldSpace.y, intersectionWorldSpace.z);
@@ -234,7 +206,7 @@ Vec3 PlayerController::get3DClickCoords(float sdl_X, float sdl_Y)
 
 void PlayerController::calculateLine()
 {
-	Vec4 sdlPosPixelSpace = Vec4(mouseHoverPos.x, mouseHoverPos.y, 0, 1);
+	Vec4 sdlPosPixelSpace = Vec4(mouseHoverPos2D.x, mouseHoverPos2D.y, 0, 1);
 
 
 	Vec4 sdlPosNDCSpace = MMath::inverse(MMath::viewportNDC(SCREEN_WIDTH, SCREEN_HEIGHT)) * sdlPosPixelSpace;
@@ -249,12 +221,13 @@ void PlayerController::calculateLine()
 
 	// Make a line from the camera position to the mouse
 	// Using the join of two points
-	line2 = transform.getPos() & sdlPosWorldSpace;
+	line = transform.getPos() & sdlPosWorldSpace;
 
 }
 
 void PlayerController::setPlayerBounds(float innerDis, float outerDis)
 {
+	//set the inner and outer bounds the camera cna move to
 	innerBounds = Sphere(ORIGIN, innerDis);
 	outerBounds = Sphere(ORIGIN, outerDis);
 }
