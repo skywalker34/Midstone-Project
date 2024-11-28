@@ -39,16 +39,16 @@ public:
 	Vec3 movingDirection;
 	Vec3 initialDirection = FORWARD;
 	Vec3 orbitAxis;
-	EnemyShip* closestEnemy;
-	EnemyShip* potentialTarget;
+	EnemyShip* closestEnemy; //used when deciding which potential enenmy is the closest
+	EnemyShip* potentialTarget; //reference to an enemy ship that this ship could attack
 
-	EnemyShip* activeTarget;
+	EnemyShip* activeTarget; //reference to the enemy this ship is attakcing
 
-	Vec4 color = BLUE;
-	bool isMoving = false;
-	bool isChasing = false;
+	
+	bool isMoving = false; //whether the ship is moving in space or not
+	bool isChasing = false; //whether the ship is chasing an enemy or not
 
-	bool canFire = true;
+	bool canFire = true; //whetehr or not the hsip can fir ethis frame
 
 	float timeSinceShot = 0;//the time since the ship has last fired a shot
 	float rateOfFire = 0.01; //how often this ship can shoot (seconds)
