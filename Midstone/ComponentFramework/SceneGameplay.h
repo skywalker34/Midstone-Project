@@ -56,20 +56,20 @@ private:
 	Model planeModel;
 	Model debris;
 
-	
-	
+
+
 
 	//UX ACTORS
 	Actor selectionSphere;
 	Actor cursorSphere;
 	Actor enemySelectionSphere;
-	
 
-	
+
+
 
 
 	AudioManager* audioManager;
-	
+
 	Vec3 lightPos = Vec3(0.0f, 0.0f, 150.0f);
 
 
@@ -79,8 +79,6 @@ private:
 	Planet planet;
 
 	Shader* lineShader = nullptr;
-	Line pathLine = Line(Vec3(0, 0, 0), Vec3(1, 1, 1));
-	Line testLine = Line(Vec3(0, 0, 0), Vec3(100, 100, 100));
 
 	std::vector<FriendlyShip*> playerFleet;
 	std::vector<EnemyShip*> enemyFleet;
@@ -93,7 +91,7 @@ private:
 	int activeShip = -1;
 	int startingFleetSize = 2;
 	int enemyIndex = 0;
-	
+
 	int startingExplosions = 10; //we're going to create 10 explosions and recycle them whenever an enemy blows up.
 
 	float timeElapsed;

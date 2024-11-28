@@ -66,15 +66,20 @@ public:
 	float currentTargetDistance;
 	float potentialTargetDistance;
 
-		Sphere detectionSphere;
-		bool HappenOnce = true;
+	Sphere detectionSphere;
+	bool HappenOnce = true;
 
 
 	FriendlyShip();
 	FriendlyShip(Model* model_, Model* bulletModel_);
-	bool OnCreate() override; 
+	bool OnCreate() override;
 	void OnDestroy();
 	void Update(const float deltaTime);
+	void ResetFire(const float deltaTime);
+	void UpdateBullet(const float deltaTime);
+	void StopSound3DLooped();
+	void ShipMovement(const float deltaTime);
+	void ChasingEnemy();
 	void Render(Shader* shader) const;
 	void RenderBullets(Shader* shader) const;
 	void RenderRange(Shader* shader) const;

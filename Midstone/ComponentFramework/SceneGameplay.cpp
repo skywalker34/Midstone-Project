@@ -27,7 +27,7 @@ void AlignForWidth(float width, float alignment = 0.5f)
 		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 }
 
-SceneGameplay::SceneGameplay(Window* window_) : shader{ nullptr }, 
+SceneGameplay::SceneGameplay(Window* window_) : shader{ nullptr },
 drawInWireMode{ false } {
 	Debug::Info("Created Scene0: ", __FILE__, __LINE__);
 	window = window_;
@@ -254,28 +254,10 @@ void SceneGameplay::Render() {
 
 	playerController.camera.RenderSkyBox();
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glUseProgram(lineShader->GetProgram());
-	glUniformMatrix4fv(lineShader->GetUniformID("projection"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
-	glUniformMatrix4fv(lineShader->GetUniformID("view"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-	glUniformMatrix4fv(lineShader->GetUniformID("model"), 1, GL_FALSE, testLine.transform.toModelMatrix());
-	testLine.draw();
-
-
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
-
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-	if (activeShip >= 0) {
-
-		glUseProgram(lineShader->GetProgram());
-		glUniformMatrix4fv(lineShader->GetUniformID("projection"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
-		glUniformMatrix4fv(lineShader->GetUniformID("view"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-		glUniformMatrix4fv(lineShader->GetUniformID("model"), 1, GL_FALSE, pathLine.transform.toModelMatrix());
-		pathLine.draw();
-	}
 
 	for (EnemyShip* ship : enemyFleet) {
 		if (ship->deleteMe == false) { //don't render a ship thats to be deleted
@@ -329,7 +311,7 @@ void SceneGameplay::Render() {
 			ship->exhaustTrail.Render(particleShader, computeShader);
 		}
 
-		if (isGivingOrders) 
+		if (isGivingOrders)
 		{
 
 
@@ -373,8 +355,8 @@ void SceneGameplay::Render() {
 		glUniformMatrix4fv(gridShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
 		playerController.Render(gridShader);
 	}
-		
-		glUseProgram(0);
+
+	glUseProgram(0);
 }
 
 void SceneGameplay::RenderIMGUI()
@@ -589,13 +571,7 @@ void SceneGameplay::UpdatePlayerFleet(const float deltaTime)
 	if (activeShip >= 0) {
 		isGivingOrders = true;
 		playerFleet[activeShip]->displayRange = true;
-		if (playerFleet[activeShip]->isMoving) {
-			pathLine.RecalculateLine(playerFleet[activeShip]->transform.getPos(), playerFleet[activeShip]->destination);
-		}
 	}
-
-
-
 }
 
 void SceneGameplay::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip, const float deltaTime)
@@ -614,7 +590,6 @@ void SceneGameplay::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip,
 			Quaternion targetQuad = QMath::lookAt(targetDirection, UP);
 			ship->transform.setOrientation(targetQuad);
 			ship->initialDirection = targetDirection;
-			testLine.RecalculateLine(targetShip->aimingPoint, ship->transform.getPos());
 		}
 
 		if (ship->isSwitchingTarget) {
@@ -625,7 +600,6 @@ void SceneGameplay::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip,
 				ship->isSwitchingTarget = false;
 				ship->slerpT = 0;
 			}
-			testLine.RecalculateLine(ship->potentialTarget->aimingPoint, ship->transform.getPos());
 		}
 	}
 }
