@@ -29,7 +29,7 @@ bool FriendlyShip::OnCreate()
 
 
 
-	
+
 
 	rangeSphereT = transform;
 	rangeSphereT.setScale(Vec3(range, range, range)); //sphere mesh has radius of 2 units wo when we scale it by range we have to divide to get the actual range
@@ -66,12 +66,28 @@ void FriendlyShip::OnDestroy()
 
 void FriendlyShip::Update(const float deltaTime)
 {
+	ResetFire(deltaTime);
+	UpdateBullet(deltaTime);
+	StopSound3DLooped();
+	ShipMovement(deltaTime);
 
+	if (displayRange) {
+		rangeSphereT.setPos(detectionSphere.center);
+	}
+
+	exhaustTrail.modelMat = transform.toModelMatrix();
+}
+
+void FriendlyShip::ResetFire(const float deltaTime)
+{
 	if (!canFire) {
 		timeSinceShot += deltaTime;
 		canFire = timeSinceShot >= rateOfFire && !isMoving;
 	}
+}
 
+void FriendlyShip::UpdateBullet(const float deltaTime)
+{
 	for (int i = 0; i < bullets.size(); i++) {
 		bullets[i]->Update(deltaTime);
 		if (bullets[i]->deleteMe) {
@@ -81,14 +97,19 @@ void FriendlyShip::Update(const float deltaTime)
 			bullets.erase(std::remove(bullets.begin(), bullets.end(), nullptr), bullets.end());
 		}
 	}
+}
 
-
+void FriendlyShip::StopSound3DLooped()
+{
 	if (HappenOnce == true && isMoving == false)
 	{
 		audioManager->StopSound3DLooped(rocketSoundIndex);
 		HappenOnce = false;
 	}
+}
 
+void FriendlyShip::ShipMovement(const float deltaTime)
+{
 	if (wouldIntersectPlanet) {
 		Orbit(orbitAxis);
 		CheckIntersection(transform.getPos());
@@ -104,36 +125,30 @@ void FriendlyShip::Update(const float deltaTime)
 	}
 	else {
 		body->vel = Vec3();
-
 	}
 
 	if (isChasing && !activeTarget->deleteMe) { //if player clicks on a ship then on an enemy the ship enters chasing mode
-		destination = activeTarget->transform.getPos(); //set the destination to the enemy's pos
-		MoveToDestination(destination);
-		if (COLLISION::SphereSphereCollisionDetected(&detectionSphere, activeTarget->collisionSphere)) {
-			//reset the variables
-			isMoving = false;
-			activeTarget = nullptr;
-			isChasing = false;
-
-		}
-		else {
-			isMoving = true;
-
-		}
+		ChasingEnemy();
 	}
 
-	detectionSphere.center = transform.getPos();//update teh collision sphere to match the ships position
+	detectionSphere.center = transform.getPos();	//update the collision sphere to match the ships position
 	collisionSphere->center = transform.getPos();
+}
 
+void FriendlyShip::ChasingEnemy()
+{
+	destination = activeTarget->transform.getPos(); //set the destination to the enemy's pos
+	MoveToDestination(destination);
+	if (COLLISION::SphereSphereCollisionDetected(&detectionSphere, activeTarget->collisionSphere)) {
+		//reset the variables
+		isMoving = false;
+		activeTarget = nullptr;
+		isChasing = false;
 
-	if (displayRange) {
-		rangeSphereT.setPos(detectionSphere.center);
 	}
-
-
-	exhaustTrail.modelMat = transform.toModelMatrix();
-
+	else {
+		isMoving = true;
+	}
 }
 
 void FriendlyShip::Render(Shader* shader) const
