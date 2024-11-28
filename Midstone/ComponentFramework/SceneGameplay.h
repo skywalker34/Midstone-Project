@@ -32,23 +32,26 @@ class AudioManager;
 class SceneGameplay : public Scene {
 private:
 
-	Shader* shader;
-	Shader* bulletShader;
-	Shader* planetShader;
-	Shader* friendlyShipShader;
-	Shader* gridShader;
-	Shader* selectionShader;
+	//SHADERS
+	Shader* shader; //default shader, renders a mesh a certain colour without lighting (use with wireframe mode to achieve 3d)
+	Shader* bulletShader; //uses fresnel effect to make a pseudo glowinf effect
+	Shader* planetShader; //uses fresnel effect as well as a specular mask to give a planet a matte atmosphere effect
+	Shader* friendlyShipShader; //uses an RGB colour mask and phong for colour customization and lightinh
+	Shader* gridShader; //uses texture and alpha blend for see-through grid
+	Shader* selectionShader; //uses dot product to render a 2d circle from a 3d sphere
+	Shader* particleShader = nullptr; //uses a vertex distance between itself and the orifgin for colour gradient effect
 
-	ComputeShader* computeShader = nullptr;
-	ComputeShader* computeExplosion = nullptr;
-	ComputeShader* computeReset = nullptr;
+	//COMPUTE SHADERS (for paticle systems)
+	ComputeShader* computeShader = nullptr; //applies a force to particles within a conical direction for jet streams
+	ComputeShader* computeExplosion = nullptr; //applies a random force outward from a point, creating an explosion effect
+	ComputeShader* computeReset = nullptr; //reset compute shader particles to their origin
+	Shader* loadVertsToBuffer = nullptr; //not a compute shader but neccessary for their ussage. isolate the vertex pos on the GPU fro the buffer and write it to a unique buffer used by compute shaders
+	
+	
+	Mesh* particleMesh; //mesh used for particle systems  (edited in notepad to be a couple thousand of verts stacked on the origin)
 
 
-	Shader* loadVertsToBuffer = nullptr;
-	Shader* particleShader = nullptr;
-
-	Mesh* particleMesh;
-
+	//MODELS
 	Model friendlyShipModel;
 	Model enemyShipModel;
 	Model bulletModel;
@@ -64,9 +67,10 @@ private:
 	Actor cursorSphere;
 	Actor enemySelectionSphere;
 	
-
-	
-
+	//SCENE ACTORS
+	Planet planet;
+	std::vector<FriendlyShip*> playerFleet;
+	std::vector<EnemyShip*> enemyFleet;
 
 	AudioManager* audioManager;
 	
@@ -76,18 +80,18 @@ private:
 	PlayerController playerController;
 	Vec3 shipWaypoint;
 
-	Planet planet;
+	
 
 	Shader* lineShader = nullptr;
 	Line pathLine = Line(Vec3(0, 0, 0), Vec3(1, 1, 1));
 	Line testLine = Line(Vec3(0, 0, 0), Vec3(100, 100, 100));
 
-	std::vector<FriendlyShip*> playerFleet;
-	std::vector<EnemyShip*> enemyFleet;
+	
 
 	std::vector<Explosion*> explosions;
-
 	std::vector<EnemySpawner> enemyFleetSpawners;
+
+
 	int enemySpawnerCount = 1;
 
 	int activeShip = -1;
