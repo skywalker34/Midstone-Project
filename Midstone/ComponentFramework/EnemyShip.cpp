@@ -13,7 +13,7 @@ EnemyShip::EnemyShip(Vec3 pos, Model* model_, int health_)
 	body = new Body(&transform, Vec3(), Vec3(), 1);
 	
 	model = model_;
-	damage = 1;
+	damage = 5;
 }
 
 void EnemyShip::setTarget(Vec3 target_)
