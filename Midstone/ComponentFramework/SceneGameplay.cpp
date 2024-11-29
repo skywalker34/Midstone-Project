@@ -27,8 +27,8 @@ void AlignForWidth(float width, float alignment = 0.5f)
 		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 }
 
-SceneGameplay::SceneGameplay(Window* window_) : shader{ nullptr }, 
-drawInWireMode{ false } {
+SceneGameplay::SceneGameplay(Window* window_) : shader{ nullptr }
+{
 	Debug::Info("Created Scene0: ", __FILE__, __LINE__);
 	window = window_;
 
@@ -188,7 +188,7 @@ void SceneGameplay::HandleEvents(const SDL_Event& sdlEvent) {
 
 
 	playerController.handleEvents(sdlEvent); //handle events on the player controller sid eof things
-	PlayerControllerHandleEvents(); //handle those changes on tehs cene side of things
+	
 
 	
 
@@ -231,6 +231,11 @@ void SceneGameplay::Update(const float deltaTime) {
 	SpawnEnemy(deltaTime);
 	UpdatePlayerFleet(deltaTime);
 	UpdateEnemyFleet(deltaTime);
+
+
+	//this may not be good practice but its the best I've got
+	//the events the player controller is handeling here need the most updated positions of the game objects, so its executed after the ship updates/ 
+	PlayerControllerHandleEvents(); //handle the changes on tehs cene side of things
 
 	planet.Update(deltaTime);
 	if (planet.GetHealth() < 0) {
@@ -283,15 +288,15 @@ void SceneGameplay::Render() {
 	}
 
 
-	//these uniforms don't change ship-to-ship so set them once
-	glUseProgram(friendlyShipShader->GetProgram());
-	glUniformMatrix4fv(friendlyShipShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
-	glUniformMatrix4fv(friendlyShipShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-	glUniform3fv(friendlyShipShader->GetUniformID("lightPos"), 1, lightPos);
-	glUniform4fv(friendlyShipShader->GetUniformID("primaryColour"), 1, PURPLE);
-	glUniform4fv(friendlyShipShader->GetUniformID("secondaryColour"), 1, GREY);
-	glUniform4fv(friendlyShipShader->GetUniformID("tertiaryColour"), 1, RED);
+	
 	for (EnemyShip* ship : enemyFleet) {
+		glUseProgram(friendlyShipShader->GetProgram());
+		glUniformMatrix4fv(friendlyShipShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+		glUniformMatrix4fv(friendlyShipShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+		glUniform3fv(friendlyShipShader->GetUniformID("lightPos"), 1, lightPos);
+		glUniform4fv(friendlyShipShader->GetUniformID("primaryColour"), 1, PURPLE);
+		glUniform4fv(friendlyShipShader->GetUniformID("secondaryColour"), 1, GREY);
+		glUniform4fv(friendlyShipShader->GetUniformID("tertiaryColour"), 1, RED);
 		if (ship->deleteMe == false) { //don't render a ship thats to be deleted
 			ship->Render(friendlyShipShader);
 			if (isGameRunning) ship->exhaustTrail.Render(particleShader, computeShader); //if the games runnign render the associated particle system too
@@ -483,6 +488,8 @@ void SceneGameplay::PlayerControllerHandleEvents()
 
 	playerController.calculateLine(); //get the raycast into the screen
 
+	isMouseOverShip = false; //assume our mouse is not over a ship
+
 	int i = 0; //holds the index of the ship 
 	for (FriendlyShip* ship : playerFleet) { //loop through player ships
 		if (COLLISION::LineSphereCollisionDetected(ship->collisionSphere, playerController.getLine())) {
@@ -504,6 +511,7 @@ void SceneGameplay::PlayerControllerHandleEvents()
 		else {
 			//if the ray doesn't collide with any ship, set bool to false
 			isMouseOverShip = false;
+		
 		}
 		i++;
 
@@ -657,7 +665,7 @@ void SceneGameplay::UpdateEnemyFleet(const float deltaTime)
 	for (int i = 0; i < enemyFleet.size(); i++) { //loop through all the enemy ships
 		
 		if (enemyFleet[i]->deleteMe) {//if any of them have set a flag telling the scene to delete them
-			DestroyEnenmy(i);//call the destroy enemy function (in this scene)
+			DestroyEnemy(i);//call the destroy enemy function (in this scene)
 		}
 		else {
 			enemyFleet[i]->Update(deltaTime); //else, you can safely update the enemy ships
@@ -666,7 +674,7 @@ void SceneGameplay::UpdateEnemyFleet(const float deltaTime)
 			if (COLLISION::SphereSphereCollisionDetected(enemyFleet[i]->collisionSphere, planet.collisionSphere)) {
 				planet.takeDamage(enemyFleet[i]->damage);
 				audioManager->PlaySound2D("Planet_Hit");
-				DestroyEnenmy(i);
+				DestroyEnemy(i);
 			}
 
 
@@ -676,7 +684,7 @@ void SceneGameplay::UpdateEnemyFleet(const float deltaTime)
 
 
 
-void SceneGameplay::DestroyEnenmy(int index)
+void SceneGameplay::DestroyEnemy(int index)
 {
 	score++; //increment the score variable
 
@@ -825,7 +833,7 @@ void SceneGameplay::createActors()
 	enemySelectionSphere = Actor(Transform(), &sphereModel);
 	cursorSphere = Actor(Transform(), &sphereModel);
 	cursorSphere.meshColour = ORANGE;
-	selectionSphere.transform.setPos(0, 0, 0);
+	selectionSphere.transform.setPos(0, 0, -0.5);//give a little offset as the ship's origin is not at their centre
 }
 
 void SceneGameplay::createShaders()

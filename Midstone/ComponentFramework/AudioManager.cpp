@@ -31,10 +31,22 @@ bool AudioManager::OnCreate()
 
 void AudioManager::OnDestroy()
 {
+    // Stop and release all looped sounds
+    for (auto& sound : soundLoops) {
+        if (sound) {
+            sound->stop();
+            sound->drop();
+            sound = nullptr;
+        }
+    }
+
+    // Drop the sound engine
     if (SoundEngine) {
         SoundEngine->drop();
+        SoundEngine = nullptr;
     }
 }
+
 
 void AudioManager::PlaySound2D(const std::string& name)
 {
