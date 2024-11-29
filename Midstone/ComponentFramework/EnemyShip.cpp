@@ -10,6 +10,7 @@ EnemyShip::EnemyShip()
 // Parameterized constructor for EnemyShip
 EnemyShip::EnemyShip(Vec3 pos, Model* model_, int health_)
 {
+
     // Initialize the transform with position, orientation, and scale
     transform = Transform(pos, Quaternion(1.0f, Vec3(0.0f, 0.0f, 0.0f)), Vec3(3.0f, 3.0f, 3.0f));
     // Create a new Body object and associate it with the transform
@@ -19,6 +20,9 @@ EnemyShip::EnemyShip(Vec3 pos, Model* model_, int health_)
     model = model_;
     // Initialize the health
     health = health_;
+  
+    damage = 5;
+
 }
 
 // Set the target position for the enemy ship

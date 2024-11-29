@@ -17,6 +17,8 @@
 #include "Line.h"
 #include "EnemySpawner.h"
 #include "Explosion.h"
+#include <string>
+#include "Options.h"
 
 using namespace MATH;
 
@@ -61,7 +63,7 @@ private:
 	Model bulletModel;
 	Model sphereModel;
 	Model planeModel;
-	Model debris;
+	Model debrisModel;
 
 
 
@@ -134,6 +136,13 @@ private:
 	ImVec4 shipColor = ImVec4(114.0f / 255.0f, 144.0f / 255.0f, 154.0f / 255.0f, 200.0f / 255.0f); //ship colour for player customization
 
 	void SaveStats(); //save stats to leaderboard
+
+
+	std::string nameEntry = "Enter Name Here";
+
+	Options options;
+
+	void SaveStats();
 
 public:
 
