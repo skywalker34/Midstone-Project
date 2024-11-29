@@ -18,18 +18,16 @@ using namespace MATH;
 
 /// Forward declarations 
 union SDL_Event;
-class Mesh;
-class Shader;
+
 
 class SceneMainMenu : public Scene {
 private:
 	
-	bool drawInWireMode;
-	bool isGameRunning = true;
 
-	Window* window;
 
-	bool show_demo_window;
+	Window* window; //window for rendering IMGUI /SDL
+
+
 
 	float volumeSlider = 0.4f;
 	float sfxSlider = 0.4f;
@@ -39,16 +37,58 @@ private:
 	Options options;
 
 public:
+	/// <summary>
+/// Explicit default constructor
+/// Initializes the main menu scene with default values.
+/// </summary>
 	explicit SceneMainMenu();
+
+	/// <summary>
+	/// Parameterized constructor
+	/// Initializes the main menu scene with a specific window.
+	/// </summary>
+	/// <param name="window_">Pointer to the window associated with the scene.</param>
 	SceneMainMenu(Window* window_);
+
+	/// <summary>
+	/// Virtual destructor
+	/// Ensures that resources used by the main menu scene are cleaned up properly.
+	/// </summary>
 	virtual ~SceneMainMenu();
 
+	/// <summary>
+	/// Initializes the main menu scene and sets up necessary resources.
+	/// </summary>
+	/// <returns>True if creation was successful, false otherwise.</returns>
 	virtual bool OnCreate() override;
+
+	/// <summary>
+	/// Cleans up resources used by the main menu scene.
+	/// </summary>
 	virtual void OnDestroy() override;
+
+	/// <summary>
+	/// Updates the main menu scene's state based on the elapsed time. Nothing here, just leaving it here in case we need it later
+	/// </summary>
+	/// <param name="deltaTime">The time elapsed since the last update.</param>
 	virtual void Update(const float deltaTime) override;
+
+	/// <summary>
+	/// Renders the main menu scene. Nothing here, just leaving it here in case we need it later
+	/// </summary>
 	virtual void Render() override;
+
+	/// <summary>
+	/// Renders ImGui elements for the main menu scene.
+	/// </summary>
 	virtual void RenderIMGUI() override;
+
+	/// <summary>
+	/// Handles events for the main menu scene.
+	/// </summary>
+	/// <param name="sdlEvent">The SDL event to handle.</param>
 	virtual void HandleEvents(const SDL_Event& sdlEvent) override;
+
 };
 
 

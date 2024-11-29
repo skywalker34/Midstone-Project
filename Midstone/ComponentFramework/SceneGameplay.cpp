@@ -27,8 +27,9 @@ void AlignForWidth(float width, float alignment = 0.5f)
 		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 }
 
-SceneGameplay::SceneGameplay(Window* window_) : shader{ nullptr },
-drawInWireMode{ false } {
+
+SceneGameplay::SceneGameplay(Window* window_) : shader{ nullptr }
+{
 	Debug::Info("Created Scene0: ", __FILE__, __LINE__);
 	window = window_;
 
@@ -74,7 +75,7 @@ bool SceneGameplay::OnCreate() {
 		std::cout << "Shader failed ... we have a problem\n";
 	}
 
-	particleMesh = new Mesh("meshes/Mario.obj");
+	particleMesh = new Mesh("meshes/Particle.obj");
 	particleMesh->OnCreate();
 
 
@@ -91,7 +92,7 @@ bool SceneGameplay::OnCreate() {
 	createModels();
 	createActors();
 	createShaders();
-	createClickGrid();
+	createPlayerController();
 
 
 	debrisModel = Model("Debris.obj");
@@ -228,11 +229,12 @@ void SceneGameplay::OnDestroy() {
 void SceneGameplay::HandleEvents(const SDL_Event& sdlEvent) {
 
 
-	playerController.handleEvents(sdlEvent);
-	//basically whats happening here is that the player controller has a boolean flag thats basically saying "I have something to tell you scenemanager"
-	//the scene knows to check for this flag and to recieve the message so the playercontroller does not need to have a reference to the scene
-	//its basically just throwing out this variable and hoping something is listening
-	//closest thing I could come up with to a delegate/event dispatcher
+	playerController.handleEvents(sdlEvent); //handle events on the player controller sid eof things
+
+
+
+
+
 	ImGui_ImplSDL2_ProcessEvent(&sdlEvent); // ImGui HandleEvents
 
 	switch (sdlEvent.type) {
@@ -246,29 +248,36 @@ void SceneGameplay::HandleEvents(const SDL_Event& sdlEvent) {
 		}
 		break;
 	}
+
+
+
+
 }
 
 void SceneGameplay::Update(const float deltaTime) {
-
-
-	playerController.Update(deltaTime);
 
 	//MUSIC VOL
 	SoundEngine->setSoundVolume(volumeSlider);
 	//SFX VOL
 	audioManager->SoundEngine->setSoundVolume(sfxSlider);
 
-	if (!isGameRunning) return;
 
 
+
+	if (!isGameRunning) return; //if the game is not running (paused) just return so nothing happens
+	//call the individual updat functions / methods
+
+	playerController.Update(deltaTime);
 	planet.Update(deltaTime);
 
-	timeElapsed += deltaTime;
-
 	SpawnEnemy(deltaTime);
-	SetActiveShip();
 	UpdatePlayerFleet(deltaTime);
 	UpdateEnemyFleet(deltaTime);
+
+
+	//this may not be good practice but its the best I've got
+	//the events the player controller is handeling here need the most updated positions of the game objects, so its executed after the ship updates/ 
+	PlayerControllerHandleEvents(); //handle the changes on tehs cene side of things
 
 	planet.Update(deltaTime);
 	if (planet.GetHealth() < 0) {
@@ -286,6 +295,8 @@ void SceneGameplay::Update(const float deltaTime) {
 		enemySpawnerCount++;
 		spawnTimer = 0.0f; // Reset the spawn timer
 	}
+
+	timeElapsed += deltaTime;
 }
 
 void SceneGameplay::Render() {
@@ -300,15 +311,25 @@ void SceneGameplay::Render() {
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+
+	if (activeShip >= 0) {
+
+		glUseProgram(lineShader->GetProgram());
+		glUniformMatrix4fv(lineShader->GetUniformID("projection"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+		glUniformMatrix4fv(lineShader->GetUniformID("view"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+		glUniformMatrix4fv(lineShader->GetUniformID("model"), 1, GL_FALSE, pathLine.transform.toModelMatrix());
+		pathLine.draw();
+	}
+
 	for (EnemyShip* ship : enemyFleet) {
+		glUseProgram(friendlyShipShader->GetProgram());
+		glUniformMatrix4fv(friendlyShipShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
+		glUniformMatrix4fv(friendlyShipShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
+		glUniform3fv(friendlyShipShader->GetUniformID("lightPos"), 1, lightPos);
+		glUniform4fv(friendlyShipShader->GetUniformID("primaryColour"), 1, PURPLE);
+		glUniform4fv(friendlyShipShader->GetUniformID("secondaryColour"), 1, GREY);
+		glUniform4fv(friendlyShipShader->GetUniformID("tertiaryColour"), 1, RED);
 		if (ship->deleteMe == false) { //don't render a ship thats to be deleted
-			glUseProgram(friendlyShipShader->GetProgram());
-			glUniformMatrix4fv(friendlyShipShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
-			glUniformMatrix4fv(friendlyShipShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-			glUniform3fv(friendlyShipShader->GetUniformID("lightPos"), 1, lightPos);
-			glUniform4fv(friendlyShipShader->GetUniformID("primaryColour"), 1, PURPLE);
-			glUniform4fv(friendlyShipShader->GetUniformID("secondaryColour"), 1, GREY);
-			glUniform4fv(friendlyShipShader->GetUniformID("tertiaryColour"), 1, RED);
 			ship->Render(friendlyShipShader);
 			if (isGameRunning) ship->exhaustTrail.Render(particleShader, computeExhaust); //if the games runnign render the associated particle system too
 
@@ -317,21 +338,23 @@ void SceneGameplay::Render() {
 
 
 
-
+	//these uniforms don't change so set them once
 	glUseProgram(planetShader->GetProgram());
 	glUniformMatrix4fv(planetShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 	glUniformMatrix4fv(planetShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
 	glUniform3fv(planetShader->GetUniformID("lightPos"), 1, lightPos);
 	glUniform3fv(planetShader->GetUniformID("cameraPos"), 1, playerController.transform.getPos());
 	planet.Render(planetShader);
-
-
 	for (Explosion* explosion : explosions) {
 		explosion->RenderDebris(bulletShader);
 		explosion->Render(particleShader, computeExplosion);
 	}
 
+
+
 	for (FriendlyShip* ship : playerFleet) {
+
+		//we can't set the common uniforms once, because this loop goes rendership->renderbullets so any ship after the first would use the bullet shader (no good)
 
 		glUseProgram(friendlyShipShader->GetProgram());
 		glUniformMatrix4fv(friendlyShipShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
@@ -341,7 +364,6 @@ void SceneGameplay::Render() {
 		glUniform4fv(friendlyShipShader->GetUniformID("secondaryColour"), 1, GREY);
 		glUniform4fv(friendlyShipShader->GetUniformID("tertiaryColour"), 1, BLUE);
 		ship->Render(friendlyShipShader);
-
 		glUseProgram(bulletShader->GetProgram());
 		glUniformMatrix4fv(bulletShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 		glUniformMatrix4fv(bulletShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
@@ -352,21 +374,17 @@ void SceneGameplay::Render() {
 			ship->exhaustTrail.Render(particleShader, computeExhaust);
 		}
 
-		if (isGivingOrders)
+
+		if (isGivingOrders)  //if the ship is being commanded, show the player its range
 		{
-
-
 			glUseProgram(shader->GetProgram());
 			glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 			glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
 			ship->RenderRange(shader);
 		}
-
-
-
 	}
 
-	if (isMouseOverShip)
+	if (isMouseOverShip) //if the mouse is hoveing a ship, render the selection sphere
 	{
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -380,7 +398,7 @@ void SceneGameplay::Render() {
 
 	if (isGivingOrders)
 	{
-
+		//if the player is giving orders and their mouse is not over a ship, render the 3d cursor
 		if (!isMouseOverShip)
 		{
 			glUseProgram(shader->GetProgram());
@@ -388,9 +406,7 @@ void SceneGameplay::Render() {
 			glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
 			cursorSphere.Render(shader);
 		}
-
-
-
+		//if player is giving orders, they need to see the grid
 		glUseProgram(gridShader->GetProgram());
 		glUniformMatrix4fv(gridShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
 		glUniformMatrix4fv(gridShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
@@ -515,95 +531,63 @@ void SceneGameplay::RenderIMGUI()
 void SceneGameplay::SpawnEnemy(const float deltaTime)
 {
 	for (int i = 0; i < enemySpawnerCount; i++) {
+		enemyFleetSpawners[i].Update(deltaTime);//update all the fleet spawners to tick their internal clocks
 
-		enemyFleetSpawners[i].Update(deltaTime);
-		if (enemyFleetSpawners[i].canSpawn == true) {
-			enemyIndex++;
-			enemyFleet.push_back(new EnemyShip(enemyFleetSpawners[i].position, &enemyShipModel, ENEMY_DEFAULT_HEALTH));
-			enemyFleet.back()->SetAudioManager(audioManager);
-			enemyFleet.back()->OnCreate();
-			enemyFleet.back()->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh);
-			enemyFleet.back()->setIndex(enemyIndex);
-			enemyFleetSpawners[i].canSpawn = false;
+		if (enemyFleetSpawners[i].canSpawn == true) { //if any of them have a flagspatcher saying to spawn an enemy
+			//do it 
+			enemyIndex++;//increment the enenmy index. note this is not the index in the enenyfleet vector, this is a unique index for teh scene to keep track of eacch enenmy 
+			//think of it like a serial code for the enemy ship
+			enemyFleet.push_back(new EnemyShip(enemyFleetSpawners[i].position, &enemyShipModel, ENEMY_DEFAULT_HEALTH)); //construct the new enemy
+			enemyFleet.back()->SetAudioManager(audioManager); //pass the enenmy the audio manager
+			enemyFleet.back()->OnCreate(); //create the enemy
+			enemyFleet.back()->exhaustTrail.OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh); //create the enenmy exhaust trail
+			enemyFleet.back()->setIndex(enemyIndex);//tell the enenmy its "serial number"
+			enemyFleetSpawners[i].canSpawn = false;//use up the flagspatcher
 		}
 	}
-
-
 }
 
-void SceneGameplay::SetActiveShip()
+void SceneGameplay::PlayerControllerHandleEvents()
 {
+	//the advent of the "Flagspatcher"
+	//basically whats happening here is that the player controller has a boolean flag thats basically saying "I have something to tell you scenemanager"
+	//the scene knows to check for this flag and to recieve the message so the playercontroller does not need to have a reference to the scene
+	//its basically just throwing out this variable and hoping something is listening
+	//closest thing I could come up with to a delegate/event dispatcher
 
 	playerController.calculateLine(); //get the raycast into the screen
 
-	int i = 0;
-	for (FriendlyShip* ship : playerFleet) {
+	isMouseOverShip = false; //assume our mouse is not over a ship
+
+	int i = 0; //holds the index of the ship 
+	for (FriendlyShip* ship : playerFleet) { //loop through player ships
 		if (COLLISION::LineSphereCollisionDetected(ship->collisionSphere, playerController.getLine())) {
 
-			selectionSphere.meshColour = GREEN;
-			selectionSphere.transform.setParent(ship->transform.toModelMatrix());
-			isMouseOverShip = true;
-			if (playerController.has3DClick) {
-				activeShip = i;
-				isGivingOrders = true;
+			selectionSphere.meshColour = GREEN; //make the selection sphere (the circle around a ship when you hover your mouse, greem)
+			selectionSphere.transform.setParent(ship->transform.toModelMatrix());//set the selections sphere's parent to be the ship so it hovers over it
+			isMouseOverShip = true;//remember our mouse is over a ship
 
-				playerController.has3DClick = false;
-				//SoundEngine->play2D("audio/SelectionSound.mp3", false); // Audio For Selection Ship
-				audioManager->PlaySound2D("Ship_Selected");
+			if (playerController.has3DClick) {
+				//if the player has clicked, then whichever ship our mouse is over has been clicked on 
+				activeShip = i;
+				isGivingOrders = true; //tell teh scene we're giving orders to the ships now 
+
+				playerController.has3DClick = false;//tell the ship its flagspatcher has been "heard"
+				audioManager->PlaySound2D("Ship_Selected"); //play the sound
 			}
 			break;
 		}
 		else {
+			//if the ray doesn't collide with any ship, set bool to false
 			isMouseOverShip = false;
+
 		}
 		i++;
 
 	}
 
-
-	if (isGivingOrders) { //if player has a ship selected and clicks on an enemy we want to attack that enenmy
-		for (EnemyShip* ship : enemyFleet) {
-			if (COLLISION::LineSphereCollisionDetected(ship->collisionSphere, playerController.getLine())) { //check for collision between player raycast and the enemy ships
-
-
-
-				selectionSphere.transform.setParent(ship->transform.toModelMatrix()); //reparent the model matrix to the ship
-				isMouseOverShip = true;
-				selectionSphere.meshColour = RED;
-
-				if (playerController.has3DClick) {
-					playerController.has3DClick = false;
-					shipWaypoint = ship->transform.getPos();
-					isGivingOrders = false;
-
-					playerFleet[activeShip]->isChasing = true;
-					playerFleet[activeShip]->activeTarget = ship;
-					activeShip = -1;
-				}
-				break;
-			}
-			else {
-				isMouseOverShip = false;
-			}
-		}
-	}
-
-
-
-	cursorSphere.transform.setPos(playerController.hoverPos);
-
-	if (playerController.has3DClick && isGivingOrders) {
-
-		if (activeShip >= 0) {
-			shipWaypoint = playerController.getClickPos();
-
-			playerFleet[activeShip]->MoveToDestination(shipWaypoint);
-			isGivingOrders = false;
-			activeShip = -1;
-		}
-	}
-
-
+	//if the player is giving orders, it means the player has clicked on a friendly ship and is now giving it command
+	if (isGivingOrders) PlayerOrders(); //get the orders from the player,
 
 	if (playerController.hasCanceledOrder) {
 		isGivingOrders = false;
@@ -615,9 +599,57 @@ void SceneGameplay::SetActiveShip()
 
 }
 
+
+void SceneGameplay::PlayerOrders()
+{
+	//move the 3d cursor to wherever the palyer's mouse is hovering (in 3d space)
+	cursorSphere.transform.setPos(playerController.mouseHoverPos3D);
+
+	//if player has a ship selected and clicks on an enemy we want to attack that enenmy
+	for (EnemyShip* ship : enemyFleet) {
+		if (COLLISION::LineSphereCollisionDetected(ship->collisionSphere, playerController.getLine())) { //check for collision between player raycast and the enemy ships
+			selectionSphere.transform.setParent(ship->transform.toModelMatrix()); //reparent the model matrix to the ship
+
+			isMouseOverShip = true;//our mouse is hovering a ship
+			selectionSphere.meshColour = RED; //its an enenmy ship so make it red
+
+			if (playerController.has3DClick) { //if player has clicked on an enemy ship
+				playerController.has3DClick = false;//use up the flagspatcher
+				//set the ship's waypoint to be the enemy's position
+				shipWaypoint = ship->transform.getPos();
+				isGivingOrders = false;//the order has been given so the player is no longer giving orders
+				playerFleet[activeShip]->slerpT = 0;
+				playerFleet[activeShip]->isChasing = true;//tell the ship its new state is chasing 
+				playerFleet[activeShip]->activeTarget = ship;//make the enemy its active target
+				activeShip = -1;//set the active ship (the one we're commanding) to a null value
+			}
+			break;
+		}
+		else {
+			//if our mouse isn't hovering over a ship theres not much we can do
+			isMouseOverShip = false;
+		}
+	}
+
+
+	//if the player has clicked while giving orders, and not hovering over an enemy ship
+	if (playerController.has3DClick) {
+
+		if (activeShip >= 0) { //shouldn't need this here, but ensure its a valid ship index (being safe is good)
+			//get the point where the player clicked in 3d space
+			shipWaypoint = playerController.getClickPos();
+			//tell the active ship to move to the click pos
+			playerFleet[activeShip]->MoveToDestination(shipWaypoint);
+			isGivingOrders = false;//our orders are complete
+			activeShip = -1;//set to null index
+		}
+	}
+}
+
+
 void SceneGameplay::UpdatePlayerFleet(const float deltaTime)
 {
-	//below can probably be a recursive function?
+
 	for (FriendlyShip* ship : playerFleet) {																				//first we loop through every oen of the player's ships
 
 		std::vector<Bullet*> temp = ship->getBullets();																		//get a reference to all the bullets that ship has fired
@@ -645,23 +677,32 @@ void SceneGameplay::UpdatePlayerFleet(const float deltaTime)
 		ship->displayRange = false;
 	}
 
+	//if a player ship is being commanded, tell that ship to display its range sphere
 	if (activeShip >= 0) {
 		isGivingOrders = true;
 		playerFleet[activeShip]->displayRange = true;
+		//if the active ship is also moving, draw the path line so player knows where its going
+		if (playerFleet[activeShip]->isMoving) {
+			pathLine.RecalculateLine(playerFleet[activeShip]->transform.getPos(), playerFleet[activeShip]->destination);
+		}
 	}
 }
 
 void SceneGameplay::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip, const float deltaTime)
 {
+	// Check if the ship is not moving
 	if (!ship->isMoving) {
+
+		// If the rotation timer is less than or equal to 1, find the closest enemy
 		if (rotationTimer <= 1) {
 			ship->FindClosestEnemy(targetShip);
-			rotationTimer += deltaTime;
+			rotationTimer += deltaTime;  // Increment the rotation timer by the elapsed time
 		}
 		else {
-			rotationTimer = 0;
+			rotationTimer = 0;  // Reset the rotation timer if it exceeds 1
 		}
 
+		// If the current target index matches the target ship's index
 		if (ship->currentTargetIndex == targetShip->shipIndex) {
 			Vec3 targetDirection = targetShip->transform.getPos() - ship->transform.getPos();
 			Quaternion targetQuad = QMath::lookAt(targetDirection, UP);
@@ -669,33 +710,36 @@ void SceneGameplay::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip,
 			ship->initialDirection = targetDirection;
 		}
 
+		// If the ship is switching targets
 		if (ship->isSwitchingTarget) {
-			ship->slerpT = ship->slerpT + deltaTime;
+			ship->slerpT = ship->slerpT + deltaTime;  // Increment the slerpT value by the elapsed time
 			if (ship->slerpT >= 1) {
-				ship->closestEnemy = ship->potentialTarget;
-				ship->currentTargetIndex = ship->closestEnemy->shipIndex;
-				ship->isSwitchingTarget = false;
-				ship->slerpT = 0;
+				ship->closestEnemy = ship->potentialTarget;  // Update the closest enemy to the potential target
+				ship->currentTargetIndex = ship->closestEnemy->shipIndex;  // Update the current target index
+				ship->isSwitchingTarget = false;  // Reset the switching target flag
+				ship->slerpT = 0;  // Reset the slerpT value
 			}
 		}
 	}
 }
+
+
 
 void SceneGameplay::UpdateEnemyFleet(const float deltaTime)
 {
-	for (int i = 0; i < enemyFleet.size(); i++) {
-		enemyFleet[i]->Update(deltaTime);
+	for (int i = 0; i < enemyFleet.size(); i++) { //loop through all the enemy ships
 
-		if (enemyFleet[i]->deleteMe) {
-			DestroyEnenmy(i);
+		if (enemyFleet[i]->deleteMe) {//if any of them have set a flag telling the scene to delete them
+			DestroyEnemy(i);//call the destroy enemy function (in this scene)
 		}
 		else {
-			enemyFleet[i]->Update(deltaTime);
+			enemyFleet[i]->Update(deltaTime); //else, you can safely update the enemy ships
 
+			//if they collided with the planet, apply damage to it and destroy the enenmy who did it 
 			if (COLLISION::SphereSphereCollisionDetected(enemyFleet[i]->collisionSphere, planet.collisionSphere)) {
 				planet.takeDamage(enemyFleet[i]->damage);
 				audioManager->PlaySound2D("Planet_Hit");
-				DestroyEnenmy(i);
+				DestroyEnemy(i);
 			}
 
 
@@ -705,18 +749,17 @@ void SceneGameplay::UpdateEnemyFleet(const float deltaTime)
 
 
 
-void SceneGameplay::DestroyEnenmy(int index)
+void SceneGameplay::DestroyEnemy(int index)
 {
-	score++;
+	score++; //increment the score variable
 
-
-	Vec3 explosionPos = enemyFleet[index]->transform.getPos();
-	bool explosionAvailable = false;
-	for (Explosion* explosion : explosions) {
-		if (!explosion->animComplete) {
-			explosionAvailable = true;
-			explosion->setPos(explosionPos);
-			explosion->ResetExplosion(computeReset);
+	Vec3 explosionPos = enemyFleet[index]->transform.getPos(); //get the last position of the enemy ship to run the explosion
+	bool explosionAvailable = false;//assume there are no explosions available
+	for (Explosion* explosion : explosions) { //loop through all explosions
+		if (!explosion->animComplete) { //if one isn't running its animation
+			explosionAvailable = true;//tell the program an explosion is avialable
+			explosion->setPos(explosionPos);//set the explosion position 
+			explosion->ResetExplosion(computeReset);//set and arm the explosion ()onexplode is then called from reset
 		}
 	}
 
@@ -726,10 +769,12 @@ void SceneGameplay::DestroyEnenmy(int index)
 		if (explosions[explosions.size() - 1]->OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh, &debrisModel) == false) {
 			std::cout << "Explosion failed ... we have a problem\n";
 		}
+		//use the back eleement (explosion we just created) to set the pause and explode
 		explosions[explosions.size() - 1]->setPos(explosionPos);
 		explosions[explosions.size() - 1]->ResetExplosion(computeReset);
 	}
 
+	//free up the memory used by the destroyed enemy and delete it
 	enemyFleet[index]->OnDestroy();
 	delete enemyFleet[index];
 	enemyFleet[index] = nullptr;
@@ -738,12 +783,9 @@ void SceneGameplay::DestroyEnenmy(int index)
 
 void SceneGameplay::GameOver()
 {
-
-
-	SaveStats();
-	audioManager->PlaySound2D("Game_Over");
-	gameOverBool = true;
-
+	SaveStats(); //save player stats to the leaderboard
+	audioManager->PlaySound2D("Game_Over");//play the game over sound
+	gameOverBool = true;//"flagspatcher" to tell scenemanager the game is over
 }
 
 
@@ -791,7 +833,7 @@ void SceneGameplay::createModels()
 	}
 
 
-	planeModel = Model("Plane.obj", std::vector<std::string>{"Grid3.png"});
+	planeModel = Model("Plane.obj", std::vector<std::string>{"Grid2.png"});
 	if (planeModel.OnCreate() == false) {
 		printf("Model failed to load");
 	}
@@ -799,9 +841,11 @@ void SceneGameplay::createModels()
 
 void SceneGameplay::createActors()
 {
+
+	//construct the starting enemies
 	for (int i = 0; i < startingFleetSize; i++) {
 		int numShips = startingFleetSize;
-		float radius = 75.0f;
+		float radius = PLANET_RADIUS + 25;
 		float angle = 2.0f * M_PI * i / numShips;										// Calculate the angle for each ship
 		float x = radius * cos(angle);													// Calculate x position
 		float z = radius * sin(angle);													// Calculate z position
@@ -809,7 +853,7 @@ void SceneGameplay::createActors()
 		enemyFleet.push_back(new EnemyShip(Vec3(x, 0, z), &enemyShipModel, ENEMY_DEFAULT_HEALTH));
 	}
 
-
+	//create the starting enemies
 	for (EnemyShip* ship : enemyFleet) {
 		ship->SetAudioManager(audioManager);
 		ship->OnCreate();
@@ -819,6 +863,7 @@ void SceneGameplay::createActors()
 		enemyIndex++;
 	}
 
+	//construct teh player fleet
 	for (int i = 0; i < startingFleetSize; i++) {
 		playerFleet.push_back(new FriendlyShip(&friendlyShipModel, &bulletModel));
 	}
@@ -826,7 +871,7 @@ void SceneGameplay::createActors()
 	//spawn the ships in a radius around the planet
 
 	int numShips = playerFleet.size();
-	float radius = 50.0f;
+	float radius = PLANET_RADIUS + 5;
 
 	for (int i = 0; i < numShips; ++i)
 	{
@@ -843,14 +888,17 @@ void SceneGameplay::createActors()
 		playerFleet[i]->rangeSphere = &sphereModel;
 	}
 
+	//create the planet object
 	planet = Planet(PLANET_RADIUS, PLANET_HEALTH, &sphereModel, ORIGIN);
 	planet.OnCreate();
 
+
+	//create all the objects the user uses to interface with the world
 	selectionSphere = Actor(Transform(), &sphereModel);
 	enemySelectionSphere = Actor(Transform(), &sphereModel);
 	cursorSphere = Actor(Transform(), &sphereModel);
 	cursorSphere.meshColour = ORANGE;
-	selectionSphere.transform.setPos(0, 0, -0.5);
+	selectionSphere.transform.setPos(0, 0, -0.5);//give a little offset as the ship's origin is not at their centre
 }
 
 void SceneGameplay::createShaders()
@@ -895,10 +943,10 @@ void SceneGameplay::createShaders()
 
 }
 
-void SceneGameplay::createClickGrid()
+void SceneGameplay::createPlayerController()
 {
-	playerController.CreateGrid(&planeModel);
-	playerController.setPlayerBounds(planet.collisionSphere->r + 10, 150);
+	playerController.CreateGrid(&planeModel); //create the grid the player uses for 3d clicks
+	playerController.setPlayerBounds(planet.collisionSphere->r + 10, PLAYER_OUTER_BOUNDS); //sets the physical boundaries of the world the player can move to, outerbounds are defined in constant.h and the innerbounds are the planet with a little buffer
 	if (playerController.OnCreate() == false) {
 		std::cout << "Controller failed ... we have a problem\n";
 	}

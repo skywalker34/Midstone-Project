@@ -14,6 +14,8 @@ layout (binding = 0) uniform sampler2D diffTexture;
 layout (binding = 1) uniform sampler2D specTexture;
 
 void main() {
+
+	//Phong constants
     vec4 ks = vec4(0.3, 0.3, 0.3, 0.0);
 
 	vec4 kd = vec4(1, 1, 1, 0.0);
@@ -21,9 +23,7 @@ void main() {
 	vec4 kt = texture(diffTexture,textureCoords); 
 	
 
-
-
-
+	//calculate the phong variables
 	float diff = max(dot(vertNormal, lightDir), 0.0);
 
 	/// Reflection is based incedent which means a vector from the light source
@@ -32,7 +32,8 @@ void main() {
 
 	float spec = max(dot(eyeDir, reflection), 0.0);
 	spec = pow(spec,1.0) * texture(specTexture,textureCoords).x;
-	vec4 outputColour = (ka + ((diff * kd) + (spec *ks)) * kt) ;	
+
+	vec4 outputColour = (ka + ((diff * kd) + (spec *ks)) * kt) ; //Phong it up	
 
 	
 

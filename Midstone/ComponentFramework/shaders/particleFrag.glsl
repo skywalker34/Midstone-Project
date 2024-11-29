@@ -13,6 +13,6 @@ in vec4 color;
 
 void main() {
 
-    vec4 kt = texture(screen, textureCoords);
+    //simply set the color to the color calculated in the vert
     fragColor = color;
 }

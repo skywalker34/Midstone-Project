@@ -1,6 +1,9 @@
 #include "ComputeShader.h"
 #include <string.h>
 
+//pretty much everythinh here is adapted from Shader.cpp from the framework just with a compute shader type isntead of a vert/frag/tess etc.
+
+
 ComputeShader::ComputeShader(const char* compFilename_) :
     computeProgram(0), compShaderID(0), compFilename(compFilename_) { }
 
@@ -91,14 +94,6 @@ bool ComputeShader::Link() {
    
     return true;
 }
-
-
-
-
-
-
-
-
 GLuint ComputeShader::GetUniformID(std::string name) {
     auto id = uniformMap.find(name);
 #ifdef _DEBUG

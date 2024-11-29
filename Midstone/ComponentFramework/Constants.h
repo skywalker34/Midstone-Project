@@ -10,10 +10,11 @@ const Vec3 ORIGIN = Vec3(0, 0, 0);
 //Gameplay
 const float PLANET_RADIUS = 30.0f;
 const int PLANET_HEALTH = 50;
+const int PLAYER_OUTER_BOUNDS = 150;
 
 // Direction
-const Vec3 FORWARD = Vec3(0, 0, -1);
-const Vec3 BACKWARD = Vec3(0, 0, 1);
+const Vec3 FORWARD = Vec3(0, 0, -1); 
+const Vec3 BACKWARD = Vec3(0, 0, 1); 
 const Vec3 LEFT = Vec3(-1, 0, 0);
 const Vec3 RIGHT = Vec3(1, 0, 0);
 const Vec3 UP = Vec3(0, 1, 0);

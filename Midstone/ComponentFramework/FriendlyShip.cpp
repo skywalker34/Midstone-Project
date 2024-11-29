@@ -1,6 +1,7 @@
 #include "FriendlyShip.h"
 #include "Sphere.h"
 #include "Collision.h"
+#include "imgui_internal.h"
 
 
 //depreciated
@@ -14,10 +15,10 @@ FriendlyShip::FriendlyShip()
 
 FriendlyShip::FriendlyShip(Model* model_, Model* bulletModel_)
 {
-	transform = Transform(Vec3(0.0f, 0.0f, 0.0f), Quaternion(1.0f, Vec3(0.0f, 0.0f, 0.0f)), Vec3(4.0f, 4.0f, 4.0f));
-	body = new Body(&transform, Vec3(), Vec3(), 1);
+	transform = Transform(Vec3(0.0f, 0.0f, 0.0f), Quaternion(1.0f, Vec3(0.0f, 0.0f, 0.0f)), Vec3(4.0f, 4.0f, 4.0f));//initialize the transform
+	body = new Body(&transform, Vec3(), Vec3(), 1);//initialize the body
 
-
+	//set the model references
 	model = model_;
 	bulletModel = bulletModel_;
 }
@@ -25,31 +26,23 @@ FriendlyShip::FriendlyShip(Model* model_, Model* bulletModel_)
 bool FriendlyShip::OnCreate()
 {
 
-	detectionSphere = Sphere(transform.getPos(), range);
 
-
-
-
-
-	rangeSphereT = transform;
-	rangeSphereT.setScale(Vec3(range, range, range)); //sphere mesh has radius of 2 units wo when we scale it by range we have to divide to get the actual range
-	//we may want to go into 3dsmax and make a unit sphere 
-
-
-
+	detectionSphere = Sphere(transform.getPos(), range);//set the detection sphere pos to this object
+	rangeSphereT = transform; //set the transform for teh range sphere object
+	rangeSphereT.setScale(Vec3(range, range, range)); //sphere mesh has radius of 1 unit, so anything we scale it by will be its world space size
+	//create the sphere to handle physics collisions
 	collisionSphere = new Sphere(transform.getPos(), collisionSphereRadius);
-	speed = 5;
+
+	speed = 5;//set the ship's speed
 	return true;
 }
 
 void FriendlyShip::OnDestroy()
 {
+	model = nullptr; //avoid dangling pointers
+	bulletModel = nullptr;
 
-	model = nullptr;
-
-
-
-	exhaustTrail.OnDestroy();
+	exhaustTrail.OnDestroy(); //destroy the exhaust trail
 
 	delete collisionSphere;
 
@@ -57,11 +50,6 @@ void FriendlyShip::OnDestroy()
 		bullet->OnDestroy();
 		delete bullet;
 	}
-
-
-
-
-
 }
 
 void FriendlyShip::Update(const float deltaTime)
@@ -78,19 +66,26 @@ void FriendlyShip::Update(const float deltaTime)
 	exhaustTrail.modelMat = transform.toModelMatrix();
 }
 
+
 void FriendlyShip::ResetFire(const float deltaTime)
 {
-	if (!canFire) {
+	if (!canFire) { //if I'm unable to shoot
+
+		//add to the count down
 		timeSinceShot += deltaTime;
+		//whether I can shoot again is dictated by the time since my last shot and whether I'm moving or not
 		canFire = timeSinceShot >= rateOfFire && !isMoving;
 	}
 }
 
+
 void FriendlyShip::UpdateBullet(const float deltaTime)
 {
+
 	for (int i = 0; i < bullets.size(); i++) {
 		bullets[i]->Update(deltaTime);
 		if (bullets[i]->deleteMe) {
+			//if a bullet has set its flag saying it needs to be destroyed, destroy it and free up the vector
 			bullets[i]->OnDestroy();
 			delete bullets[i];
 			bullets[i] = nullptr;
@@ -99,8 +94,11 @@ void FriendlyShip::UpdateBullet(const float deltaTime)
 	}
 }
 
+
 void FriendlyShip::StopSound3DLooped()
 {
+
+	//on the frame we stop moving (happenonce) we want to stop the moving sound
 	if (HappenOnce == true && isMoving == false)
 	{
 		audioManager->StopSound3DLooped(rocketSoundIndex);
@@ -131,8 +129,19 @@ void FriendlyShip::ShipMovement(const float deltaTime)
 		ChasingEnemy();
 	}
 
-	detectionSphere.center = transform.getPos();	//update the collision sphere to match the ships position
+
+	//update all the ship's "children" so they stay with the ship 
+	detectionSphere.center = transform.getPos();//update teh collision sphere to match the ships position
 	collisionSphere->center = transform.getPos();
+	exhaustTrail.modelMat = transform.toModelMatrix();
+	if (displayRange) {
+		rangeSphereT.setPos(detectionSphere.center);
+	}
+
+
+
+
+
 }
 
 void FriendlyShip::ChasingEnemy()
@@ -149,21 +158,17 @@ void FriendlyShip::ChasingEnemy()
 	else {
 		isMoving = true;
 	}
+
 }
 
 void FriendlyShip::Render(Shader* shader) const
 {
 
-	model->BindTextures(0, 0);
-
+	model->BindTextures(0, 0); //bind teh first texture associated with the friendly ship model 
+	//then render
 	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, transform.toModelMatrix());
-
 	model->mesh->Render(GL_TRIANGLES);
-
 	model->UnbindTextures();
-
-
-
 
 }
 
@@ -250,7 +255,7 @@ void FriendlyShip::MoveToDestination(Vec3 destination_)
 void FriendlyShip::CheckIntersection(Vec3 initailPosition)
 {
 	float angle = acos(VMath::dot(VMath::normalize(initailPosition - ORIGIN), VMath::normalize(initailPosition - destination)));
-	wouldIntersectPlanet = VMath::mag(initailPosition - ORIGIN) * sin(angle) < PLANET_RADIUS + collisionSphereRadius;
+	wouldIntersectPlanet = angle > IM_PI / 2 ? false : VMath::mag(initailPosition - ORIGIN) * sin(angle) < PLANET_RADIUS + collisionSphereRadius;
 }
 
 void FriendlyShip::Orbit(Vec3 axis)

@@ -63,6 +63,7 @@ static bool LoadTextureFromFile(const char* file_name, GLuint* out_texture, int*
 	}
 }
 
+
 void AlignForWidth2(float width, float alignment = 0.5f)
 {
 	ImGuiStyle& style = ImGui::GetStyle();
@@ -72,7 +73,9 @@ void AlignForWidth2(float width, float alignment = 0.5f)
 		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 }
 
-SceneMainMenu::SceneMainMenu(Window* window_) : drawInWireMode{ true }, show_demo_window {true} {
+
+SceneMainMenu::SceneMainMenu(Window* window_) {
+
 	Debug::Info("Created Main Menu: ", __FILE__, __LINE__);
 	window = window_;
 
@@ -138,12 +141,6 @@ void SceneMainMenu::Update(const float deltaTime)
 
 void SceneMainMenu::Render() 
 {
-	/// Set the background color then clear the screen
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
-	glUseProgram(0);
 }
 
 void SceneMainMenu::RenderIMGUI()
@@ -162,7 +159,7 @@ void SceneMainMenu::RenderIMGUI()
 	IM_ASSERT(ret);
 	ImDrawList* drawList = ImGui::GetBackgroundDrawList();
 	ImVec2 image_pos = ImVec2(0, 0); // Set image position
-	drawList->AddImage((ImTextureID)(intptr_t)my_image_texture, image_pos, ImVec2(my_image_width / 1.5, my_image_height / 1.5));
+	drawList->AddImage((ImTextureID)(intptr_t)my_image_texture, image_pos, ImVec2(my_image_width / 0.85, my_image_height / 0.85));
 
 	bool p_open = false;
 	float width = 0.0f;
