@@ -140,7 +140,7 @@ void SceneMainMenu::RenderIMGUI()
 	IM_ASSERT(ret);
 	ImDrawList* drawList = ImGui::GetBackgroundDrawList();
 	ImVec2 image_pos = ImVec2(0, 0); // Set image position
-	drawList->AddImage((ImTextureID)(intptr_t)my_image_texture, image_pos, ImVec2(my_image_width / 1.5, my_image_height / 1.5));
+	drawList->AddImage((ImTextureID)(intptr_t)my_image_texture, image_pos, ImVec2(my_image_width / 0.85, my_image_height / 0.85));
 
 	bool p_open = false;
 	ImGui::Begin("A START BUTTON MAYBE?", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
