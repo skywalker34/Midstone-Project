@@ -189,9 +189,9 @@ void SceneGameplay::HandleEvents(const SDL_Event& sdlEvent) {
 
 
 	playerController.handleEvents(sdlEvent); //handle events on the player controller sid eof things
-	
 
-	
+
+
 
 
 	ImGui_ImplSDL2_ProcessEvent(&sdlEvent); // ImGui HandleEvents
@@ -210,7 +210,7 @@ void SceneGameplay::HandleEvents(const SDL_Event& sdlEvent) {
 
 
 
-	
+
 }
 
 void SceneGameplay::Update(const float deltaTime) {
@@ -221,7 +221,7 @@ void SceneGameplay::Update(const float deltaTime) {
 	audioManager->SoundEngine->setSoundVolume(sfxSlider);
 
 
-	
+
 
 	if (!isGameRunning) return; //if the game is not running (paused) just return so nothing happens
 	//call the individual updat functions / methods
@@ -310,7 +310,7 @@ void SceneGameplay::Render() {
 	}
 
 
-	
+
 	for (FriendlyShip* ship : playerFleet) {
 
 		//we can't set the common uniforms once, because this loop goes rendership->renderbullets so any ship after the first would use the bullet shader (no good)
@@ -503,7 +503,7 @@ void SceneGameplay::PlayerControllerHandleEvents()
 		else {
 			//if the ray doesn't collide with any ship, set bool to false
 			isMouseOverShip = false;
-		
+
 		}
 		i++;
 
@@ -511,7 +511,7 @@ void SceneGameplay::PlayerControllerHandleEvents()
 
 	//if the player is giving orders, it means the player has clicked on a friendly ship and is now giving it command
 	if (isGivingOrders) PlayerOrders(); //get the orders from the player,
-	
+
 	if (playerController.hasCanceledOrder) {
 		isGivingOrders = false;
 		activeShip = -1;
@@ -541,7 +541,7 @@ void SceneGameplay::PlayerOrders()
 				//set the ship's waypoint to be the enemy's position
 				shipWaypoint = ship->transform.getPos();
 				isGivingOrders = false;//the order has been given so the player is no longer giving orders
-
+				playerFleet[activeShip]->slerpT = 0;
 				playerFleet[activeShip]->isChasing = true;//tell the ship its new state is chasing 
 				playerFleet[activeShip]->activeTarget = ship;//make the enemy its active target
 				activeShip = -1;//set the active ship (the one we're commanding) to a null value
@@ -572,7 +572,7 @@ void SceneGameplay::PlayerOrders()
 
 void SceneGameplay::UpdatePlayerFleet(const float deltaTime)
 {
-	
+
 	for (FriendlyShip* ship : playerFleet) {																				//first we loop through every oen of the player's ships
 
 		std::vector<Bullet*> temp = ship->getBullets();																		//get a reference to all the bullets that ship has fired
@@ -647,7 +647,7 @@ void SceneGameplay::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip,
 void SceneGameplay::UpdateEnemyFleet(const float deltaTime)
 {
 	for (int i = 0; i < enemyFleet.size(); i++) { //loop through all the enemy ships
-		
+
 		if (enemyFleet[i]->deleteMe) {//if any of them have set a flag telling the scene to delete them
 			DestroyEnemy(i);//call the destroy enemy function (in this scene)
 		}

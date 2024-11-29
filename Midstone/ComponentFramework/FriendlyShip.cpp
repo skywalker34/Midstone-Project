@@ -1,6 +1,7 @@
 #include "FriendlyShip.h"
 #include "Sphere.h"
 #include "Collision.h"
+#include "imgui_internal.h"
 
 
 //depreciated
@@ -68,9 +69,9 @@ void FriendlyShip::Update(const float deltaTime)
 
 void FriendlyShip::ResetFire(const float deltaTime)
 {
-		if (!canFire) { //if I'm unable to shoot
+	if (!canFire) { //if I'm unable to shoot
 
-  //add to the count down
+		//add to the count down
 		timeSinceShot += deltaTime;
 		//whether I can shoot again is dictated by the time since my last shot and whether I'm moving or not
 		canFire = timeSinceShot >= rateOfFire && !isMoving;
@@ -97,7 +98,7 @@ void FriendlyShip::UpdateBullet(const float deltaTime)
 void FriendlyShip::StopSound3DLooped()
 {
 
-  	//on the frame we stop moving (happenonce) we want to stop the moving sound
+	//on the frame we stop moving (happenonce) we want to stop the moving sound
 	if (HappenOnce == true && isMoving == false)
 	{
 		audioManager->StopSound3DLooped(rocketSoundIndex);
@@ -138,7 +139,7 @@ void FriendlyShip::ShipMovement(const float deltaTime)
 	}
 
 
-	
+
 
 
 }
@@ -193,7 +194,7 @@ void FriendlyShip::RenderRange(Shader* shader) const
 void FriendlyShip::FindClosestEnemy(EnemyShip* enemy)
 {
 	if (!isSwitchingTarget) {
-		currentTargetDistance = VMath::mag(transform.getPos() - closestEnemy->transform.getPos()); 
+		currentTargetDistance = VMath::mag(transform.getPos() - closestEnemy->transform.getPos());
 		potentialTargetDistance = VMath::mag(transform.getPos() - enemy->transform.getPos());
 		potentialTarget = enemy;
 
@@ -254,7 +255,7 @@ void FriendlyShip::MoveToDestination(Vec3 destination_)
 void FriendlyShip::CheckIntersection(Vec3 initailPosition)
 {
 	float angle = acos(VMath::dot(VMath::normalize(initailPosition - ORIGIN), VMath::normalize(initailPosition - destination)));
-	wouldIntersectPlanet = VMath::mag(initailPosition - ORIGIN) * sin(angle) < PLANET_RADIUS + collisionSphereRadius;
+	wouldIntersectPlanet = angle > IM_PI / 2 ? false : VMath::mag(initailPosition - ORIGIN) * sin(angle) < PLANET_RADIUS + collisionSphereRadius;
 }
 
 void FriendlyShip::Orbit(Vec3 axis)
