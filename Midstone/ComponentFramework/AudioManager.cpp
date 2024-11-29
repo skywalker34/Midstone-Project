@@ -45,10 +45,12 @@ void AudioManager::PlaySound2D(const std::string& name)
     }
     else if (name == "Game_Over")
     {
+        //play the game over sound
         SoundEngine->play2D(gameOver.c_str(), false);
     }
     else if (name == "Ship_Selected")
     {
+        //play teh ship selected sound
         SoundEngine->play2D(shipSelected.c_str(), false);
     }
     
@@ -66,10 +68,12 @@ void AudioManager::PlaySound3D(const std::string& name, const Vec3& pos)
     }
     else if (name == "Enemy_Explosion")
     {
+        //play an enemy explosion sound
         SoundEngine->play3D(enemyExplosion[0].c_str(), position);
     }
     else if (name == "Enemy_Hit")
     {
+        //plan enemy hit sound
         SoundEngine->play3D(enemyHit.c_str(), position);
     }
 }
@@ -87,7 +91,7 @@ int AudioManager::PlaySound3DLooped(const std::string& name, const Vec3& pos)
 
     if (sound)
     {
-        soundLoops.push_back(sound);
+        soundLoops.push_back(sound); //add the sound to a list of sounds so it can be referenced again later (to stop it_
         return soundLoops.size() - 1; // Return the index of the sound in the vector
     }
 

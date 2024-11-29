@@ -63,7 +63,7 @@ public:
     void OnExplode();
 
     /// <summary>
-    /// Resets the explosion state using the specified compute shader.
+    /// Resets the explosion state using the specified compute shader and then calls the OnExplode method to run the anim
     /// </summary>
     /// <param name="comp">Pointer to the compute shader used for resetting the explosion.</param>
     void ResetExplosion(ComputeShader* comp);

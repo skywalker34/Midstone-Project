@@ -46,7 +46,7 @@ private:
 	ComputeShader* computeExplosion = nullptr; //applies a random force outward from a point, creating an explosion effect
 	ComputeShader* computeReset = nullptr; //reset compute shader particles to their origin
 	Shader* loadVertsToBuffer = nullptr; //not a compute shader but neccessary for their ussage. isolate the vertex pos on the GPU fro the buffer and write it to a unique buffer used by compute shaders
-	
+	Shader* lineShader = nullptr; //shader to render the lines
 	
 	Mesh* particleMesh; //mesh used for particle systems  (edited in notepad to be a couple thousand of verts stacked on the origin)
 
@@ -78,11 +78,14 @@ private:
 
 
 	PlayerController playerController;
+
+
+
 	Vec3 shipWaypoint;
 
 	
 
-	Shader* lineShader = nullptr;
+	
 	Line pathLine = Line(Vec3(0, 0, 0), Vec3(1, 1, 1));
 	Line testLine = Line(Vec3(0, 0, 0), Vec3(100, 100, 100));
 
@@ -95,7 +98,7 @@ private:
 	int enemySpawnerCount = 1;
 
 	int activeShip = -1;
-	int startingFleetSize = 2;
+	int startingFleetSize = 5;
 	int enemyIndex = 0;
 	
 	int startingExplosions = 10; //we're going to create 10 explosions and recycle them whenever an enemy blows up.
@@ -131,14 +134,22 @@ public:
 	virtual void RenderIMGUI() override;
 	virtual void HandleEvents(const SDL_Event& sdlEvent) override;
 	void SpawnEnemy(const float deltaTime);
-	void SetActiveShip();
+	void PlayerControllerHandleEvents();
 	void RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip, const float deltaTime);
+	void PlayerOrders();
+
+	//update functions
+
 	void UpdatePlayerFleet(const float deltaTime);
 	void UpdateEnemyFleet(const float deltaTime);
+
+
+	//On create events
+
 	void createModels();
 	void createActors();
 	void createShaders();
-	void createClickGrid();
+	void createPlayerController();
 	void DestroyEnenmy(int index);
 
 	void GameOver();

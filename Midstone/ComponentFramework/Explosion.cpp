@@ -85,23 +85,28 @@ void Explosion::Update(float deltaTime)
 
 void Explosion::OnExplode()
 {
-	animComplete = false;
-	for (int i = 0; i < debrisChunkCount; i++) {
+	animComplete = false;//tell the program the animation/simulation has begun
+	for (int i = 0; i < debrisChunkCount; i++) { //for each of the larger debris meshes...
 
+		//create 2 random vectors
 		Vec3 rv1 = Vec3(fmod(rand(), 2 * 2) - 1, fmod(rand(), 2 * 2) - 1, fmod(rand(), 2 * 2) - 1);
 		Vec3 rv2 = Vec3(fmod(rand(), 2 * 2) - 1, fmod(rand(), 2 * 2) - 1, fmod(rand(), 2 * 2) - 1);
-
+		//then cross them. this is so there's more variation in the flightpaths of the debris.
+		//at least it looked better then when I was just generating 1 random vec
 		Vec3 rv = VMath::cross(rv1, rv2);
 
+		//apply a force using the random vector (no need to normalize so that there's force too)
 		body[i]->ApplyForce(rv); //create a random vector
+		//also give the debris a random spin
 		body[i]->angularVel = (Vec3(fmod(rand(), 2 * 2) - 1, fmod(rand(), 2 * 2) - 1, fmod(rand(), 2 * 2) - 1)); //create a random vector
 		
 	}
-	onExplode = false;
+	onExplode = false; //tell the program the inital explosion is done
 }
 
 void Explosion::ResetExplosion(ComputeShader* comp)
 {
+	//null out all physics values and reset position to local 0 for the debris chunks
 	for (int i = 0; i < debrisChunkCount; i++) {
 		debrisTransforms[i]->setPos(Vec3());
 
@@ -109,10 +114,12 @@ void Explosion::ResetExplosion(ComputeShader* comp)
 		body[i]->angularVel = Vec3();
 	}
 
-	glUseProgram(comp->GetProgram());
+	//run a compute shader to reset all the particle pos to 0
 
-	glUniform1i(comp->GetUniformID("yDispatch"), 100); //amount of dispatches in the y direction(?) so the GPUs can work in parralel doing these calculations
-	glDispatchCompute(100, 100, 1);//make sure the dispatch in the y parameter heres matches that in the uniform above
+	glUseProgram(comp->GetProgram());
+	 
+	glUniform1i(comp->GetUniformID("yDispatch"), YDISPATCH); //amount of dispatches in the y direction(?) so the GPUs can work in parralel doing these calculations
+	glDispatchCompute(100, YDISPATCH, 1);//make sure the dispatch in the y parameter heres matches that in the uniform above
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
 
@@ -120,6 +127,7 @@ void Explosion::ResetExplosion(ComputeShader* comp)
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, 0);
 
+	
 	OnExplode();
 
 }

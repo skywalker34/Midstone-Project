@@ -82,6 +82,8 @@ void SceneManager::Run() {
 		currentScene->Render();
 		currentScene->RenderIMGUI();
 		SDL_GL_SwapWindow(window->getWindow());
+
+		//use "flagspatchers" to know when to switch scenes 
 		if (mainMenu && currentScene->switchButton)
 		{
 			currentScene->switchButton = false;
@@ -129,10 +131,6 @@ void SceneManager::HandleEvents() {
 			case SDL_SCANCODE_F3:
 			case SDL_SCANCODE_F4:
 			case SDL_SCANCODE_F5:
-		
-				
-				break;
-
 			default:
 				break;
 			}
