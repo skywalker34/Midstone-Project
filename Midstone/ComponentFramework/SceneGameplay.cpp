@@ -59,8 +59,8 @@ bool SceneGameplay::OnCreate() {
 
 
 
-	computeShader = new ComputeShader("shaders/computer.glsl");	//create the compute shader
-	if (computeShader->OnCreate() == false) {
+	computeExhaust = new ComputeShader("shaders/computer.glsl");	//create the compute shader
+	if (computeExhaust->OnCreate() == false) {
 		std::cout << "Shader failed ... we have a problem\n";
 	}
 
@@ -94,8 +94,8 @@ bool SceneGameplay::OnCreate() {
 	createClickGrid();
 
 
-	debris = Model("Debris.obj");
-	debris.OnCreate();
+	debrisModel = Model("Debris.obj");
+	debrisModel.OnCreate();
 
 	enemyFleetSpawners.push_back(EnemySpawner(100.0f, 15, 5));
 	printf("On Create finished!!!!!");
@@ -113,7 +113,7 @@ bool SceneGameplay::OnCreate() {
 
 	for (int i = 0; i < startingExplosions; i++) {
 		explosions.push_back(new Explosion());
-		if (explosions[i]->OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh, &debris) == false) {
+		if (explosions[i]->OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh, &debrisModel) == false) {
 			std::cout << "Explosion failed ... we have a problem\n";
 		}
 	}
@@ -130,6 +130,46 @@ bool SceneGameplay::OnCreate() {
 void SceneGameplay::OnDestroy() {
 	Debug::Info("Deleting assets Scene0: ", __FILE__, __LINE__);
 
+	//DELETE SHADERS
+	shader->OnDestroy();
+	delete shader;
+
+	bulletShader->OnDestroy();
+	delete bulletShader;
+
+	planetShader->OnDestroy();
+	delete planetShader;
+
+	friendlyShipShader->OnDestroy();
+	delete friendlyShipShader;
+
+	gridShader->OnDestroy();
+	delete gridShader;
+
+	selectionShader->OnDestroy();
+	delete selectionShader;
+
+	lineShader->OnDestroy();
+	delete lineShader;
+
+	//DELETE COMPUTE SHADERS
+	computeExhaust->OnDestroy();
+	delete computeExhaust;
+
+	computeExplosion->OnDestroy();
+	delete computeExplosion;
+
+	computeReset->OnDestroy();
+	delete computeReset;
+
+	loadVertsToBuffer->OnDestroy();
+	delete loadVertsToBuffer;
+
+	//DELETE MESH/MODELS
+
+	particleMesh->OnDestroy();
+	delete particleMesh;
+
 	friendlyShipModel.OnDestroy();
 
 	enemyShipModel.OnDestroy();
@@ -137,6 +177,12 @@ void SceneGameplay::OnDestroy() {
 	bulletModel.OnDestroy();
 
 	sphereModel.OnDestroy();
+
+	planeModel.OnDestroy();
+
+	debrisModel.OnDestroy();
+
+	//DELETE WORLD OBJECTS
 
 	playerController.OnDestroy();
 
@@ -155,29 +201,14 @@ void SceneGameplay::OnDestroy() {
 		delete explosion;
 	}
 
-	shader->OnDestroy();
-	delete shader;
-
-	bulletShader->OnDestroy();
-	delete bulletShader;
-
-	planetShader->OnDestroy();
-	delete planetShader;
-
-	friendlyShipShader->OnDestroy();
-	delete friendlyShipShader;
-
 	planet.OnDestroy();
 
+	audioManager->OnDestroy();
+	delete audioManager;
+	
 
-	computeShader->OnDestroy();
-	delete computeShader;
-
-	loadVertsToBuffer->OnDestroy();
-	delete loadVertsToBuffer;
-
-	lineShader->OnDestroy();
-	delete lineShader;
+	
+	//CLEANUP GUI
 
 	options.SaveOptions("options.txt", volumeSlider, sfxSlider, Vec4(shipColor.x, shipColor.y, shipColor.z, shipColor.w));
 
@@ -186,8 +217,12 @@ void SceneGameplay::OnDestroy() {
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
 
-	audioManager->OnDestroy();
-	delete audioManager;
+	SoundEngine->drop();
+	
+
+	window = nullptr; //prevent dangling pointers
+
+	printf("All assets deleted");
 }
 
 void SceneGameplay::HandleEvents(const SDL_Event& sdlEvent) {
@@ -278,7 +313,7 @@ void SceneGameplay::Render() {
 			glUniform4fv(friendlyShipShader->GetUniformID("secondaryColour"), 1, GREY);
 			glUniform4fv(friendlyShipShader->GetUniformID("tertiaryColour"), 1, RED);
 			ship->Render(friendlyShipShader);
-			if (isGameRunning) ship->exhaustTrail.Render(particleShader, computeShader); //if the games runnign render the associated particle system too
+			if (isGameRunning) ship->exhaustTrail.Render(particleShader, computeExhaust); //if the games runnign render the associated particle system too
 
 		}
 	}
@@ -317,7 +352,7 @@ void SceneGameplay::Render() {
 		ship->RenderBullets(bulletShader);
 
 		if (ship->isMoving && isGameRunning) {
-			ship->exhaustTrail.Render(particleShader, computeShader);
+			ship->exhaustTrail.Render(particleShader, computeExhaust);
 		}
 
 		if (isGivingOrders)
@@ -686,7 +721,7 @@ void SceneGameplay::DestroyEnenmy(int index)
 	if (!explosionAvailable) {
 		//if there are no explosions availabel then cretae a new one
 		explosions.push_back(new Explosion());
-		if (explosions[explosions.size() - 1]->OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh, &debris) == false) {
+		if (explosions[explosions.size() - 1]->OnCreate(&playerController.camera, loadVertsToBuffer, particleMesh, &debrisModel) == false) {
 			std::cout << "Explosion failed ... we have a problem\n";
 		}
 		explosions[explosions.size() - 1]->setPos(explosionPos);

@@ -115,7 +115,7 @@ bool SceneMainMenu::OnCreate() {
 }
 
 void SceneMainMenu::OnDestroy() {
-	Debug::Info("Deleting assets Scene0: ", __FILE__, __LINE__);
+	Debug::Info("Deleting assets SceneMainMenu: ", __FILE__, __LINE__);
 
 	options.SaveOptions("options.txt", volumeSlider, sfxSlider, Vec4(shipColor.x, shipColor.y, shipColor.z, shipColor.w));
 

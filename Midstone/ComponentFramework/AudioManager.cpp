@@ -33,6 +33,7 @@ void AudioManager::OnDestroy()
 {
     if (SoundEngine) {
         SoundEngine->drop();
+  
     }
 }
 

@@ -41,7 +41,7 @@ private:
 	Shader* gridShader;
 	Shader* selectionShader;
 
-	ComputeShader* computeShader = nullptr;
+	ComputeShader* computeExhaust = nullptr;
 	ComputeShader* computeExplosion = nullptr;
 	ComputeShader* computeReset = nullptr;
 
@@ -56,7 +56,7 @@ private:
 	Model bulletModel;
 	Model sphereModel;
 	Model planeModel;
-	Model debris;
+	Model debrisModel;
 
 
 
