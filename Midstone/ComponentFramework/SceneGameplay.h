@@ -63,13 +63,14 @@ private:
 	Model planeModel;
 	Model debris;
 
-	
-	
+
+
 
 	//UX ACTORS
 	Actor selectionSphere;
 	Actor cursorSphere;
 	Actor enemySelectionSphere;
+
 	
 	//SCENE ACTORS
 	Planet planet;
@@ -85,6 +86,7 @@ private:
 	std::vector<EnemySpawner> enemyFleetSpawners; //list of enemy fleet spawners
 	
 
+
 	//MISC
 
 	Vec3 lightPos = Vec3(0.0f, 0.0f, 150.0f); //world light pos
@@ -93,20 +95,21 @@ private:
 
 	Vec3 shipWaypoint; //holds a position for a ship to move to 
 
+
 	Line pathLine = Line(Vec3(0, 0, 0), Vec3(1, 1, 1));
-	Line testLine = Line(Vec3(0, 0, 0), Vec3(100, 100, 100));
 
-	
 
-	
 
 
 	int enemySpawnerCount = 1; //amount of enenmy spawners 
+
 
 	int activeShip = -1; //holds the id of the player ship that is being commanded (set to -1 if null)
 	int startingFleetSize = 5; //how many ships the player/enenmy starts with
 	int enemyIndex = 0; //uniquee enenmy index (increments when enemies are created)
 	
+
+
 	int startingExplosions = 10; //we're going to create 10 explosions and recycle them whenever an enemy blows up.
 
 	float timeElapsed; //how much time has passed since the play session began

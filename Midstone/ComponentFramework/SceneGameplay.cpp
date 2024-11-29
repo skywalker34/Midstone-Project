@@ -27,6 +27,7 @@ void AlignForWidth(float width, float alignment = 0.5f)
 		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 }
 
+
 SceneGameplay::SceneGameplay(Window* window_) : shader{ nullptr }
 {
 	Debug::Info("Created Scene0: ", __FILE__, __LINE__);
@@ -264,19 +265,11 @@ void SceneGameplay::Render() {
 
 	playerController.camera.RenderSkyBox();
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glUseProgram(lineShader->GetProgram());
-	glUniformMatrix4fv(lineShader->GetUniformID("projection"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
-	glUniformMatrix4fv(lineShader->GetUniformID("view"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
-	glUniformMatrix4fv(lineShader->GetUniformID("model"), 1, GL_FALSE, testLine.transform.toModelMatrix());
-	testLine.draw();
-
-
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
-
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
 
 	if (activeShip >= 0) {
 
@@ -287,8 +280,6 @@ void SceneGameplay::Render() {
 		pathLine.draw();
 	}
 
-
-	
 	for (EnemyShip* ship : enemyFleet) {
 		glUseProgram(friendlyShipShader->GetProgram());
 		glUniformMatrix4fv(friendlyShipShader->GetUniformID("projectionMatrix"), 1, GL_FALSE, playerController.camera.GetProjectionMatrix());
@@ -342,6 +333,7 @@ void SceneGameplay::Render() {
 			ship->exhaustTrail.Render(particleShader, computeShader);
 		}
 
+
 		if (isGivingOrders)  //if the ship is being commanded, show the player its range
 		{
 			glUseProgram(shader->GetProgram());
@@ -379,8 +371,8 @@ void SceneGameplay::Render() {
 		glUniformMatrix4fv(gridShader->GetUniformID("viewMatrix"), 1, GL_FALSE, playerController.camera.GetViewMatrix());
 		playerController.Render(gridShader);
 	}
-		
-		glUseProgram(0);
+
+	glUseProgram(0);
 }
 
 void SceneGameplay::RenderIMGUI()
@@ -612,13 +604,7 @@ void SceneGameplay::UpdatePlayerFleet(const float deltaTime)
 	if (activeShip >= 0) {
 		isGivingOrders = true;
 		playerFleet[activeShip]->displayRange = true;
-		if (playerFleet[activeShip]->isMoving) {
-			pathLine.RecalculateLine(playerFleet[activeShip]->transform.getPos(), playerFleet[activeShip]->destination);
-		}
 	}
-
-
-
 }
 
 void SceneGameplay::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip, const float deltaTime)
@@ -637,11 +623,10 @@ void SceneGameplay::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip,
 
 		// If the current target index matches the target ship's index
 		if (ship->currentTargetIndex == targetShip->shipIndex) {
-			Vec3 targetDirection = targetShip->transform.getPos() - ship->transform.getPos();  // Calculate the direction to the target
-			Quaternion targetQuad = QMath::lookAt(targetDirection, UP);  // Calculate the target orientation
-			ship->transform.setOrientation(targetQuad);  // Set the ship's orientation to face the target
-			ship->initialDirection = targetDirection;  // Update the ship's initial direction
-			testLine.RecalculateLine(targetShip->aimingPoint, ship->transform.getPos());  // Update the test line for debugging purposes
+			Vec3 targetDirection = targetShip->transform.getPos() - ship->transform.getPos();
+			Quaternion targetQuad = QMath::lookAt(targetDirection, UP);
+			ship->transform.setOrientation(targetQuad);
+			ship->initialDirection = targetDirection;
 		}
 
 		// If the ship is switching targets
@@ -653,7 +638,6 @@ void SceneGameplay::RotateTowardEnemy(FriendlyShip* ship, EnemyShip* targetShip,
 				ship->isSwitchingTarget = false;  // Reset the switching target flag
 				ship->slerpT = 0;  // Reset the slerpT value
 			}
-			testLine.RecalculateLine(ship->potentialTarget->aimingPoint, ship->transform.getPos());  // Update the test line for the potential target
 		}
 	}
 }

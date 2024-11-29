@@ -25,8 +25,8 @@ FriendlyShip::FriendlyShip(Model* model_, Model* bulletModel_)
 bool FriendlyShip::OnCreate()
 {
 
-	detectionSphere = Sphere(transform.getPos(), range);//set the detection sphere pos to this object
 
+	detectionSphere = Sphere(transform.getPos(), range);//set the detection sphere pos to this object
 	rangeSphereT = transform; //set the transform for teh range sphere object
 	rangeSphereT.setScale(Vec3(range, range, range)); //sphere mesh has radius of 1 unit, so anything we scale it by will be its world space size
 	//create the sphere to handle physics collisions
@@ -53,15 +53,34 @@ void FriendlyShip::OnDestroy()
 
 void FriendlyShip::Update(const float deltaTime)
 {
+	ResetFire(deltaTime);
+	UpdateBullet(deltaTime);
+	StopSound3DLooped();
+	ShipMovement(deltaTime);
 
-	if (!canFire) { //if I'm unable to shoot
-		//add to the count down
+	if (displayRange) {
+		rangeSphereT.setPos(detectionSphere.center);
+	}
+
+	exhaustTrail.modelMat = transform.toModelMatrix();
+}
+
+
+void FriendlyShip::ResetFire(const float deltaTime)
+{
+		if (!canFire) { //if I'm unable to shoot
+
+  //add to the count down
 		timeSinceShot += deltaTime;
 		//whether I can shoot again is dictated by the time since my last shot and whether I'm moving or not
 		canFire = timeSinceShot >= rateOfFire && !isMoving;
 	}
+}
 
-	//loop through and update all the bullets
+
+void FriendlyShip::UpdateBullet(const float deltaTime)
+{
+
 	for (int i = 0; i < bullets.size(); i++) {
 		bullets[i]->Update(deltaTime);
 		if (bullets[i]->deleteMe) {
@@ -72,14 +91,22 @@ void FriendlyShip::Update(const float deltaTime)
 			bullets.erase(std::remove(bullets.begin(), bullets.end(), nullptr), bullets.end());
 		}
 	}
+}
 
-	//on the frame we stop moving (happenonce) we want to stop the moving sound
+
+void FriendlyShip::StopSound3DLooped()
+{
+
+  	//on the frame we stop moving (happenonce) we want to stop the moving sound
 	if (HappenOnce == true && isMoving == false)
 	{
 		audioManager->StopSound3DLooped(rocketSoundIndex);
 		HappenOnce = false;
 	}
+}
 
+void FriendlyShip::ShipMovement(const float deltaTime)
+{
 	if (wouldIntersectPlanet) {
 		Orbit(orbitAxis);
 		CheckIntersection(transform.getPos());
@@ -95,23 +122,10 @@ void FriendlyShip::Update(const float deltaTime)
 	}
 	else {
 		body->vel = Vec3();
-
 	}
 
 	if (isChasing && !activeTarget->deleteMe) { //if player clicks on a ship then on an enemy the ship enters chasing mode
-		destination = activeTarget->transform.getPos(); //set the destination to the enemy's pos
-		MoveToDestination(destination);
-		if (COLLISION::SphereSphereCollisionDetected(&detectionSphere, activeTarget->collisionSphere)) {
-			//reset the variables
-			isMoving = false;
-			activeTarget = nullptr;
-			isChasing = false;
-
-		}
-		else {
-			isMoving = true;
-
-		}
+		ChasingEnemy();
 	}
 
 
@@ -125,6 +139,24 @@ void FriendlyShip::Update(const float deltaTime)
 
 
 	
+
+
+}
+
+void FriendlyShip::ChasingEnemy()
+{
+	destination = activeTarget->transform.getPos(); //set the destination to the enemy's pos
+	MoveToDestination(destination);
+	if (COLLISION::SphereSphereCollisionDetected(&detectionSphere, activeTarget->collisionSphere)) {
+		//reset the variables
+		isMoving = false;
+		activeTarget = nullptr;
+		isChasing = false;
+
+	}
+	else {
+		isMoving = true;
+	}
 
 }
 

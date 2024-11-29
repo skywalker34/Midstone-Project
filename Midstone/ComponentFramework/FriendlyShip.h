@@ -74,8 +74,10 @@ public:
 	float currentTargetDistance; //how far teh target is from this ship
 	float potentialTargetDistance;//how far a enenmy hsip that isn't being a target is from the ship
 
+
 		
 	bool HappenOnce = true;//used to trigger the rocket sound loop once
+
 
 
 	/// <summary>
@@ -92,11 +94,14 @@ public:
 	/// <param name="bulletModel_">Pointer to the model used for the bullets fired by the ship.</param>
 	FriendlyShip(Model* model_, Model* bulletModel_);
 
+
 	/// <summary>
 	/// Initializes the friendly ship and sets up necessary resources.
 	/// </summary>
 	/// <returns>True if creation was successful, false otherwise.</returns>
 	bool OnCreate() override;
+
+
 
 	/// <summary>
 	/// Cleans up resources used by the friendly ship.
@@ -109,7 +114,14 @@ public:
 	/// <param name="deltaTime">The time elapsed since the last update.</param>
 	void Update(const float deltaTime);
 
-	/// <summary>
+	void ResetFire(const float deltaTime);
+	void UpdateBullet(const float deltaTime);
+	void StopSound3DLooped();
+	void ShipMovement(const float deltaTime);
+	void ChasingEnemy();
+
+
+ 	/// <summary>
 	/// Renders the friendly ship.
 	/// </summary>
 	/// <param name="shader">The shader to use for rendering.</param>
