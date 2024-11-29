@@ -12,6 +12,7 @@
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_opengl3.h"
+#include "Options.h"
 
 using namespace MATH;
 
@@ -30,6 +31,12 @@ private:
 
 	bool show_demo_window;
 
+	float volumeSlider = 0.4f;
+	float sfxSlider = 0.4f;
+
+	ImVec4 shipColor = ImVec4(114.0f / 255.0f, 144.0f / 255.0f, 154.0f / 255.0f, 200.0f / 255.0f);
+
+	Options options;
 
 public:
 	explicit SceneMainMenu();

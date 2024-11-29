@@ -17,6 +17,8 @@
 #include "Line.h"
 #include "EnemySpawner.h"
 #include "Explosion.h"
+#include <string>
+#include "Options.h"
 
 using namespace MATH;
 
@@ -112,6 +114,12 @@ private:
 
 	ImVec4 shipColor = ImVec4(114.0f / 255.0f, 144.0f / 255.0f, 154.0f / 255.0f, 200.0f / 255.0f);
 
+	bool nameEntryComplete;
+
+	std::string nameEntry = "Enter Name Here";
+
+	Options options;
+
 	void SaveStats();
 public:
 	explicit SceneGameplay();
@@ -136,6 +144,7 @@ public:
 	void DestroyEnenmy(int index);
 
 	void GameOver();
+
 };
 
 

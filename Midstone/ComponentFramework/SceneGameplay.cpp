@@ -118,6 +118,11 @@ bool SceneGameplay::OnCreate() {
 		}
 	}
 
+	options.readOptions("options.txt");
+	volumeSlider = options.musicVol;
+	sfxSlider = options.sfxVol;
+	shipColor = ImVec4(options.shipColour.x, options.shipColour.y, options.shipColour.z, options.shipColour.w);
+
 	return true;
 
 }
@@ -174,6 +179,7 @@ void SceneGameplay::OnDestroy() {
 	lineShader->OnDestroy();
 	delete lineShader;
 
+	options.SaveOptions("options.txt", volumeSlider, sfxSlider, Vec4(shipColor.x, shipColor.y, shipColor.z, shipColor.w));
 
 	// Cleanup
 	ImGui_ImplOpenGL3_Shutdown();
@@ -231,6 +237,9 @@ void SceneGameplay::Update(const float deltaTime) {
 
 	planet.Update(deltaTime);
 	if (planet.GetHealth() < 0) {
+		isGameRunning = false;
+	}
+	if (planet.GetHealth() < 0 && nameEntryComplete) {
 		GameOver();
 	}
 
@@ -366,23 +375,26 @@ void SceneGameplay::RenderIMGUI()
 	ImGui_ImplSDL2_NewFrame();
 	ImGui::NewFrame();
 	bool p_open = false;
+	float width = 0.0f;
 	// Apply the font 
 	ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
 	// Use the loaded font
-	ImGui::Begin("Timer and Score", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-	ImGui::Text("Time = %f", timeElapsed);
-	ImGui::Text("Score = %i", score);
-	ImGui::Text("Planet Health: = %i", planet.GetHealth());
-	ImGui::End();
 
+	if (isGameRunning && planet.GetHealth() >= 0)
+	{
+		ImGui::Begin("Timer and Score", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+		ImGui::Text("Time = %f", timeElapsed);
+		ImGui::Text("Score = %i", score);
+		ImGui::Text("Planet Health: = %i", planet.GetHealth());
+		ImGui::End();
+	}
 
 
 	//Pause Menu Creation (A lot of sloppy alignment but looks okay now)
-	if (!isGameRunning)
+	if (!isGameRunning && planet.GetHealth() >= 0)
 	{
 		//Begin Pause Menu
-		ImGui::Begin("Pause Menu", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-		float width = 0.0f;
+		ImGui::Begin("Pause Menu", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);;
 		ImGui::SetWindowFontScale(2.0);
 		width = ImGui::CalcTextSize("Game Paused").x;
 		AlignForWidth(width);
@@ -430,6 +442,34 @@ void SceneGameplay::RenderIMGUI()
 		//End Pause Menu
 		ImGui::End();
 	}
+
+	if (!isGameRunning && planet.GetHealth() < 0)
+	{
+		//Begin Name Entry
+		ImGui::Begin("Name Entry", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+		ImGui::SetWindowFontScale(2.0);
+		width = ImGui::CalcTextSize("Name Entry").x;
+		AlignForWidth(width);
+		ImGui::Text("Name Entry");
+
+		
+		std::vector<char> buffer(nameEntry.begin(), nameEntry.end());
+		buffer.push_back('\0');
+		ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.92f);
+		if (ImGui::InputText("##Input Text", buffer.data(), buffer.size()))
+		{
+			nameEntry = std::string(buffer.begin(), buffer.end() - 1);
+		}
+		width = 150.0f;
+		AlignForWidth(width);
+		if (ImGui::Button("Submit", ImVec2(150, 30)))
+		{
+			nameEntryComplete = true;
+		}
+		//End Name Entry
+		ImGui::End();
+	}
+
 	ImGui::PopFont(); // Pop the font after usage 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -677,7 +717,7 @@ void SceneGameplay::SaveStats() {
 	// Check if the file is open
 	if (outFile.is_open()) {
 		// Write the data to the file
-		outFile << timeElapsed << " " << score << " " << "\n";
+		outFile << timeElapsed << " " << score << " " << nameEntry << "\n";
 		outFile.close();
 
 		std::cout << "Data appended to file successfully." << std::endl;

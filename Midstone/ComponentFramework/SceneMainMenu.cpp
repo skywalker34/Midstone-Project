@@ -63,6 +63,15 @@ static bool LoadTextureFromFile(const char* file_name, GLuint* out_texture, int*
 	}
 }
 
+void AlignForWidth2(float width, float alignment = 0.5f)
+{
+	ImGuiStyle& style = ImGui::GetStyle();
+	float avail = ImGui::GetContentRegionAvail().x;
+	float off = (avail - width) * alignment;
+	if (off > 0.0f)
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
+}
+
 SceneMainMenu::SceneMainMenu(Window* window_) : drawInWireMode{ true }, show_demo_window {true} {
 	Debug::Info("Created Main Menu: ", __FILE__, __LINE__);
 	window = window_;
@@ -80,6 +89,11 @@ SceneMainMenu::SceneMainMenu(Window* window_) : drawInWireMode{ true }, show_dem
 	// Load the font 
 	io.Fonts->AddFontFromFileTTF("./fonts/Galaksi.ttf", 16.0f);
 
+	options.readOptions("options.txt");
+	volumeSlider = options.musicVol;
+	sfxSlider = options.sfxVol;
+	shipColor = ImVec4(options.shipColour.x, options.shipColour.y, options.shipColour.z, options.shipColour.w);
+
 	SoundEngine->play2D("audio/BackGroundMusic3.mp3", true); // Audio For Main Screen
 
 
@@ -94,7 +108,6 @@ SceneMainMenu::~SceneMainMenu() {
 bool SceneMainMenu::OnCreate() {
 	Debug::Info("Loading assets Main Menu: ", __FILE__, __LINE__);
 
-	
 	printf("On Create finished!!!!!");
 	return true;
 
@@ -103,6 +116,8 @@ bool SceneMainMenu::OnCreate() {
 
 void SceneMainMenu::OnDestroy() {
 	Debug::Info("Deleting assets Scene0: ", __FILE__, __LINE__);
+
+	options.SaveOptions("options.txt", volumeSlider, sfxSlider, Vec4(shipColor.x, shipColor.y, shipColor.z, shipColor.w));
 
 	// Cleanup
 	ImGui_ImplOpenGL3_Shutdown();
@@ -118,6 +133,7 @@ void SceneMainMenu::HandleEvents(const SDL_Event& sdlEvent)
 
 void SceneMainMenu::Update(const float deltaTime) 
 {
+	SoundEngine->setSoundVolume(volumeSlider);
 }
 
 void SceneMainMenu::Render() 
@@ -149,9 +165,42 @@ void SceneMainMenu::RenderIMGUI()
 	drawList->AddImage((ImTextureID)(intptr_t)my_image_texture, image_pos, ImVec2(my_image_width / 1.5, my_image_height / 1.5));
 
 	bool p_open = false;
+	float width = 0.0f;
 	ImGui::Begin("A START BUTTON MAYBE?", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 	if (ImGui::Button("START GAME", ImVec2(300, 90)))
 		switchButton = true;
+	ImGui::End();
+
+	//Begin Main Menu Options
+	ImGui::Begin("Main Menu Options", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+	ImGui::SetWindowFontScale(2.0);
+	width = ImGui::CalcTextSize("Options").x;
+	AlignForWidth2(width);
+	ImGui::Text("Options", ImGuiWindowFlags_AlwaysAutoResize);
+
+	//Okay so sliders are working.
+	const ImGuiSliderFlags flags_for_sliders = ImGuiSliderFlags_None;
+	ImGui::SetWindowFontScale(1.2);
+	width = ImGui::CalcTextSize("Music Volume").x;
+	AlignForWidth2(width);
+	ImGui::Text("Music Volume");
+	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
+	ImGui::SliderFloat("##1", &volumeSlider, 0.0f, 1.0f, "%.3f", flags_for_sliders);
+	width = ImGui::CalcTextSize("Sfx Volume").x;
+	AlignForWidth2(width);
+	ImGui::Text("Sfx Volume");
+	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
+	ImGui::SliderFloat("##2", &sfxSlider, 0.0f, 1.0f, "%.3f", flags_for_sliders);
+
+	//Primary Color Slider works
+	width = ImGui::CalcTextSize("Ship Color").x;
+	AlignForWidth2(width);
+	ImGui::Text("Ship Color");
+	//Probably store this in scene so we can pass it to the shader (NOW IN 3g.h file)
+	ImGui::ColorButton("MyColor##3c", *(ImVec4*)&shipColor, ImGuiColorEditFlags_NoBorder, ImVec2(ImGui::GetWindowWidth() * 0.95f, 20));
+	ImGui::ColorPicker3("##MyColor##5", (float*)&shipColor, ImGuiColorEditFlags_PickerHueBar | ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoAlpha);
+
+	//End Pause Menu
 	ImGui::End();
 
 	ImGui::Render(); // Calling This before CurrentScene render wont work
