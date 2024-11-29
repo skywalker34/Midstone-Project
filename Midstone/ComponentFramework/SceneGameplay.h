@@ -114,8 +114,6 @@ private:
 
 	ImVec4 shipColor = ImVec4(114.0f / 255.0f, 144.0f / 255.0f, 154.0f / 255.0f, 200.0f / 255.0f);
 
-	bool nameEntryComplete;
-
 	std::string nameEntry = "Enter Name Here";
 
 	Options options;

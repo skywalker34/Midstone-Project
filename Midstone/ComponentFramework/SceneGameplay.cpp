@@ -274,9 +274,6 @@ void SceneGameplay::Update(const float deltaTime) {
 	if (planet.GetHealth() < 0) {
 		isGameRunning = false;
 	}
-	if (planet.GetHealth() < 0 && nameEntryComplete) {
-		GameOver();
-	}
 
 	for (Explosion* explosion : explosions) {
 		explosion->Update(deltaTime);
@@ -487,19 +484,24 @@ void SceneGameplay::RenderIMGUI()
 		AlignForWidth(width);
 		ImGui::Text("Name Entry");
 
-		
-		std::vector<char> buffer(nameEntry.begin(), nameEntry.end());
-		buffer.push_back('\0');
-		ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.92f);
-		if (ImGui::InputText("##Input Text", buffer.data(), buffer.size()))
+		char buffer[256];
+		//Get size of std::string
+		size_t length = nameEntry.size();
+		//If our name is somehow bigger than our buffer.
+		if (length >= sizeof(buffer))
 		{
-			nameEntry = std::string(buffer.begin(), buffer.end() - 1);
+			length = sizeof(buffer) - 1; 
 		}
+		std::memcpy(buffer, nameEntry.c_str(), length);
+		buffer[length] = '\0'; 
+		ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.93f);
+		if (ImGui::InputText("##EnterName", buffer, sizeof(buffer))) nameEntry = buffer;
 		width = 150.0f;
 		AlignForWidth(width);
 		if (ImGui::Button("Submit", ImVec2(150, 30)))
 		{
-			nameEntryComplete = true;
+			//End Game on button press and go to next scene
+			GameOver();
 		}
 		//End Name Entry
 		ImGui::End();
