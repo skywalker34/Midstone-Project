@@ -17,7 +17,7 @@ out vec3 normal;
 
 void main() {
 
-//stolen from physics class:
+    //stolen from physics class:
     // We need the incident vector
     // First get the vertex position in world space
     vec3 vertexPosWorldSpace = (modelMatrix * vVertex).xyz; // That last bit is called a swizzle

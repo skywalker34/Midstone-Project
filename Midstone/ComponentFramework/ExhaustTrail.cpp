@@ -27,7 +27,7 @@ bool ExhaustTrail::OnCreate(Camera* cam_, Shader* loadVerts, Mesh* mesh_)
 	//safest bet for the vertcount is multiply the listed size by 4 and then round up and you should have more than enough space
 	//inefficient on storage/VRAM I know but I don't have any ideas on how to solve this problem
 
-	//give all of our particles a starting velocity so they can orbit 
+	//give all of our particles a starting velocity of 0 at the origin
 	Vec3 initialVelocities[10000];
 	for (int i = 0; i < BUF_SIZE; i++) {
 		initialVelocities[i] = Vec3(0.0, 0.0, 0.0);
@@ -47,20 +47,21 @@ bool ExhaustTrail::OnCreate(Camera* cam_, Shader* loadVerts, Mesh* mesh_)
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0); //unbind the buffer
 
 
-	printf("OnCreate Done!");
 	return true;
 }
 
 void ExhaustTrail::OnDestroy()
 {
 	mesh = nullptr;
+	glDeleteBuffers(1, &posBuffer);
+	glDeleteBuffers(1, &velBuffer);
 }
 
 void ExhaustTrail::Render(Shader* shader, ComputeShader* comp)
 {
 
 
-	if (mesh == nullptr) {
+	if (mesh == nullptr) { //error check 
 
 		printf("NO MESH!!!");
 		return;
@@ -74,11 +75,11 @@ void ExhaustTrail::Render(Shader* shader, ComputeShader* comp)
 	glUseProgram(comp->GetProgram());
 
 	glUniform1i(comp->GetUniformID("yDispatch"), YDISPATCH); //amount of dispatches in the y direction(?) so the GPUs can work in parralel doing these calculations
-	glUniform1f(comp->GetUniformID("simSpeed"), 60); //frequency 
-	glUniform1f(comp->GetUniformID("randSeed"), rand());
+	glUniform1f(comp->GetUniformID("simSpeed"), 60); //frequency of teh sim (delta time) fps
+	glUniform1f(comp->GetUniformID("randSeed"), rand()); //seed for random generation done on the gpu
 	glUniform3fv(comp->GetUniformID("forwardVector"), 1, Vec3(0, 0, -1)); //direction the "ship" is headed
 	glDispatchCompute(100, YDISPATCH, 1);//make sure the dispatch in the y parameter heres matches that in the uniform above
-	glMemoryBarrier(GL_ALL_BARRIER_BITS);
+	glMemoryBarrier(GL_ALL_BARRIER_BITS); //stop the rest of the shaders being executed until computing is done
 
 
 	glUseProgram(shader->GetProgram());

@@ -11,7 +11,8 @@ layout(location = 0) out vec4 fragColour;
 
 void main(){
     
-    //if its an edge, make it black, if its not, make it white to give everything a black bordder
+    //if its an edge, make it the specified colour, if its not, make it seethrough
+    //this gives the mesh the effect of being a 2d UI circle around an object
 
     if(dot(normal, -incident) < 0.4){
 

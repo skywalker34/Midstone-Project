@@ -63,7 +63,7 @@ static bool LoadTextureFromFile(const char* file_name, GLuint* out_texture, int*
 	}
 }
 
-SceneGameOver::SceneGameOver(Window* window_) : drawInWireMode{ true }, show_demo_window {true} {
+SceneGameOver::SceneGameOver(Window* window_){
 	Debug::Info("Created SceneGameOver: ", __FILE__, __LINE__);
 	window = window_;
 
