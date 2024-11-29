@@ -604,6 +604,10 @@ void SceneGameplay::UpdatePlayerFleet(const float deltaTime)
 	if (activeShip >= 0) {
 		isGivingOrders = true;
 		playerFleet[activeShip]->displayRange = true;
+		//if the active ship is also moving, draw the path line so player knows where its going
+		if (playerFleet[activeShip]->isMoving) {
+			pathLine.RecalculateLine(playerFleet[activeShip]->transform.getPos(), playerFleet[activeShip]->destination);
+		}
 	}
 }
 
