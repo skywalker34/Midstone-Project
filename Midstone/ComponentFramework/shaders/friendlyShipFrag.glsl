@@ -17,29 +17,27 @@ layout (binding = 0) uniform sampler2D diffMask;
 
 void main() {
     vec4 ks = vec4(0.3, 0.3, 0.3, 0.0);
-	//vec4 kd = vec4(0.0, 0.0, 0.8, 0.0);
-	//vec4 ka = vec4(0.001, 0.001, 0.001, 0.0);
+
 
 	vec4 kd = vec4(1, 1, 1, 0.0);
 	vec4 ka = vec4(0.1, 0.1, 0.1, 0.0);
 	vec4 texColor = texture(diffMask,textureCoords); 
 	vec4 kt;
 
-//	kd = vec4(0,0,0,1);
-//	ka = vec4(0,0,0,1);
-//	kt = vec4(0,0,0,1);
 
 
 
-    vec4 secondary = secondaryColour;
-    vec4 primary = primaryColour;
-    vec4 tertiary = tertiaryColour;
 
+    vec4 secondary = secondaryColour; //colour to replace the scondary on the colour mask
+    vec4 primary = primaryColour; //colour to replace the primary on the mask
+    vec4 tertiary = tertiaryColour; //colour to replace the tertiary on the mask
+
+	//mix the user-colours with the mask colours
     vec4 greenReplacement = mix(texColor, secondary, texColor.g);
     vec4 redReplacement = mix(texColor, primary, texColor.r);
     vec4 blueReplacement = mix(texColor, tertiary, texColor.b);
 
-    // Combine the colors based on the original components
+    // get teh combined texture colour
     kt = vec4(
         blueReplacement.r * texColor.b + greenReplacement.r * texColor.g + redReplacement.r * texColor.r,
         blueReplacement.g * texColor.b + greenReplacement.g * texColor.g + redReplacement.g * texColor.r,
@@ -47,6 +45,7 @@ void main() {
         1.0
 		);
     
+	//Phong follows:
 
 	float diff = max(dot(vertNormal, lightDir), 0.0);
 
@@ -58,8 +57,7 @@ void main() {
 	spec = pow(spec,1.0);
 	vec4 outputColour = (ka + ((diff * kd) + (spec *ks)) * kt) ;	
 	
-	//mix with an atmosphere colour at the edges
+
 	fragColour = outputColour = (ka + ((diff * kd) + (spec *ks)) * kt);
-	
-	//fragColour = outputColour;
+
 }

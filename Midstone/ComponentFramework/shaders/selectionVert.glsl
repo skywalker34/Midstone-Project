@@ -12,12 +12,12 @@ layout(location = 2) uniform mat4 modelMatrix;
 layout(location = 3) uniform vec3 cameraPos;
 
 
-out vec3 incident; // You could call this "incoming" if you like
+out vec3 incident; 
 out vec3 normal;
 
 void main() {
 
-//stolen from physics class:
+    //stolen from physics class:
     // We need the incident vector
     // First get the vertex position in world space
     vec3 vertexPosWorldSpace = (modelMatrix * vVertex).xyz; // That last bit is called a swizzle

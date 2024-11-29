@@ -3,17 +3,23 @@
 
 bool COLLISION::SphereSphereCollisionDetected(const Sphere* body1, const Sphere* body2) {
 	bool result = false;
-	float sumOfRadii = body1->r + body2->r;
-	float distance = VMath::mag(body2->center - body1->center);
+	float sumOfRadii = body1->r + body2->r; //get the sum of the radius of both spheres combined
+	float distance = VMath::mag(body2->center - body1->center); //get distanc ebetween 2 spheres
+
+	//if the distance is less then the sum of the radii then the spheres are colliding
 	if (distance <= sumOfRadii)
 	{
 		result = true;
 	}
+
 	return result;
 }
 
 bool COLLISION::LineSphereCollisionDetected(const Sphere* body, const DualQuat line_)
 {
+	//dualquat-sphere intersection referenced from Hamish Todd https://substack.com/home/post/p-142600125 (thanks Umer)
+
+
 	DualQuat line = DQMath::normalize(line_);
 
 	Vec4 centrePoint = body->center;
@@ -28,16 +34,6 @@ bool COLLISION::LineSphereCollisionDetected(const Sphere* body, const DualQuat l
 
 	if (dSquared > 0) { //if d^2 > 0 then the line and sphere intersect
 		return true;
-
-		/*Vec4 i1 = line ^ (M.plane + Plane(0, 0, 0, sqrt(dSquared))) * -1;
-		i1 = i1 / i1.w;
-		i1.print("Intersection Point 1");
-
-
-
-		Vec4 i2 = line ^ (M.plane + Plane(0, 0, 0, -sqrt(dSquared))) * -1;
-		i2 = i2 / i2.w;
-		i2.print("Intersection Point 2");*/
 	}
 
 	return false;
@@ -45,6 +41,8 @@ bool COLLISION::LineSphereCollisionDetected(const Sphere* body, const DualQuat l
 
 bool COLLISION::SpherePointCollisionDetected(const Sphere* body, const Vec3 pos)
 {
+	//if the distance between a sphere and a point is less than the sphere's radius they're colliding
+	//pretty straightforward
 	float distance = VMath::mag(body->center - pos);
 	if (distance < body->r) return true;
 	return false;
@@ -52,6 +50,3 @@ bool COLLISION::SpherePointCollisionDetected(const Sphere* body, const Vec3 pos)
 
 
 
-//void COLLISION::SphereSphereCollisionResponse(Sphere* body1, Sphere* body2) {
-//	std::cout << "We have impact baby or in this case... I SEE YOU!" << std::endl;
-//}

@@ -10,8 +10,6 @@
 int main(int argc, char* args[]) {
 	static_assert(sizeof(void*) == 4, "This program is not ready for 64-bit build");
 
-	//Debug::DebugInit("GameEngineLog.txt");
-	
 	SceneManager* gsm = new SceneManager();
 	if (gsm->Initialize("Game Engine", 1280, 720) ==  true) {
 		gsm->Run();

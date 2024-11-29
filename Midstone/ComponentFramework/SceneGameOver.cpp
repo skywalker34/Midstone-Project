@@ -63,7 +63,7 @@ static bool LoadTextureFromFile(const char* file_name, GLuint* out_texture, int*
 	}
 }
 
-SceneGameOver::SceneGameOver(Window* window_) : drawInWireMode{ true }, show_demo_window {true} {
+SceneGameOver::SceneGameOver(Window* window_){
 	Debug::Info("Created SceneGameOver: ", __FILE__, __LINE__);
 	window = window_;
 
@@ -77,6 +77,8 @@ SceneGameOver::SceneGameOver(Window* window_) : drawInWireMode{ true }, show_dem
 	ImGui_ImplSDL2_InitForOpenGL(window->getWindow(), window->getContext());
 	ImGui_ImplOpenGL3_Init("#version 450");
 
+	// Load the font 
+	io.Fonts->AddFontFromFileTTF("./fonts/Ethnocentric Rg It.otf", 12.0f);
 	// Read text file
 	readLeaderboard("leaderboard.txt", leaderboard);
 
@@ -125,18 +127,17 @@ void SceneGameOver::Render()
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	
+
+	glUseProgram(0);
+}
+
+void SceneGameOver::RenderIMGUI()
+{
 	// IMGUI STUFF
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame();
 
-	//This is the font stuff if you can find a working one then yeah. But otherwise im gonna keep it default for now.
-	//ImGuiIO& io = ImGui::GetIO();
-	//ImFontConfig config;
-	//config.OversampleH = 2;
-	//io.Fonts->AddFontDefault();
-	//ImFont* font_title = io.Fonts->AddFontFromFileTTF("./fonts/Comic Sans MS.ttf", 23.0f, &config);
-	//IM_ASSERT(font_title != NULL);
-	//io.Fonts->Build();
 
 	ImGui::NewFrame();
 
@@ -152,10 +153,8 @@ void SceneGameOver::Render()
 
 	bool p_open = false;
 	ImGui::Begin("A START BUTTON MAYBE?", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-	//ImGui::PushFont(font_title);
 	if (ImGui::Button("Main Menu", ImVec2(300, 90)))
 		switchButton = true;
-	//ImGui::PopFont();
 	ImGui::End();
 
 	ImGui::Begin("LeaderBoard", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
@@ -168,11 +167,9 @@ void SceneGameOver::Render()
 	}
 	ImGui::End();
 
-	//ImGui::ShowDemoWindow();
+
 	ImGui::Render(); // Calling This before CurrentScene render wont work
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-	glUseProgram(0);
 }
 
 

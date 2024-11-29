@@ -1,6 +1,7 @@
 #include "FriendlyShip.h"
 #include "Sphere.h"
 #include "Collision.h"
+#include "imgui_internal.h"
 
 
 //depreciated
@@ -10,17 +11,14 @@ FriendlyShip::FriendlyShip()
 	body = new Body(&transform, Vec3(), Vec3(), 1);
 
 
-
-	//printf("FriendlyShip Constructor: Transform initialized with position (%f, %f, %f)\n", transform.getPos().x, transform.getPos().y, transform.getPos().z);
-
 }
 
 FriendlyShip::FriendlyShip(Model* model_, Model* bulletModel_)
 {
-	transform = Transform(Vec3(0.0f, 0.0f, 0.0f), Quaternion(1.0f, Vec3(0.0f, 0.0f, 0.0f)), Vec3(4.0f, 4.0f, 4.0f));
-	body = new Body(&transform, Vec3(), Vec3(), 1);
+	transform = Transform(Vec3(0.0f, 0.0f, 0.0f), Quaternion(1.0f, Vec3(0.0f, 0.0f, 0.0f)), Vec3(4.0f, 4.0f, 4.0f));//initialize the transform
+	body = new Body(&transform, Vec3(), Vec3(), 1);//initialize the body
 
-
+	//set the model references
 	model = model_;
 	bulletModel = bulletModel_;
 }
@@ -28,33 +26,23 @@ FriendlyShip::FriendlyShip(Model* model_, Model* bulletModel_)
 bool FriendlyShip::OnCreate()
 {
 
-	detectionSphere = Sphere(transform.getPos(), range);
 
-	printf("Ship Created! \n");
-
-	rangeSphere = Model("Sphere.obj");
-
-	if (rangeSphere.OnCreate() == false) return false;
-	printf("Ship Created! \n");
-	rangeSphereT = transform;
-	rangeSphereT.setScale(Vec3(range, range, range)); //sphere mesh has radius of 2 units wo when we scale it by range we have to divide to get the actual range
-	//we may want to go into 3dsmax and make a unit sphere 
-
-
-
+	detectionSphere = Sphere(transform.getPos(), range);//set the detection sphere pos to this object
+	rangeSphereT = transform; //set the transform for teh range sphere object
+	rangeSphereT.setScale(Vec3(range, range, range)); //sphere mesh has radius of 1 unit, so anything we scale it by will be its world space size
+	//create the sphere to handle physics collisions
 	collisionSphere = new Sphere(transform.getPos(), collisionSphereRadius);
-	speed = 5;
+
+	speed = 5;//set the ship's speed
 	return true;
 }
 
 void FriendlyShip::OnDestroy()
 {
+	model = nullptr; //avoid dangling pointers
+	bulletModel = nullptr;
 
-	model = nullptr;
-
-	rangeSphere.OnDestroy();
-
-	exhaustTrail.OnDestroy();
+	exhaustTrail.OnDestroy(); //destroy the exhaust trail
 
 	delete collisionSphere;
 
@@ -62,43 +50,64 @@ void FriendlyShip::OnDestroy()
 		bullet->OnDestroy();
 		delete bullet;
 	}
-
-	delete model;
-
-
-
 }
 
 void FriendlyShip::Update(const float deltaTime)
 {
+	ResetFire(deltaTime);
+	UpdateBullet(deltaTime);
+	StopSound3DLooped();
+	ShipMovement(deltaTime);
 
-	if (!canFire) {
+	if (displayRange) {
+		rangeSphereT.setPos(detectionSphere.center);
+	}
+
+	exhaustTrail.modelMat = transform.toModelMatrix();
+}
+
+
+void FriendlyShip::ResetFire(const float deltaTime)
+{
+	if (!canFire) { //if I'm unable to shoot
+
+		//add to the count down
 		timeSinceShot += deltaTime;
+		//whether I can shoot again is dictated by the time since my last shot and whether I'm moving or not
 		canFire = timeSinceShot >= rateOfFire && !isMoving;
 	}
+}
+
+
+void FriendlyShip::UpdateBullet(const float deltaTime)
+{
 
 	for (int i = 0; i < bullets.size(); i++) {
 		bullets[i]->Update(deltaTime);
 		if (bullets[i]->deleteMe) {
+			//if a bullet has set its flag saying it needs to be destroyed, destroy it and free up the vector
 			bullets[i]->OnDestroy();
 			delete bullets[i];
 			bullets[i] = nullptr;
 			bullets.erase(std::remove(bullets.begin(), bullets.end(), nullptr), bullets.end());
 		}
 	}
+}
 
-	if (HasReachDestination()) {
-		isMoving = false;
 
-		bool HappenOnce = true;
-		if (HappenOnce == true && isMoving == false)
-		{
-			//SoundEngineFlying->stopAllSounds();
-			audioManager->StopSound3DLooped(rocketSoundIndex);
-			HappenOnce = false;
-		}
+void FriendlyShip::StopSound3DLooped()
+{
+
+	//on the frame we stop moving (happenonce) we want to stop the moving sound
+	if (HappenOnce == true && isMoving == false)
+	{
+		audioManager->StopSound3DLooped(rocketSoundIndex);
+		HappenOnce = false;
 	}
+}
 
+void FriendlyShip::ShipMovement(const float deltaTime)
+{
 	if (wouldIntersectPlanet) {
 		Orbit(orbitAxis);
 		CheckIntersection(transform.getPos());
@@ -109,54 +118,57 @@ void FriendlyShip::Update(const float deltaTime)
 		slerpT = slerpT >= 1 ? 1 : slerpT + deltaTime;
 		body->Update(deltaTime);
 		RotateTowardTarget(movingDirection);
-		isMoving = VMath::mag(destination - transform.getPos()) > 0.01;
+		isMoving = !HasReachDestination();
+
 	}
 	else {
 		body->vel = Vec3();
 	}
 
 	if (isChasing && !activeTarget->deleteMe) { //if player clicks on a ship then on an enemy the ship enters chasing mode
-		destination = activeTarget->transform.getPos(); //set the destination to the enemy's pos
-		MoveToDestination(destination);
-		//isMoving = VMath::mag(destination - transform.getPos()) > 0.01; //check if we've already reached the enemy
-		if (COLLISION::SphereSphereCollisionDetected(&detectionSphere, activeTarget->collisionSphere)) {
-			//reset the variables
-			isMoving = false;
-			activeTarget = nullptr;
-			isChasing = false;
-		}
-		else {
-			isMoving = true;
-
-		}
+		ChasingEnemy();
 	}
 
+
+	//update all the ship's "children" so they stay with the ship 
 	detectionSphere.center = transform.getPos();//update teh collision sphere to match the ships position
 	collisionSphere->center = transform.getPos();
-
-
+	exhaustTrail.modelMat = transform.toModelMatrix();
 	if (displayRange) {
 		rangeSphereT.setPos(detectionSphere.center);
 	}
 
 
-	exhaustTrail.modelMat = transform.toModelMatrix();
+
+
+
+}
+
+void FriendlyShip::ChasingEnemy()
+{
+	destination = activeTarget->transform.getPos(); //set the destination to the enemy's pos
+	MoveToDestination(destination);
+	if (COLLISION::SphereSphereCollisionDetected(&detectionSphere, activeTarget->collisionSphere)) {
+		//reset the variables
+		isMoving = false;
+		activeTarget = nullptr;
+		isChasing = false;
+
+	}
+	else {
+		isMoving = true;
+	}
 
 }
 
 void FriendlyShip::Render(Shader* shader) const
 {
 
-	model->BindTextures(0, 0);
-
+	model->BindTextures(0, 0); //bind teh first texture associated with the friendly ship model 
+	//then render
 	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, transform.toModelMatrix());
-
 	model->mesh->Render(GL_TRIANGLES);
-
 	model->UnbindTextures();
-
-
-
 
 }
 
@@ -174,8 +186,7 @@ void FriendlyShip::RenderRange(Shader* shader) const
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, rangeSphereT.toModelMatrix());
 		glUniform4fv(shader->GetUniformID("meshColor"), 1, Vec4(0.2, 0.3, 0.5, 0.4));
-		//glUniform4fv(shader->GetUniformID("meshColor"), 1, color);
-		rangeSphere.mesh->Render(GL_LINES);
+		rangeSphere->mesh->Render(GL_LINES);
 		glDisable(GL_BLEND);
 	}
 }
@@ -204,8 +215,6 @@ void FriendlyShip::Fire()
 	canFire = false;
 	timeSinceShot = 0;
 
-	// Calculate the direction the ship is facing
-
 
 	// Add some randomness to the direction to simulate flak guns
 	float randomOffsetX = static_cast<float>(rand()) / RAND_MAX - 1.0f;
@@ -223,25 +232,8 @@ void FriendlyShip::Fire()
 
 	// Audio
 	Vec3 bulletSpawn = transform.getPos();
-	audioManager->PlaySound3D("Ship_SHooting", transform.getPos());
-	//irrklang::vec3df position(bulletSpawn.x, bulletSpawn.y, bulletSpawn.z);
-	//int RandomChance = rand() % 3 + 1; // Random number From 1 to 3
-	//if (RandomChance == 1)
-	//{
-	//	SoundEngine->play3D("audio/LaserShooting.mp3", position, false); // Audio For Shooting Noise
-	//	SoundEngine->setSoundVolume(1.0f);
-	//}
-	//if (RandomChance == 2)
-	//{
-	//	SoundEngine->play3D("audio/DisturbedShooting.mp3", position, false); // Audio For Shooting Noise
-	//	SoundEngine->setSoundVolume(1.0f);
+	audioManager->PlaySound3D("Ship_Shooting", transform.getPos());
 
-	//}
-	//if (RandomChance == 3)
-	//{
-	//	SoundEngine->play3D("audio/PewShoot.mp3", position, false); // Audio For Shooting Noise
-	//	SoundEngine->setSoundVolume(1.0f);
-	//}
 }
 
 
@@ -249,8 +241,7 @@ void FriendlyShip::MoveToDestination(Vec3 destination_)
 {
 	destination = destination_;
 	isMoving = true;
-
-	rocketSoundIndex = audioManager->PlaySound3DLooped("Rocket_Loop", transform.getPos());
+	HappenOnce = true;
 
 	CheckIntersection(transform.getPos());
 
@@ -264,7 +255,7 @@ void FriendlyShip::MoveToDestination(Vec3 destination_)
 void FriendlyShip::CheckIntersection(Vec3 initailPosition)
 {
 	float angle = acos(VMath::dot(VMath::normalize(initailPosition - ORIGIN), VMath::normalize(initailPosition - destination)));
-	wouldIntersectPlanet = VMath::mag(initailPosition - ORIGIN) * sin(angle) < PLANET_RADIUS + collisionSphereRadius;
+	wouldIntersectPlanet = angle > IM_PI / 2 ? false : VMath::mag(initailPosition - ORIGIN) * sin(angle) < PLANET_RADIUS + collisionSphereRadius;
 }
 
 void FriendlyShip::Orbit(Vec3 axis)

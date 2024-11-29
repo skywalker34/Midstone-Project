@@ -6,17 +6,32 @@
 //From Game Physics
 using namespace MATHEX;
 using namespace MATH;
-// Instead of a class, let’s put all the collision equations in a namespace.
-// I got this idea from the book "Beautiful C++: 30 Core Guidelines for Writing
-// Clean, Safe, and Fast Code" 
-namespace COLLISION {
-	// Checks if two spheres have collided and return true or false.
-	bool SphereSphereCollisionDetected(const Sphere* body1, const Sphere* body2);
-	bool LineSphereCollisionDetected(const Sphere* body, const DualQuat line);
-	bool SpherePointCollisionDetected(const Sphere* body, const Vec3 pos);
 
-	// If a collision has occurred do something
-	//void SphereSphereCollisionResponse(Sphere* body1, Sphere* body2);
+namespace COLLISION {
+    /// <summary>
+    /// Checks if two spheres have collided and returns true or false.
+    /// </summary>
+    /// <param name="body1">Pointer to the first sphere.</param>
+    /// <param name="body2">Pointer to the second sphere.</param>
+    /// <returns>Returns true if the spheres have collided, otherwise false.</returns>
+    bool SphereSphereCollisionDetected(const Sphere* body1, const Sphere* body2);
+
+    /// <summary>
+    /// Checks if a line (defined as a dual quaternion) and a sphere have collided.
+    /// </summary>
+    /// <param name="body">Pointer to the sphere.</param>
+    /// <param name="line">The dual quaternion representing the line.</param>
+    /// <returns>Returns true if the line and sphere have collided, otherwise false.</returns>
+    bool LineSphereCollisionDetected(const Sphere* body, const DualQuat line);
+
+    /// <summary>
+    /// Checks if a point (in space) and a sphere have collided.
+    /// </summary>
+    /// <param name="body">Pointer to the sphere.</param>
+    /// <param name="pos">The position of the point in space.</param>
+    /// <returns>Returns true if the point and sphere have collided, otherwise false.</returns>
+    bool SpherePointCollisionDetected(const Sphere* body, const Vec3 pos);
 }
+
 
 #endif

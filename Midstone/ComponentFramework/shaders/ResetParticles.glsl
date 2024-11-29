@@ -16,9 +16,6 @@ layout(binding = 1) buffer layoutVel
     vec3 vel[];
 } buf2;
 
-
-
-
 void main()
 {
     uint index = gl_GlobalInvocationID.x + yDispatch * gl_GlobalInvocationID.y;

@@ -1,7 +1,7 @@
 #include <glew.h>
 #include <iostream>
 #include <SDL.h>
-#include "SceneUI2.h"
+#include "SceneMainMenu.h"
 #include <MMath.h>
 #include <QMath.h>
 #include <VMath.h>
@@ -63,8 +63,20 @@ static bool LoadTextureFromFile(const char* file_name, GLuint* out_texture, int*
 	}
 }
 
-SceneUI2::SceneUI2(Window* window_) : drawInWireMode{ true }, show_demo_window {true} {
-	Debug::Info("Created Scene2g: ", __FILE__, __LINE__);
+
+void AlignForWidth2(float width, float alignment = 0.5f)
+{
+	ImGuiStyle& style = ImGui::GetStyle();
+	float avail = ImGui::GetContentRegionAvail().x;
+	float off = (avail - width) * alignment;
+	if (off > 0.0f)
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
+}
+
+
+SceneMainMenu::SceneMainMenu(Window* window_) {
+
+	Debug::Info("Created Main Menu: ", __FILE__, __LINE__);
 	window = window_;
 
 	// ImGUI stuff for initialize from Scotties Vid.
@@ -76,19 +88,28 @@ SceneUI2::SceneUI2(Window* window_) : drawInWireMode{ true }, show_demo_window {
 	// Setup Platform/Renderer backends
 	ImGui_ImplSDL2_InitForOpenGL(window->getWindow(), window->getContext());
 	ImGui_ImplOpenGL3_Init("#version 450");
-}
 
-SceneUI2::~SceneUI2() {
-	Debug::Info("Deleted Scene2g: ", __FILE__, __LINE__);
+	// Load the font 
+	io.Fonts->AddFontFromFileTTF("./fonts/Galaksi.ttf", 16.0f);
 
-
-}
-
-bool SceneUI2::OnCreate() {
-	Debug::Info("Loading assets Scene2g: ", __FILE__, __LINE__);
+	options.readOptions("options.txt");
+	volumeSlider = options.musicVol;
+	sfxSlider = options.sfxVol;
+	shipColor = ImVec4(options.shipColour.x, options.shipColour.y, options.shipColour.z, options.shipColour.w);
 
 	SoundEngine->play2D("audio/BackGroundMusic3.mp3", true); // Audio For Main Screen
-	
+
+
+}
+
+SceneMainMenu::~SceneMainMenu() {
+	Debug::Info("Deleted Main Menu: ", __FILE__, __LINE__);
+
+
+}
+
+bool SceneMainMenu::OnCreate() {
+	Debug::Info("Loading assets Main Menu: ", __FILE__, __LINE__);
 
 	printf("On Create finished!!!!!");
 	return true;
@@ -96,8 +117,10 @@ bool SceneUI2::OnCreate() {
 
 }
 
-void SceneUI2::OnDestroy() {
-	Debug::Info("Deleting assets Scene0: ", __FILE__, __LINE__);
+void SceneMainMenu::OnDestroy() {
+	Debug::Info("Deleting assets SceneMainMenu: ", __FILE__, __LINE__);
+
+	options.SaveOptions("options.txt", volumeSlider, sfxSlider, Vec4(shipColor.x, shipColor.y, shipColor.z, shipColor.w));
 
 	// Cleanup
 	ImGui_ImplOpenGL3_Shutdown();
@@ -106,33 +129,26 @@ void SceneUI2::OnDestroy() {
 	SoundEngine->drop(); // Removes Sound from scene
 }
 
-void SceneUI2::HandleEvents(const SDL_Event& sdlEvent) 
+void SceneMainMenu::HandleEvents(const SDL_Event& sdlEvent) 
 {
 	ImGui_ImplSDL2_ProcessEvent(&sdlEvent); // ImGui HandleEvents
 }
 
-void SceneUI2::Update(const float deltaTime) 
+void SceneMainMenu::Update(const float deltaTime) 
+{
+	SoundEngine->setSoundVolume(volumeSlider);
+}
+
+void SceneMainMenu::Render() 
 {
 }
 
-void SceneUI2::Render() 
+void SceneMainMenu::RenderIMGUI()
 {
-	/// Set the background color then clear the screen
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// IMGUI STUFF
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame();
-
-	//This is the font stuff if you can find a working one then yeah. But otherwise im gonna keep it default for now.
-	//ImGuiIO& io = ImGui::GetIO();
-	//ImFontConfig config;
-	//config.OversampleH = 2;
-	//io.Fonts->AddFontDefault();
-	//ImFont* font_title = io.Fonts->AddFontFromFileTTF("./fonts/Comic Sans MS.ttf", 23.0f, &config);
-	//IM_ASSERT(font_title != NULL);
-	//io.Fonts->Build();
 
 	ImGui::NewFrame();
 
@@ -143,21 +159,49 @@ void SceneUI2::Render()
 	IM_ASSERT(ret);
 	ImDrawList* drawList = ImGui::GetBackgroundDrawList();
 	ImVec2 image_pos = ImVec2(0, 0); // Set image position
-	drawList->AddImage((ImTextureID)(intptr_t)my_image_texture, image_pos, ImVec2(my_image_width / 1.5, my_image_height / 1.5));
+	drawList->AddImage((ImTextureID)(intptr_t)my_image_texture, image_pos, ImVec2(my_image_width / 0.85, my_image_height / 0.85));
 
 	bool p_open = false;
+	float width = 0.0f;
 	ImGui::Begin("A START BUTTON MAYBE?", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-	//ImGui::PushFont(font_title);
 	if (ImGui::Button("START GAME", ImVec2(300, 90)))
 		switchButton = true;
-	//ImGui::PopFont();
 	ImGui::End();
 
-	//ImGui::ShowDemoWindow();
+	//Begin Main Menu Options
+	ImGui::Begin("Main Menu Options", &p_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+	ImGui::SetWindowFontScale(2.0);
+	width = ImGui::CalcTextSize("Options").x;
+	AlignForWidth2(width);
+	ImGui::Text("Options", ImGuiWindowFlags_AlwaysAutoResize);
+
+	//Okay so sliders are working.
+	const ImGuiSliderFlags flags_for_sliders = ImGuiSliderFlags_None;
+	ImGui::SetWindowFontScale(1.2);
+	width = ImGui::CalcTextSize("Music Volume").x;
+	AlignForWidth2(width);
+	ImGui::Text("Music Volume");
+	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
+	ImGui::SliderFloat("##1", &volumeSlider, 0.0f, 1.0f, "%.3f", flags_for_sliders);
+	width = ImGui::CalcTextSize("Sfx Volume").x;
+	AlignForWidth2(width);
+	ImGui::Text("Sfx Volume");
+	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
+	ImGui::SliderFloat("##2", &sfxSlider, 0.0f, 1.0f, "%.3f", flags_for_sliders);
+
+	//Primary Color Slider works
+	width = ImGui::CalcTextSize("Ship Color").x;
+	AlignForWidth2(width);
+	ImGui::Text("Ship Color");
+	//Probably store this in scene so we can pass it to the shader (NOW IN 3g.h file)
+	ImGui::ColorButton("MyColor##3c", *(ImVec4*)&shipColor, ImGuiColorEditFlags_NoBorder, ImVec2(ImGui::GetWindowWidth() * 0.95f, 20));
+	ImGui::ColorPicker3("##MyColor##5", (float*)&shipColor, ImGuiColorEditFlags_PickerHueBar | ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoAlpha);
+
+	//End Pause Menu
+	ImGui::End();
+
 	ImGui::Render(); // Calling This before CurrentScene render wont work
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-	glUseProgram(0);
 }
 
 

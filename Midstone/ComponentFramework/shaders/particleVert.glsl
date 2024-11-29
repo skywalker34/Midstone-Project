@@ -23,22 +23,19 @@ out vec4 color;
 
 
 void main() {
-//    vec3 position = (modelMatrix * vVertex).xyz;
-//
-//    //color = vec4(buf.data[gl_VertexID], 0.0);
-//
-//    position += buf.data[gl_VertexID];
 
+    //pull the position from the buf that was written from teh compute shader (all local model spaces)
     vec4 localPos =   vec4(buf.data[gl_VertexID], 1.0);
 
-    vec4 nearColor = vec4(1,1,1,1);
-    vec4 farColor = vec4(1.0f, 0.6f, 0.0f, 1.0f);
+    
+    vec4 nearColor = vec4(1,1,1,1);//color to be used for particles near the origin (white)
+    vec4 farColor = vec4(1.0f, 0.6f, 0.0f, 1.0f);//color to be used for paritcles far from the origin (orange)
 
-    color = mix(nearColor, farColor, length(localPos) / 2.4);
+    color = mix(nearColor, farColor, length(localPos) / 2.4); //lerp to get what color the particle should be
 
-    vec3 position = (modelMatrix * localPos).xyz;
+    vec3 position = (modelMatrix * localPos).xyz; //get teh position
 
-
+    //pass it off to the frag
     gl_Position = projectionMatrix * viewMatrix * vec4(position, 1.0);
     
 }

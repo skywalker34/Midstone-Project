@@ -16,29 +16,21 @@ public:
 	
 	
 private:
+	//different scenes that can be loaded
 	enum class SCENE_NUMBER {
-		SCENE0g = 0,
-		SCENE0p,
-		SCENE1g,
-		SCENE2g,
-		SCENE2,
-		SCENE3g,
-		SCENE4,
-		SCENE5g,
-		SCENE6,
-		SCENEUI,
-		SCENEUI2,
+		SCENEGAMEPLAY,
+		SCENEMAINMENU,
 		SCENEGAMEOVER
 	};
 
-	class Scene* currentScene;
+	class Scene* currentScene; //scene taht is running
 	class Timer* timer;
 	class Window* window;
 	
-	unsigned int fps;
-	bool isRunning;
-	bool fullScreen;
-	bool mainMenu = false;
+	unsigned int fps; //frame rate 
+	bool isRunning; //whetehr teh game is running or noo
+	bool fullScreen; //whther to run in fullscreen or not (this is a thing????)
+	bool mainMenu = false; //whether the atcive scene is the main menu or not
 	bool BuildNewScene(SCENE_NUMBER scene_);
 };
 

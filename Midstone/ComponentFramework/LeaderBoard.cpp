@@ -34,6 +34,3 @@ void sortLeaderboardByScore(std::vector<Leaderboard>& leaderboard) {
     });
 }
 
-//void writeLeaderboard(const std::string& filename, std::vector<LeaderboardEntry>& leaderboard)
-//{
-//}
