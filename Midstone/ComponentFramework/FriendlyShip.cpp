@@ -137,11 +137,6 @@ void FriendlyShip::ShipMovement(const float deltaTime)
 	if (displayRange) {
 		rangeSphereT.setPos(detectionSphere.center);
 	}
-
-
-
-
-
 }
 
 void FriendlyShip::ChasingEnemy()
@@ -153,12 +148,10 @@ void FriendlyShip::ChasingEnemy()
 		isMoving = false;
 		activeTarget = nullptr;
 		isChasing = false;
-
 	}
 	else {
 		isMoving = true;
 	}
-
 }
 
 void FriendlyShip::Render(Shader* shader) const
@@ -169,7 +162,6 @@ void FriendlyShip::Render(Shader* shader) const
 	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, transform.toModelMatrix());
 	model->mesh->Render(GL_TRIANGLES);
 	model->UnbindTextures();
-
 }
 
 void FriendlyShip::RenderBullets(Shader* shader) const
@@ -233,7 +225,6 @@ void FriendlyShip::Fire()
 	// Audio
 	Vec3 bulletSpawn = transform.getPos();
 	audioManager->PlaySound3D("Ship_Shooting", transform.getPos());
-
 }
 
 
@@ -260,7 +251,7 @@ void FriendlyShip::CheckIntersection(Vec3 initailPosition)
 
 void FriendlyShip::Orbit(Vec3 axis)
 {
-	Quaternion newPosition = QMath::angleAxisRotation(1.0f, axis);
+	Quaternion newPosition = QMath::angleAxisRotation(-1.0f, axis);
 	movingDirection = QMath::rotate(transform.getPos(), newPosition) - transform.getPos();
 	if (slerpT >= 1) {
 		Quaternion rotationQuad = QMath::lookAt(movingDirection, UP);
