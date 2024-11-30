@@ -145,7 +145,7 @@ void SceneGameOver::RenderIMGUI()
 	int my_image_height = 0;
 	GLuint my_image_texture = 0;
 	//PUT NEW IMAGE HERE
-	bool ret = LoadTextureFromFile("./textures/GameOverPhoto.png", &my_image_texture, &my_image_width, &my_image_height);
+	bool ret = LoadTextureFromFile("./textures/GameOverPhoto.jpg", &my_image_texture, &my_image_width, &my_image_height);
 	IM_ASSERT(ret);
 	ImDrawList* drawList = ImGui::GetBackgroundDrawList();
 	ImVec2 image_pos = ImVec2(0, 0); // Set image position
