@@ -206,9 +206,9 @@ void SceneGameplay::OnDestroy() {
 
 	audioManager->OnDestroy();
 	delete audioManager;
-	
 
-	
+
+
 	//CLEANUP GUI
 
 	options.SaveOptions("options.txt", volumeSlider, sfxSlider, Vec4(shipColor.x, shipColor.y, shipColor.z, shipColor.w));
@@ -219,7 +219,7 @@ void SceneGameplay::OnDestroy() {
 	ImGui::DestroyContext();
 
 	SoundEngine->drop();
-	
+
 
 	window = nullptr; //prevent dangling pointers
 
@@ -260,9 +260,6 @@ void SceneGameplay::Update(const float deltaTime) {
 	SoundEngine->setSoundVolume(volumeSlider);
 	//SFX VOL
 	audioManager->SoundEngine->setSoundVolume(sfxSlider);
-
-
-
 
 	if (!isGameRunning) return; //if the game is not running (paused) just return so nothing happens
 	//call the individual updat functions / methods
@@ -506,10 +503,10 @@ void SceneGameplay::RenderIMGUI()
 		//If our name is somehow bigger than our buffer.
 		if (length >= sizeof(buffer))
 		{
-			length = sizeof(buffer) - 1; 
+			length = sizeof(buffer) - 1;
 		}
 		std::memcpy(buffer, nameEntry.c_str(), length);
-		buffer[length] = '\0'; 
+		buffer[length] = '\0';
 		ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.93f);
 		if (ImGui::InputText("##EnterName", buffer, sizeof(buffer))) nameEntry = buffer;
 		width = 150.0f;

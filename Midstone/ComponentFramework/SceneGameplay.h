@@ -48,12 +48,12 @@ private:
 	Shader* particleShader = nullptr; //uses a vertex distance between itself and the orifgin for colour gradient effect
 
 	//COMPUTE SHADERS (for paticle systems)
-	ComputeShader* computeShader = nullptr; //applies a force to particles within a conical direction for jet streams
+	ComputeShader* computeExhaust = nullptr; //applies a force to particles within a conical direction for jet streams
 	ComputeShader* computeExplosion = nullptr; //applies a random force outward from a point, creating an explosion effect
 	ComputeShader* computeReset = nullptr; //reset compute shader particles to their origin
 	Shader* loadVertsToBuffer = nullptr; //not a compute shader but neccessary for their ussage. isolate the vertex pos on the GPU fro the buffer and write it to a unique buffer used by compute shaders
 	Shader* lineShader = nullptr; //shader to render the lines
-	
+
 	Mesh* particleMesh; //mesh used for particle systems  (edited in notepad to be a couple thousand of verts stacked on the origin)
 
 
@@ -73,7 +73,7 @@ private:
 	Actor cursorSphere;
 	Actor enemySelectionSphere;
 
-	
+
 	//SCENE ACTORS
 	Planet planet;
 	std::vector<FriendlyShip*> playerFleet;
@@ -86,14 +86,14 @@ private:
 	PlayerController playerController;//how the player interfaces with the game world
 	std::vector<Explosion*> explosions; //list of explosion particle effects
 	std::vector<EnemySpawner> enemyFleetSpawners; //list of enemy fleet spawners
-	
+
 
 
 	//MISC
 
 	Vec3 lightPos = Vec3(0.0f, 0.0f, 150.0f); //world light pos
 
-	
+
 
 	Vec3 shipWaypoint; //holds a position for a ship to move to 
 
@@ -109,7 +109,7 @@ private:
 	int activeShip = -1; //holds the id of the player ship that is being commanded (set to -1 if null)
 	int startingFleetSize = 5; //how many ships the player/enenmy starts with
 	int enemyIndex = 0; //uniquee enenmy index (increments when enemies are created)
-	
+
 
 
 	int startingExplosions = 10; //we're going to create 10 explosions and recycle them whenever an enemy blows up.
@@ -121,7 +121,7 @@ private:
 	int score = 0; //player score (incremented when an enenmy is killed)
 	const int ENEMY_DEFAULT_HEALTH = 5;
 
-	
+
 	bool isGameRunning = true; //used to pause the game
 	bool isGivingOrders = false;//used when giving commands to ships
 	bool isMouseOverShip = false;//whetehr or not the player is hovering their mouse over a ship (any ship)
@@ -141,8 +141,6 @@ private:
 	std::string nameEntry = "Enter Name Here";
 
 	Options options;
-
-	void SaveStats();
 
 public:
 
