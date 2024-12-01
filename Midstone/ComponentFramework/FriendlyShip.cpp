@@ -97,7 +97,6 @@ void FriendlyShip::UpdateBullet(const float deltaTime)
 
 void FriendlyShip::StopSound3DLooped()
 {
-
 	//on the frame we stop moving (happenonce) we want to stop the moving sound
 	if (HappenOnce == true && isMoving == false)
 	{
@@ -141,8 +140,10 @@ void FriendlyShip::ShipMovement(const float deltaTime)
 
 void FriendlyShip::ChasingEnemy()
 {
-	destination = activeTarget->transform.getPos(); //set the destination to the enemy's pos
-	MoveToDestination(destination);
+	destination = activeTarget->transform.getPos(); // set the destination to the enemy's pos
+	if (!isMoving) {								// Only run this once so slerp doesn't reset
+		MoveToDestination(destination);
+	}
 	if (COLLISION::SphereSphereCollisionDetected(&detectionSphere, activeTarget->collisionSphere)) {
 		//reset the variables
 		isMoving = false;
